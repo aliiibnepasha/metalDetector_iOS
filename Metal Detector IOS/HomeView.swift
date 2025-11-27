@@ -9,6 +9,7 @@ import SwiftUI
 
 struct HomeView: View {
     var onSettingsTap: () -> Void
+    var onDetectorTap: (String) -> Void
     
     var body: some View {
         ZStack {
@@ -72,37 +73,55 @@ struct HomeView: View {
                         // Gold Detector Card
                         FeatureCard(
                             backgroundImageName: "Gold Detector",
-                            title: "Gold Detector"
+                            title: "Gold Detector",
+                            onTap: {
+                                onDetectorTap("Gold Detector")
+                            }
                         )
                         
                         // Metal Detector Card
                         FeatureCard(
                             backgroundImageName: "Metal Detector",
-                            title: "Metal Detector"
+                            title: "Metal Detector",
+                            onTap: {
+                                onDetectorTap("Metal Detector")
+                            }
                         )
                         
                         // Stud Finder Card
                         FeatureCard(
                             backgroundImageName: "Stud Finder",
-                            title: "Stud Finder"
+                            title: "Stud Finder",
+                            onTap: {
+                                onDetectorTap("Stud Finder")
+                            }
                         )
                         
                         // Handled Detector Card
                         FeatureCard(
                             backgroundImageName: "Handled Detector",
-                            title: "Handled Detector"
+                            title: "Handled Detector",
+                            onTap: {
+                                onDetectorTap("Handled Detector")
+                            }
                         )
                         
                         // Digital Compass Card
                         FeatureCard(
                             backgroundImageName: "Digital Compass",
-                            title: "Digital Compass"
+                            title: "Digital Compass",
+                            onTap: {
+                                onDetectorTap("Digital Compass")
+                            }
                         )
                         
                         // Bubble Level Card
                         FeatureCard(
                             backgroundImageName: "Bubble level",
-                            title: "Bubble level"
+                            title: "Bubble level",
+                            onTap: {
+                                onDetectorTap("Bubble level")
+                            }
                         )
                     }
                     .padding(.top, 24)
@@ -116,10 +135,11 @@ struct HomeView: View {
 struct FeatureCard: View {
     let backgroundImageName: String
     let title: String
+    var onTap: (() -> Void)?
     
     var body: some View {
         Button(action: {
-            // Handle card tap
+            onTap?()
         }) {
             ZStack {
                 // Background Image
@@ -158,6 +178,6 @@ struct FeatureCard: View {
 }
 
 #Preview {
-    HomeView(onSettingsTap: {})
+    HomeView(onSettingsTap: {}, onDetectorTap: { _ in })
 }
 

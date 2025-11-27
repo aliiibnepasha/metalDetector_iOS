@@ -13,6 +13,7 @@ enum IntroRoute: Hashable {
     case intro3
     case home
     case settings
+    case detector(String) // Store detector title
 }
 
 struct RootView: View {
@@ -22,46 +23,59 @@ struct RootView: View {
     var body: some View {
         ZStack {
             NavigationStack(path: $navigationPath) {
-                Intro1View(
-                    onNext: {
-                        navigationPath.append(IntroRoute.intro2)
-                    },
-                    onSkip: {
-                        navigationPath.append(IntroRoute.intro2)
+                IntroOnboardingView(
+                    onGetStarted: {
+                        navigationPath.append(IntroRoute.home)
                     }
                 )
                 .navigationDestination(for: IntroRoute.self) { route in
                     switch route {
-                    case .intro2:
-                        Intro2View(
-                            onNext: {
-                                navigationPath.append(IntroRoute.intro3)
-                            },
-                            onSkip: {
-                                navigationPath.append(IntroRoute.intro3)
-                            }
-                        )
-                        .navigationBarBackButtonHidden(true)
-                        .navigationBarHidden(true)
-                    case .intro3:
-                        Intro3View(
-                            onGetStarted: {
-                                navigationPath.append(IntroRoute.home)
-                            },
-                            onSkip: {
-                                navigationPath.append(IntroRoute.home)
-                            }
-                        )
-                        .navigationBarBackButtonHidden(true)
-                        .navigationBarHidden(true)
                     case .home:
                         HomeView(
                             onSettingsTap: {
                                 navigationPath.append(IntroRoute.settings)
+                            },
+                            onDetectorTap: { title in
+                                navigationPath.append(IntroRoute.detector(title))
                             }
                         )
                         .navigationBarBackButtonHidden(true)
                         .navigationBarHidden(true)
+                    case .detector(let title):
+                        if title == "Handled Detector" {
+                            HandledDetectorView(
+                                onBackTap: {
+                                    navigationPath.removeLast()
+                                }
+                            )
+                            .navigationBarBackButtonHidden(true)
+                            .navigationBarHidden(true)
+                        } else if title == "Digital Compass" {
+                            CompassDetectorView(
+                                onBackTap: {
+                                    navigationPath.removeLast()
+                                }
+                            )
+                            .navigationBarBackButtonHidden(true)
+                            .navigationBarHidden(true)
+                        } else if title == "Bubble level" {
+                            BubbleLevelView(
+                                onBackTap: {
+                                    navigationPath.removeLast()
+                                }
+                            )
+                            .navigationBarBackButtonHidden(true)
+                            .navigationBarHidden(true)
+                        } else {
+                            DetectorView(
+                                detectorTitle: title,
+                                onBackTap: {
+                                    navigationPath.removeLast()
+                                }
+                            )
+                            .navigationBarBackButtonHidden(true)
+                            .navigationBarHidden(true)
+                        }
                     case .settings:
                         SettingsView(
                             onBackTap: {
@@ -70,7 +84,7 @@ struct RootView: View {
                         )
                         .navigationBarBackButtonHidden(true)
                         .navigationBarHidden(true)
-                    case .intro1:
+                    case .intro1, .intro2, .intro3:
                         EmptyView()
                     }
                 }

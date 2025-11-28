@@ -10,6 +10,7 @@ import SwiftUI
 struct HomeView: View {
     var onSettingsTap: () -> Void
     var onDetectorTap: (String) -> Void
+    var onProTap: (() -> Void)? = nil
     
     var body: some View {
         ZStack {
@@ -29,7 +30,7 @@ struct HomeView: View {
                     
                     // Pro Button (Crown)
                     Button(action: {
-                        // Handle pro action
+                        onProTap?()
                     }) {
                         ZStack {
                             Image("Pro Button Background")

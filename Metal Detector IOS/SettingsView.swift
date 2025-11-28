@@ -10,6 +10,7 @@ import SwiftUI
 struct SettingsView: View {
     @State private var rotationAngle: Double = 0
     var onBackTap: () -> Void
+    var onGetPremiumTap: (() -> Void)? = nil
     
     var body: some View {
         ZStack {
@@ -60,7 +61,7 @@ struct SettingsView: View {
                                 
                                 // Get Premium Button
                                 Button(action: {
-                                    // Handle get premium
+                                    onGetPremiumTap?()
                                 }) {
                                     ZStack {
                                         // Background from assets

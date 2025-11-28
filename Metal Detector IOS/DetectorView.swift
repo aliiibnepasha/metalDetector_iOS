@@ -15,6 +15,8 @@ struct DetectorView: View {
     var onGraphViewTap: (() -> Void)? = nil
     var onDigitalViewTap: (() -> Void)? = nil
     var onSensorViewTap: (() -> Void)? = nil
+    var onCalibrationViewTap: (() -> Void)? = nil
+    var onMagneticViewTap: (() -> Void)? = nil
     
     var body: some View {
         ZStack {
@@ -100,14 +102,20 @@ struct DetectorView: View {
                             ViewCard(
                                 backgroundImageName: "Calibration View Background",
                                 title: "Calibration view",
-                                lottieName: "Weighing Scale"
+                                lottieName: "Weighing Scale",
+                                onTap: {
+                                    onCalibrationViewTap?()
+                                }
                             )
                             
                             // Magnetic View
                             ViewCard(
                                 backgroundImageName: "Magnetic View Background",
                                 title: "Magnetic view",
-                                lottieName: "Magnet"
+                                lottieName: "Magnet",
+                                onTap: {
+                                    onMagneticViewTap?()
+                                }
                             )
                         }
                     }

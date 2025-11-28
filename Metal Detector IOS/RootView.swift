@@ -18,6 +18,9 @@ enum IntroRoute: Hashable {
     case graphView
     case digitalView
     case sensorView
+    case calibrationView
+    case magneticView
+    case paywall
 }
 
 struct RootView: View {
@@ -41,6 +44,9 @@ struct RootView: View {
                             },
                             onDetectorTap: { title in
                                 navigationPath.append(IntroRoute.detector(title))
+                            },
+                            onProTap: {
+                                navigationPath.append(IntroRoute.paywall)
                             }
                         )
                         .navigationBarBackButtonHidden(true)
@@ -87,6 +93,12 @@ struct RootView: View {
                                 },
                                 onSensorViewTap: {
                                     navigationPath.append(IntroRoute.sensorView)
+                                },
+                                onCalibrationViewTap: {
+                                    navigationPath.append(IntroRoute.calibrationView)
+                                },
+                                onMagneticViewTap: {
+                                    navigationPath.append(IntroRoute.magneticView)
                                 }
                             )
                             .navigationBarBackButtonHidden(true)
@@ -96,6 +108,9 @@ struct RootView: View {
                         SettingsView(
                             onBackTap: {
                                 navigationPath.removeLast()
+                            },
+                            onGetPremiumTap: {
+                                navigationPath.append(IntroRoute.paywall)
                             }
                         )
                         .navigationBarBackButtonHidden(true)
@@ -129,6 +144,37 @@ struct RootView: View {
                     case .sensorView:
                         SensorView(
                             onBackTap: {
+                                navigationPath.removeLast()
+                            }
+                        )
+                        .navigationBarBackButtonHidden(true)
+                        .navigationBarHidden(true)
+                    case .calibrationView:
+                        CalibrationView(
+                            onBackTap: {
+                                navigationPath.removeLast()
+                            }
+                        )
+                        .navigationBarBackButtonHidden(true)
+                        .navigationBarHidden(true)
+                    case .magneticView:
+                        MagneticView(
+                            onBackTap: {
+                                navigationPath.removeLast()
+                            }
+                        )
+                        .navigationBarBackButtonHidden(true)
+                        .navigationBarHidden(true)
+                    case .paywall:
+                        PaywallView(
+                            onClose: {
+                                navigationPath.removeLast()
+                            },
+                            onGoPremium: {
+                                // Handle go premium action (e.g., purchase flow)
+                                navigationPath.removeLast()
+                            },
+                            onContinueFree: {
                                 navigationPath.removeLast()
                             }
                         )

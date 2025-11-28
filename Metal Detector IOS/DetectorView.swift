@@ -11,6 +11,10 @@ import Lottie
 struct DetectorView: View {
     let detectorTitle: String
     var onBackTap: () -> Void
+    var onMeterViewTap: (() -> Void)? = nil
+    var onGraphViewTap: (() -> Void)? = nil
+    var onDigitalViewTap: (() -> Void)? = nil
+    var onSensorViewTap: (() -> Void)? = nil
     
     var body: some View {
         ZStack {
@@ -50,14 +54,20 @@ struct DetectorView: View {
                             ViewCard(
                                 backgroundImageName: "Meter View Background",
                                 title: "Meter view",
-                                lottieName: "meter"
+                                lottieName: "meter",
+                                onTap: {
+                                    onMeterViewTap?()
+                                }
                             )
                             
                             // Graph View
                             ViewCard(
                                 backgroundImageName: "Graph View Background",
                                 title: "Graph view",
-                                lottieName: "Graph Lottie Animation"
+                                lottieName: "Graph Lottie Animation",
+                                onTap: {
+                                    onGraphViewTap?()
+                                }
                             )
                         }
                         
@@ -67,14 +77,20 @@ struct DetectorView: View {
                             ViewCard(
                                 backgroundImageName: "Digital View Background",
                                 title: "Digital view",
-                                lottieName: "Animated compass"
+                                lottieName: "Animated compass",
+                                onTap: {
+                                    onDigitalViewTap?()
+                                }
                             )
                             
                             // Sensor View
                             ViewCard(
                                 backgroundImageName: "Sensor View Background",
                                 title: "Sensor view",
-                                lottieName: "sensor"
+                                lottieName: "sensor",
+                                onTap: {
+                                    onSensorViewTap?()
+                                }
                             )
                         }
                         
@@ -107,10 +123,11 @@ struct ViewCard: View {
     let backgroundImageName: String
     let title: String
     let lottieName: String
+    var onTap: (() -> Void)? = nil
     
     var body: some View {
         Button(action: {
-            // Handle card tap
+            onTap?()
         }) {
             ZStack {
                 // Background Image from assets

@@ -14,6 +14,10 @@ enum IntroRoute: Hashable {
     case home
     case settings
     case detector(String) // Store detector title
+    case meterView
+    case graphView
+    case digitalView
+    case sensorView
 }
 
 struct RootView: View {
@@ -71,6 +75,18 @@ struct RootView: View {
                                 detectorTitle: title,
                                 onBackTap: {
                                     navigationPath.removeLast()
+                                },
+                                onMeterViewTap: {
+                                    navigationPath.append(IntroRoute.meterView)
+                                },
+                                onGraphViewTap: {
+                                    navigationPath.append(IntroRoute.graphView)
+                                },
+                                onDigitalViewTap: {
+                                    navigationPath.append(IntroRoute.digitalView)
+                                },
+                                onSensorViewTap: {
+                                    navigationPath.append(IntroRoute.sensorView)
                                 }
                             )
                             .navigationBarBackButtonHidden(true)
@@ -86,6 +102,38 @@ struct RootView: View {
                         .navigationBarHidden(true)
                     case .intro1, .intro2, .intro3:
                         EmptyView()
+                    case .meterView:
+                        MeterView(
+                            onBackTap: {
+                                navigationPath.removeLast()
+                            }
+                        )
+                        .navigationBarBackButtonHidden(true)
+                        .navigationBarHidden(true)
+                    case .graphView:
+                        GraphView(
+                            onBackTap: {
+                                navigationPath.removeLast()
+                            }
+                        )
+                        .navigationBarBackButtonHidden(true)
+                        .navigationBarHidden(true)
+                    case .digitalView:
+                        DigitalView(
+                            onBackTap: {
+                                navigationPath.removeLast()
+                            }
+                        )
+                        .navigationBarBackButtonHidden(true)
+                        .navigationBarHidden(true)
+                    case .sensorView:
+                        SensorView(
+                            onBackTap: {
+                                navigationPath.removeLast()
+                            }
+                        )
+                        .navigationBarBackButtonHidden(true)
+                        .navigationBarHidden(true)
                     }
                 }
                 .navigationBarBackButtonHidden(true)

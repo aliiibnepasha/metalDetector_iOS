@@ -9,8 +9,7 @@ import SwiftUI
 
 struct CalibrationView: View {
     var onBackTap: () -> Void
-    @State private var calibrationValue: Double = 0.0 // Current calibration value (0-100)
-    @State private var needleRotation: Double = -90.0 // Needle rotation angle (starting from left)
+    @StateObject private var detectorManager = MetalDetectorManager.shared
     
     var body: some View {
         ZStack {
@@ -32,7 +31,7 @@ struct CalibrationView: View {
                     }
                     
                     Text("Calibration view")
-                        .font(.system(size: 23, weight: .bold, design: .serif))
+                        .font(.system(size: 20, weight: .bold, design: .serif))
                         .foregroundColor(.white)
                     
                     Spacer()
@@ -94,7 +93,8 @@ struct CalibrationView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 110, height: 90) // Based on image dimensions
-                        .rotationEffect(.degrees(needleRotation), anchor: UnitPoint(x: 0.4, y: 0.6))
+                        .rotationEffect(.degrees(detectorManager.getCalibrationNeedleRotation()), anchor: UnitPoint(x: 0.4, y: 0.6))
+                        .animation(.easeOut(duration: 0.2), value: detectorManager.detectionLevel)
                     // Needle rotates around bottom center point to indicate values on meter
                 }
                 .frame(width: 310, height: 310)
@@ -120,21 +120,11 @@ struct CalibrationView: View {
             }
         }
         .onAppear {
-            // Update needle rotation based on calibration value
-            updateNeedleRotation()
+            detectorManager.startDetection()
         }
-        .onChange(of: calibrationValue) { _ in
-            // Update needle rotation when calibration value changes
-            updateNeedleRotation()
+        .onDisappear {
+            detectorManager.stopDetection()
         }
-    }
-    
-    // Update needle rotation based on calibration value (0-100 maps to -90 to 90 degrees)
-    private func updateNeedleRotation() {
-        // Map calibration value (0-100) to rotation angle
-        // For semi-circular meter: -90 (left/min) to 90 (right/max)
-        let normalizedValue = min(100, max(0, calibrationValue))
-        needleRotation = -90 + (normalizedValue / 100.0) * 180.0
     }
 }
 

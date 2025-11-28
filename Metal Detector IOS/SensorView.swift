@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SensorView: View {
     var onBackTap: () -> Void
-    @State private var percentage: Double = 74.0 // Current percentage (0-100)
+    @StateObject private var detectorManager = MetalDetectorManager.shared
     
     var body: some View {
         ZStack {
@@ -81,7 +81,7 @@ struct SensorView: View {
                 Spacer()
                 
                 // Circular Progress Indicator
-                CircularProgressView(percentage: percentage)
+                CircularProgressView(percentage: detectorManager.detectionLevel)
                     .frame(width: 310, height: 310)
                 
                 Spacer()
@@ -103,6 +103,12 @@ struct SensorView: View {
                 Spacer()
                     .frame(height: 40)
             }
+        }
+        .onAppear {
+            detectorManager.startDetection()
+        }
+        .onDisappear {
+            detectorManager.stopDetection()
         }
     }
 }
@@ -186,6 +192,7 @@ struct CircularProgressView: View {
             Text("\(Int(percentage))%")
                 .font(.system(size: 64, weight: .bold, design: .serif))
                 .foregroundColor(.white)
+                .animation(.none, value: percentage)
         }
     }
 }

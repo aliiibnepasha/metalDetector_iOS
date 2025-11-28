@@ -9,7 +9,9 @@ import SwiftUI
 
 struct MeterView: View {
     var onBackTap: () -> Void
-    @State private var needleRotation: Double = -90 // Start at MIN position (left side)
+    @StateObject private var detectorManager = MetalDetectorManager.shared
+    @State private var soundEnabled = true
+    @State private var vibrationEnabled = true
     
     var body: some View {
         ZStack {
@@ -38,7 +40,8 @@ struct MeterView: View {
                     
                     // Sound Button
                     Button(action: {
-                        // Handle sound action
+                        soundEnabled.toggle()
+                        detectorManager.setSoundEnabled(soundEnabled)
                     }) {
                         ZStack {
                             Image("Pro Button Background")
@@ -57,7 +60,8 @@ struct MeterView: View {
                     
                     // Vibration Button
                     Button(action: {
-                        // Handle vibration action
+                        vibrationEnabled.toggle()
+                        detectorManager.setVibrationEnabled(vibrationEnabled)
                     }) {
                         ZStack {
                             Image("Pro Button Background")
@@ -86,19 +90,29 @@ struct MeterView: View {
                         .frame(maxWidth: .infinity)
                         .frame(height: 350)
                     
-                    // Needle Image (will be rotated later based on detection)
-                    // Needle is smaller - roughly 2/3 of meter radius
-                    // Circular pivot point should be exactly at bottom center of meter
+                    // Needle Image - Fixed pivot point (circle), only tip rotates
+                    // Position needle so pivot (circle) stays fixed at meter's bottom center
                     Image("Meter Needle") // User will provide this asset name
                         .resizable()
                         .scaledToFit()
                         .frame(width: 100, height: 100)
-                        .rotationEffect(.degrees(needleRotation), anchor: UnitPoint(x: 0.13, y: 0.11))
-                    // Note: Needle rotation starts at -90 degrees (MIN position, left side)
-                    // Later rotation will be updated based on detection logic
-                    // Range: -90 (MIN) to 90 (MAX) degrees
-                    // The circular pivot point at bottom center stays fixed, only needle tip rotates
-                    // ZStack bottom alignment ensures pivot point aligns with meter's bottom center
+                        // Rotate around the fixed anchor point - this keeps pivot stationary
+                        // Anchor (0.3, 0.3) = pivot circle location in needle image
+                        .rotationEffect(
+                            .degrees(detectorManager.getMeterNeedleRotation()),
+                            anchor: UnitPoint(x: 0.3, y: 0.3)
+                        )
+                        .animation(.easeOut(duration: 0.2), value: detectorManager.getMeterNeedleRotation())
+                        // Position anchor point at bottom center of meter
+                        // Anchor at (0.3, 0.3) in 100x100 image = 30px from top-left
+                        // Image center = (50, 50), anchor offset = (30-50, 30-50) = (-20, -20)
+                        // With bottom alignment, offset to align anchor at bottom center
+                        .offset(y: -20) // Move up to align anchor point (circle pivot) at bottom center
+                    // Note: Starting rotation is -170 degrees (MIN position, left side)
+                    // Needle tip starts at MIN segment end when detection level = 0
+                    // Range: -170 (MIN) to 90 (MAX) degrees (260 degrees total range)
+                    // The circular pivot point (anchor 0.3, 0.3) stays FIXED at meter's bottom center
+                    // Only the narrow needle tip rotates around this fixed pivot point
                 }
                 .frame(maxWidth: .infinity)
                 .frame(height: 350)
@@ -116,6 +130,7 @@ struct MeterView: View {
                         .foregroundColor(.white.opacity(0.7))
                 }
                 .padding(.top, 32)
+                .opacity(detectorManager.detectionLevel > 10 ? 1.0 : 0.7)
                 
                 Spacer()
                 
@@ -130,7 +145,7 @@ struct MeterView: View {
                                 .foregroundColor(.white)
                             
                             HStack(spacing: 2) {
-                                Text("41")
+                                Text(String(format: "%.0f", detectorManager.magneticFieldStrength))
                                     .font(.system(size: 18, weight: .semibold))
                                     .foregroundColor(.white)
                                 
@@ -142,21 +157,25 @@ struct MeterView: View {
                     )
                     .padding(.top, 24)
                 
-                // Axis Detection Cards
+                // Axis Detection Cards (These would need individual axis data from manager)
+                // For now showing total field strength variations
                 HStack(spacing: 12) {
-                    // X-axis Card
-                    AxisCard(title: "X-axis", value: "18")
-                    
-                    // Y-axis Card
-                    AxisCard(title: "Y-axis", value: "28")
-                    
-                    // Z-axis Card
-                    AxisCard(title: "Z-axis", value: "38")
+                    AxisCard(title: "X-axis", value: String(format: "%.0f", detectorManager.magneticFieldStrength * 0.4))
+                    AxisCard(title: "Y-axis", value: String(format: "%.0f", detectorManager.magneticFieldStrength * 0.5))
+                    AxisCard(title: "Z-axis", value: String(format: "%.0f", detectorManager.magneticFieldStrength * 0.6))
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 12)
                 .padding(.bottom, 40)
             }
+        }
+        .onAppear {
+            // Start detection when view appears
+            detectorManager.startDetection()
+        }
+        .onDisappear {
+            // Stop detection when leaving view
+            detectorManager.stopDetection()
         }
     }
 }

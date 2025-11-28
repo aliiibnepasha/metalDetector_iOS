@@ -9,8 +9,7 @@ import SwiftUI
 
 struct DigitalView: View {
     var onBackTap: () -> Void
-    @State private var meterValue: Double = 95.4 // Current meter reading (will be updated from sensor)
-    @State private var needleRotation: Double = 90.0 // Needle rotation angle (0-360 degrees)
+    @StateObject private var detectorManager = MetalDetectorManager.shared
     
     var body: some View {
         ZStack {
@@ -95,8 +94,9 @@ struct DigitalView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 130, height:130)
-                        .rotationEffect(.degrees(needleRotation), anchor: .bottom)
-                        .offset(x: 16, y: -15) // Position at top of the meter circle, slightly to the right
+                        .rotationEffect(.degrees(detectorManager.getMeterNeedleRotation() + 90), anchor: .bottom)
+                        .offset(x: 1, y: -12) // Position at top of the meter circle, slightly to the right
+                        .animation(.easeOut(duration: 0.2), value: detectorManager.detectionLevel)
                     
                     // Center value display (separate, inside the main gauge center)
                     ZStack {
@@ -110,7 +110,7 @@ struct DigitalView: View {
                             )
                         
                         // Value text (percentage/reading)
-                        Text(String(format: "%.1f", meterValue))
+                        Text(String(format: "%.1f", detectorManager.magneticFieldStrength))
                             .font(.system(size: 36, weight: .bold, design: .serif))
                             .foregroundColor(.white)
                     }
@@ -139,21 +139,11 @@ struct DigitalView: View {
             }
         }
         .onAppear {
-            // Update needle rotation based on meter value
-            updateNeedleRotation()
+            detectorManager.startDetection()
         }
-        .onChange(of: meterValue) { _ in
-            // Update needle rotation when meter value changes
-            updateNeedleRotation()
+        .onDisappear {
+            detectorManager.stopDetection()
         }
-    }
-    
-    // Update needle rotation based on meter value (0-100 maps to 0-360 degrees)
-    private func updateNeedleRotation() {
-        // Map meter value (0-100) to rotation angle (0-360 degrees)
-        // Adjust this mapping based on your sensor range
-        let normalizedValue = min(100, max(0, meterValue))
-        needleRotation = (normalizedValue / 100.0) * 360.0
     }
 }
 

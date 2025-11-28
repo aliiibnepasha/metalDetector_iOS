@@ -9,8 +9,10 @@ import SwiftUI
 
 struct GraphView: View {
     var onBackTap: () -> Void
-    @State private var graphData: [Double] = [5, 12, 8, 25, 18, 35, 28, 45, 38, 30, 42, 48]
-    @State private var cursorPosition: Double = 60.0 // X position of cursor (0-100)
+    @StateObject private var detectorManager = MetalDetectorManager.shared
+    @State private var graphData: [Double] = []
+    @State private var maxDataPoints = 50 // Keep last 50 readings
+    @State private var cursorPosition: Double = 100.0 // X position of cursor (0-100)
     
     // Computed properties for cursor value and label
     private var selectedValue: Double {
@@ -136,6 +138,25 @@ struct GraphView: View {
                     .frame(height: 40)
             }
         }
+        .onAppear {
+            detectorManager.startDetection()
+            // Initialize with empty array - will fill with real data
+            graphData = []
+        }
+        .onDisappear {
+            detectorManager.stopDetection()
+        }
+        .onReceive(detectorManager.$magneticFieldStrength) { newValue in
+            // Update graph data with new reading
+            if !newValue.isNaN && !newValue.isInfinite {
+                graphData.append(newValue)
+                if graphData.count > maxDataPoints {
+                    graphData.removeFirst()
+                }
+                // Move cursor to latest point
+                cursorPosition = 100.0
+            }
+        }
     }
 }
 
@@ -145,16 +166,20 @@ struct GraphContainer: View {
     
     // Computed properties for cursor
     private var selectedValue: Double {
+        // Safety check - return 0 if data is empty
+        guard !data.isEmpty else { return 0 }
+        
         let index = (cursorPosition / 100.0) * Double(data.count - 1)
         let lowerIndex = Int(index)
-        let upperIndex = min(lowerIndex + 1, data.count - 1)
-        let fraction = index - Double(lowerIndex)
+        let clampedLowerIndex = max(0, min(lowerIndex, data.count - 1))
+        let upperIndex = min(clampedLowerIndex + 1, data.count - 1)
+        let fraction = index - Double(clampedLowerIndex)
         
-        if lowerIndex == upperIndex {
-            return data[lowerIndex]
+        if clampedLowerIndex == upperIndex {
+            return data[clampedLowerIndex]
         }
         
-        return data[lowerIndex] * (1 - fraction) + data[upperIndex] * fraction
+        return data[clampedLowerIndex] * (1 - fraction) + data[upperIndex] * fraction
     }
     
     private var selectedLabel: String {

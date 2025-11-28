@@ -9,32 +9,31 @@ import SwiftUI
 
 struct MagneticView: View {
     var onBackTap: () -> Void
-    @State private var magneticValue: Double = 24.0 // Current magnetic reading in µT
-    @State private var detectionLevel: Double = 0.0 // Detection level (0-100) - determines which capsules fill
+    @StateObject private var detectorManager = MetalDetectorManager.shared
     
     // Computed properties for capsule fill levels
     private var firstCapsuleFill: Double {
         // First capsule fills with green (0-33% detection)
-        min(100, max(0, (detectionLevel / 33.0) * 100))
+        min(100, max(0, (detectorManager.detectionLevel / 33.0) * 100))
     }
     
     private var secondCapsuleFill: Double {
         // Second capsule fills with orange (33-66% detection)
-        if detectionLevel < 33 {
+        if detectorManager.detectionLevel < 33 {
             return 0
-        } else if detectionLevel >= 66 {
+        } else if detectorManager.detectionLevel >= 66 {
             return 100
         } else {
-            return ((detectionLevel - 33) / 33.0) * 100
+            return ((detectorManager.detectionLevel - 33) / 33.0) * 100
         }
     }
     
     private var thirdCapsuleFill: Double {
         // Third capsule fills with red (66-100% detection)
-        if detectionLevel < 66 {
+        if detectorManager.detectionLevel < 66 {
             return 0
         } else {
-            return ((detectionLevel - 66) / 34.0) * 100
+            return ((detectorManager.detectionLevel - 66) / 34.0) * 100
         }
     }
     
@@ -115,7 +114,7 @@ struct MagneticView: View {
                             // Magnetic Value Display
                             VStack(spacing: 12) {
                                 HStack(alignment: .firstTextBaseline, spacing: 4) {
-                                    Text("\(Int(magneticValue))")
+                                    Text("\(Int(detectorManager.magneticFieldStrength))")
                                         .font(.system(size: 54, weight: .bold, design: .serif))
                                         .foregroundColor(.white)
                                     
@@ -190,7 +189,7 @@ struct MagneticView: View {
                 HStack(spacing: 16) {
                     // Start Detection Button (Green)
                     Button(action: {
-                        // Handle start detection
+                        detectorManager.startDetection()
                     }) {
                         Text("Start Detection")
                             .font(.system(size: 18, weight: .semibold))
@@ -204,7 +203,7 @@ struct MagneticView: View {
                     
                     // Stop Detection Button (Red)
                     Button(action: {
-                        // Handle stop detection
+                        detectorManager.stopDetection()
                     }) {
                         Text("Stop Detection")
                             .font(.system(size: 18, weight: .semibold))
@@ -225,6 +224,8 @@ struct MagneticView: View {
                     .frame(height: 40)
             }
         }
+        // Note: MagneticView has its own Start/Stop buttons, so no auto-start here
+        // Detection starts/stops manually via buttons
     }
 }
 

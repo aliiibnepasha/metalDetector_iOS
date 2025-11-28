@@ -11,6 +11,7 @@ import Lottie
 struct DetectorView: View {
     let detectorTitle: String
     var onBackTap: () -> Void
+    @StateObject private var detectorManager = MetalDetectorManager.shared
     var onMeterViewTap: (() -> Void)? = nil
     var onGraphViewTap: (() -> Void)? = nil
     var onDigitalViewTap: (() -> Void)? = nil
@@ -124,6 +125,11 @@ struct DetectorView: View {
                 }
             }
         }
+        .onAppear {
+            // Set detection mode based on detector title
+            detectorManager.setMode(for: detectorTitle)
+        }
+        // Don't auto-start detection here - let individual views handle it
     }
 }
 

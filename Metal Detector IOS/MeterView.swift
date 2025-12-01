@@ -82,39 +82,39 @@ struct MeterView: View {
                 .padding(.top, 20)
                 
                 // Meter Container
-                ZStack(alignment: Alignment(horizontal: .center, vertical: .bottom)) {
-                    // Meter Image (Min to Max scale)
-                    Image("Meter") // User will provide this asset name
-                        .resizable()
-                        .scaledToFit()
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 350)
-                    
-                    // Needle Image - Fixed pivot point (circle), only tip rotates
-                    // Position needle so pivot (circle) stays fixed at meter's bottom center
-                    Image("Meter Needle") // User will provide this asset name
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 100, height: 100)
-                        // Rotate around the fixed anchor point - this keeps pivot stationary
-                        // Anchor (0.3, 0.3) = pivot circle location in needle image
-                        .rotationEffect(
-                            .degrees(detectorManager.getMeterNeedleRotation()),
-                            anchor: UnitPoint(x: 0.3, y: 0.3)
-                        )
-                        .animation(.easeOut(duration: 0.2), value: detectorManager.getMeterNeedleRotation())
-                        // Position anchor point at bottom center of meter
-                        // Anchor at (0.3, 0.3) in 100x100 image = 30px from top-left
-                        // Image center = (50, 50), anchor offset = (30-50, 30-50) = (-20, -20)
-                        // With bottom alignment, offset to align anchor at bottom center
-                        .offset(y: -20) // Move up to align anchor point (circle pivot) at bottom center
-                    // Note: Starting rotation is -170 degrees (MIN position, left side)
-                    // Needle tip starts at MIN segment end when detection level = 0
-                    // Range: -170 (MIN) to 90 (MAX) degrees (260 degrees total range)
-                    // The circular pivot point (anchor 0.3, 0.3) stays FIXED at meter's bottom center
-                    // Only the narrow needle tip rotates around this fixed pivot point
+                GeometryReader { geometry in
+                    ZStack {
+                        // Meter Image (Min to Max scale)
+                        Image("Meter") // User will provide this asset name
+                            .resizable()
+                            .scaledToFit()
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 350)
+                            // Overlay needle directly on meter at exact pivot position
+                            .overlay(
+                                // Needle Image - Circle pivot absolutely FIXED at meter bottom center
+                                Image("Meter Needle") // User will provide this asset name
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 100, height: 100)
+                                    // Rotate around anchor point (circle pivot)
+                                    .rotationEffect(
+                                        .degrees(detectorManager.getMeterNeedleRotation()),
+                                        anchor: UnitPoint(x: 0.2, y: 0.1) // Circle pivot location
+                                    )
+                                    .animation(.easeOut(duration: 0.2), value: detectorManager.getMeterNeedleRotation())
+                                    // Position anchor point at bottom center of meter
+                                    // Anchor (0.3, 0.3) = 30px from top-left = 20px offset from center
+                                    .offset(x: 20, y: 30) // Align anchor to bottom center: X center, Y bottom
+                                ,
+                                alignment: .bottom // Align to bottom of meter
+                            )
+                        // CIRCLE PIVOT: Fixed at meter bottom center (X: center, Y: bottom)
+                        // NARROW TIP: Rotates around fixed circle pivot
+                        // Range: -170 (MIN) to 90 (MAX) degrees (260 degrees total)
+                    }
+                    .frame(maxWidth: .infinity)
                 }
-                .frame(maxWidth: .infinity)
                 .frame(height: 350)
                 .padding(.horizontal, 30)
                 .padding(.top, 40)

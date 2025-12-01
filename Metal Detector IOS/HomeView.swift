@@ -14,7 +14,7 @@ struct HomeView: View {
     
     var body: some View {
         ZStack {
-            // Background
+            // Backgrouπnd
             Color.black
                 .ignoresSafeArea()
             
@@ -181,4 +181,5 @@ struct FeatureCard: View {
 #Preview {
     HomeView(onSettingsTap: {}, onDetectorTap: { _ in })
 }
+
 

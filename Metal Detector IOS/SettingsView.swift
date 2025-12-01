@@ -6,13 +6,25 @@
 //
 
 import SwiftUI
+import SafariServices
 
 struct SettingsView: View {
     @State private var rotationAngle: Double = 0
+    @State private var showPrivacyPolicy = false
+    @State private var showTermsOfUse = false
+    @State private var showShareSheet = false
+    @State private var showRatingPopup = false
     @StateObject private var localizationManager = LocalizationManager.shared
     var onBackTap: () -> Void
     var onGetPremiumTap: (() -> Void)? = nil
     var onLanguageTap: (() -> Void)? = nil
+    
+    private let privacyPolicyURL = URL(string: "https://theswiftvision.com/privacy-policy.html")!
+    private let termsOfUseURL = URL(string: "https://theswiftvision.com/terms-of-service.html")!
+    
+    private let shareText = "Check out Metal Detector App! 🔍"
+    private let shareURL = URL(string: "https://apps.apple.com/app/id")! // Add your App Store URL here
+    private let appStoreURL = URL(string: "https://apps.apple.com/app/id")! // Add your App Store URL here
     
     var body: some View {
         ZStack {
@@ -137,7 +149,10 @@ struct SettingsView: View {
                             // Share
                             SettingsRow(
                                 iconName: "Share Icon",
-                                title: LocalizedString.share.localized
+                                title: LocalizedString.share.localized,
+                                onTap: {
+                                    showShareSheet = true
+                                }
                             )
                             
                             Divider()
@@ -147,7 +162,10 @@ struct SettingsView: View {
                             // Rate
                             SettingsRow(
                                 iconName: "Rate Icon",
-                                title: LocalizedString.rate.localized
+                                title: LocalizedString.rate.localized,
+                                onTap: {
+                                    showRatingPopup = true
+                                }
                             )
                             
                             Divider()
@@ -157,7 +175,10 @@ struct SettingsView: View {
                             // Privacy Policy
                             SettingsRow(
                                 iconName: "Privacy Icon",
-                                title: LocalizedString.privacyPolicy.localized
+                                title: LocalizedString.privacyPolicy.localized,
+                                onTap: {
+                                    showPrivacyPolicy = true
+                                }
                             )
                             
                             Divider()
@@ -167,12 +188,251 @@ struct SettingsView: View {
                             // Terms of Use
                             SettingsRow(
                                 iconName: "Terms Icon",
-                                title: LocalizedString.termsOfUse.localized
+                                title: LocalizedString.termsOfUse.localized,
+                                onTap: {
+                                    showTermsOfUse = true
+                                }
                             )
                         }
                         .padding(.vertical, 24)
                     }
                     .padding(.horizontal, 24)
+                }
+            }
+        }
+        .sheet(isPresented: $showPrivacyPolicy) {
+            SafariView(url: privacyPolicyURL)
+        }
+        .sheet(isPresented: $showTermsOfUse) {
+            SafariView(url: termsOfUseURL)
+        }
+        .sheet(isPresented: $showShareSheet) {
+            ShareSheet(activityItems: [shareText, shareURL])
+        }
+        .overlay {
+            if showRatingPopup {
+                RatingPopupView(
+                    onRateUs: {
+                        // Open App Store for rating
+                        if UIApplication.shared.canOpenURL(appStoreURL) {
+                            UIApplication.shared.open(appStoreURL, options: [:], completionHandler: nil)
+                        }
+                        showRatingPopup = false
+                    },
+                    onNotNow: {
+                        showRatingPopup = false
+                    },
+                    onClose: {
+                        showRatingPopup = false
+                    }
+                )
+                .transition(.asymmetric(
+                    insertion: .scale(scale: 0.0).combined(with: .opacity),
+                    removal: .scale(scale: 0.0).combined(with: .opacity)
+                ))
+                .animation(.spring(response: 0.4, dampingFraction: 0.7), value: showRatingPopup)
+            }
+        }
+    }
+}
+
+// MARK: - Safari View Wrapper
+struct SafariView: UIViewControllerRepresentable {
+    let url: URL
+    
+    func makeUIViewController(context: Context) -> SFSafariViewController {
+        return SFSafariViewController(url: url)
+    }
+    
+    func updateUIViewController(_ uiViewController: SFSafariViewController, context: Context) {
+        // No updates needed
+    }
+}
+
+// MARK: - Share Sheet Wrapper
+struct ShareSheet: UIViewControllerRepresentable {
+    let activityItems: [Any]
+    
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        let controller = UIActivityViewController(
+            activityItems: activityItems,
+            applicationActivities: nil
+        )
+        
+        // For iPad support - prevent crash on iPad
+        if let popover = controller.popoverPresentationController {
+            let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
+            let window = windowScene?.windows.first
+            popover.sourceView = window
+            popover.sourceRect = CGRect(
+                x: UIScreen.main.bounds.width / 2,
+                y: UIScreen.main.bounds.height / 2,
+                width: 0,
+                height: 0
+            )
+            popover.permittedArrowDirections = []
+        }
+        
+        return controller
+    }
+    
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {
+        // No updates needed
+    }
+}
+
+// MARK: - Rating Popup View
+struct RatingPopupView: View {
+    @State private var selectedRating: Int = 0
+    @State private var appearScale: CGFloat = 0.0
+    @StateObject private var localizationManager = LocalizationManager.shared
+    let onRateUs: () -> Void
+    let onNotNow: () -> Void
+    let onClose: () -> Void
+    
+    var body: some View {
+        ZStack {
+            // Backdrop with subtle blur only (no white/grey tint)
+            Color.black.opacity(0.6)
+                .ignoresSafeArea()
+                .blur(radius: 2)
+                .onTapGesture {
+                    onClose()
+                }
+            
+            // Popup Card
+            VStack(spacing: 0) {
+                // Close Button (Top Right)
+                HStack {
+                    Spacer()
+                    Button(action: {
+                        onClose()
+                    }) {
+                        ZStack {
+                            Circle()
+                                .fill(Color.white.opacity(0.1))
+                                .frame(width: 32, height: 32)
+                            
+                            Image(systemName: "xmark")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(.white.opacity(0.6))
+                        }
+                    }
+                    .padding(.trailing, 16)
+                    .padding(.top, 16)
+                }
+                
+                Spacer()
+                    .frame(height: 24)
+                
+                // Large Golden Star Icon
+                ZStack {
+                    // Glowing circle background
+                    Circle()
+                        .fill(
+                            RadialGradient(
+                                gradient: Gradient(colors: [
+                                    Color(red: 1.0, green: 0.85, blue: 0.0).opacity(0.3),
+                                    Color(red: 1.0, green: 0.85, blue: 0.0).opacity(0.1)
+                                ]),
+                                center: .center,
+                                startRadius: 20,
+                                endRadius: 50
+                            )
+                        )
+                        .frame(width: 100, height: 100)
+                        .blur(radius: 10)
+                    
+                    Circle()
+                        .fill(Color(red: 1.0, green: 0.85, blue: 0.0).opacity(0.2))
+                        .frame(width: 80, height: 80)
+                    
+                    Image(systemName: "star.fill")
+                        .font(.system(size: 48, weight: .medium))
+                        .foregroundColor(Color(red: 1.0, green: 0.85, blue: 0.0))
+                }
+                .padding(.bottom, 24)
+                
+                // Question Text
+                Text(LocalizedString.howDoYouFeelAboutApp.localized)
+                    .font(.custom("Zodiak", size: 18))
+                    .foregroundColor(.white)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 32)
+                    .id(localizationManager.currentLanguage)
+                
+                // Stars Rating
+                HStack(spacing: 16) {
+                    ForEach(1...5, id: \.self) { index in
+                        Button(action: {
+                            withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                                selectedRating = index
+                            }
+                        }) {
+                            Image(systemName: index <= selectedRating ? "star.fill" : "star")
+                                .font(.system(size: 32))
+                                .foregroundColor(
+                                    index <= selectedRating 
+                                    ? Color(red: 1.0, green: 0.85, blue: 0.0) 
+                                    : Color.white.opacity(0.3)
+                                )
+                                .scaleEffect(index <= selectedRating ? 1.1 : 1.0)
+                                .animation(.spring(response: 0.2), value: selectedRating)
+                        }
+                    }
+                }
+                .padding(.horizontal, 24)
+                .padding(.bottom, 32)
+                
+                // Buttons
+                VStack(spacing: 16) {
+                    // Rate Us Button
+                    Button(action: {
+                        onRateUs()
+                    }) {
+                        ZStack {
+                            // Button background from assets (same as Go Premium button)
+                            Image("Go Premium Button Background")
+                                .resizable()
+                                .scaledToFill()
+                                .frame(height: 56)
+                                .clipShape(RoundedRectangle(cornerRadius: 58.76))
+                            
+                            Text(LocalizedString.rateUs.localized)
+                                .font(.custom("Manrope_Bold", size: 16))
+                                .foregroundColor(Color(red: 21/255, green: 21/255, blue: 21/255))
+                                .id(localizationManager.currentLanguage)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 56)
+                    }
+                    
+                    // Not Now Button
+                    Button(action: {
+                        onNotNow()
+                    }) {
+                        Text(LocalizedString.notNow.localized)
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(.white.opacity(0.6))
+                            .id(localizationManager.currentLanguage)
+                    }
+                }
+                .padding(.horizontal, 24)
+                .padding(.bottom, 24)
+            }
+            .background(
+                RoundedRectangle(cornerRadius: 20)
+                    .fill(Color(red: 0.17, green: 0.17, blue: 0.17)) // #2b2b2b
+            )
+            .frame(width: 320)
+            .scaleEffect(appearScale)
+            .opacity(appearScale > 0 ? 1 : 0)
+            .padding(.horizontal, 40) // Increased left/right padding for more space
+            .onAppear {
+                // Animate from 0% to 100% scale
+                withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
+                    appearScale = 1.0
                 }
             }
         }

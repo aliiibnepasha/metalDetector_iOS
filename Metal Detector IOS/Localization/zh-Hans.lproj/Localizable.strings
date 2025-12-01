@@ -45,7 +45,14 @@
 "go_premium" = "升级到高级版";
 "get_premium" = "获取高级版";
 "continue_free" = "继续免费";
+"or_continue_for_free" = "或继续免费使用";
 "go_premium_for_6_dollars_month" = "以6美元/月升级到高级版";
+"whats_included" = "包含内容";
+"remove_ads" = "移除广告";
+"unlimited_scanning" = "无限扫描";
+"ultra_accurate_detection" = "超高精度检测";
+"gold_precious_metal_scanner" = "黄金和贵金属扫描仪";
+"24_7_help_support" = "24/7 帮助与支持";
 
 // MARK: - Intro Screens
 "next" = "下一步";
@@ -54,7 +61,13 @@
 "metal_detector_gold_finder" = "金属探测器与黄金查找器";
 "detect_metal_accessories_gold" = "轻松检测金属配件和黄金材料。";
 "gold_metal_sensitivity_gauge" = "黄金与金属敏感度测量仪";
+"monitor_live_sensor_curves" = "监控实时传感器曲线并发现隐藏材料。";
 "the_smart_way_to_find_north" = "找到北方的智能方式";
+"guided_by_precision" = "由您口袋中的精密磁传感器引导。";
+
+// MARK: - Splash Screen
+"metal_detector_pro" = "金属探测器";
+"loading" = "加载中...";
 
 // MARK: - Premium Card
 "detect_hidden_treasures_faster" = "使用高级模式更快地检测隐藏的宝藏";

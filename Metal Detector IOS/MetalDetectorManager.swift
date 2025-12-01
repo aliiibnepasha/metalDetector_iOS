@@ -42,6 +42,7 @@ class MetalDetectorManager: ObservableObject {
     @Published var isDetecting: Bool = false
     @Published var detectionLevel: Double = 0.0 // 0-100
     @Published var currentMode: DetectionMode = .metalDetector // Default mode
+    @Published var isMetalDetected: Bool = false // True when metal is actually detected
     
     // Detection thresholds
     private var baseMagneticField: Double = 0.0 // Will be calibrated on first reading
@@ -220,7 +221,10 @@ class MetalDetectorManager: ObservableObject {
         
         // Only trigger if significant change detected AND detection level is meaningful
         if difference > adjustedThreshold && detectionLevel > triggerLevel {
-            // Metal detected! (only when metal is actually close)
+            DispatchQueue.main.async {
+                self.isMetalDetected = true
+            }
+            
             let now = Date()
             
             // Play sound if enabled and cooldown passed
@@ -233,6 +237,13 @@ class MetalDetectorManager: ObservableObject {
             if vibrationEnabled && now.timeIntervalSince(lastVibrationTime) > vibrationCooldown {
                 triggerVibration()
                 lastVibrationTime = now
+            }
+        } else {
+            // Reset detection state when below threshold
+            DispatchQueue.main.async {
+                if self.detectionLevel < 10 {
+                    self.isMetalDetected = false
+                }
             }
         }
     }
@@ -268,6 +279,8 @@ class MetalDetectorManager: ObservableObject {
     }
     
     // MARK: - Mode Management
+    @Published var currentDetectorTitle: String = "Gold Detector" // Store current detector title for messages
+    
     func setMode(_ mode: DetectionMode) {
         currentMode = mode
         // Reset calibration when mode changes
@@ -278,6 +291,7 @@ class MetalDetectorManager: ObservableObject {
     }
     
     func setMode(for detectorTitle: String) {
+        currentDetectorTitle = detectorTitle // Store detector title
         switch detectorTitle {
         case "Metal Detector":
             setMode(.metalDetector)
@@ -286,7 +300,7 @@ class MetalDetectorManager: ObservableObject {
         case "Handled Detector", "Handheld Scanner":
             setMode(.handheldScanner)
         default:
-            // Default to Metal Detector for other detectors
+            // Default to Metal Detector for other detectors (Gold Detector, etc.)
             setMode(.metalDetector)
         }
     }
@@ -317,5 +331,39 @@ class MetalDetectorManager: ObservableObject {
     func getGraphDataPoint() -> Double {
         // Return current magnetic field strength for graph
         return magneticFieldStrength
+    }
+    
+    // MARK: - Get Detection Message Key
+    func getDetectionMessageKey() -> String {
+        // Check detector title to determine message type
+        if currentDetectorTitle == "Gold Detector" {
+            // Gold Detector messages
+            if isMetalDetected {
+                return LocalizedString.goldDetectedNearby
+            } else {
+                return LocalizedString.noGoldDetected
+            }
+        } else if currentDetectorTitle == "Metal Detector" {
+            // Metal Detector messages
+            if isMetalDetected {
+                return LocalizedString.metalDetected
+            } else {
+                return LocalizedString.noMetalDetected
+            }
+        } else if currentDetectorTitle == "Stud Finder" {
+            // Stud Finder messages
+            if isMetalDetected {
+                return LocalizedString.studDetected
+            } else {
+                return LocalizedString.noStudDetected
+            }
+        } else {
+            // Default for Handheld Scanner and others
+            if isMetalDetected {
+                return LocalizedString.metalDetected
+            } else {
+                return LocalizedString.noMetalDetected
+            }
+        }
     }
 }

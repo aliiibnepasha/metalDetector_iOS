@@ -45,7 +45,14 @@
 "go_premium" = "升級到高級版";
 "get_premium" = "獲取高級版";
 "continue_free" = "繼續免費";
+"or_continue_for_free" = "或繼續免費使用";
 "go_premium_for_6_dollars_month" = "以6美元/月升級到高級版";
+"whats_included" = "包含內容";
+"remove_ads" = "移除廣告";
+"unlimited_scanning" = "無限掃描";
+"ultra_accurate_detection" = "超高精度檢測";
+"gold_precious_metal_scanner" = "黃金和貴金屬掃描儀";
+"24_7_help_support" = "24/7 幫助與支持";
 
 // MARK: - Intro Screens
 "next" = "下一步";
@@ -54,7 +61,13 @@
 "metal_detector_gold_finder" = "金屬探測器與黃金查找器";
 "detect_metal_accessories_gold" = "輕鬆檢測金屬配件和黃金材料。";
 "gold_metal_sensitivity_gauge" = "黃金與金屬敏感度測量儀";
+"monitor_live_sensor_curves" = "監控實時傳感器曲線並發現隱藏材料。";
 "the_smart_way_to_find_north" = "找到北方的智能方式";
+"guided_by_precision" = "由您口袋中的精密磁傳感器引導。";
+
+// MARK: - Splash Screen
+"metal_detector_pro" = "金屬探測器";
+"loading" = "載入中...";
 
 // MARK: - Premium Card
 "detect_hidden_treasures_faster" = "使用高級模式更快地檢測隱藏的寶藏";

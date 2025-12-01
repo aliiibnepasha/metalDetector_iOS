@@ -135,15 +135,17 @@ struct MeterView: View {
                 
                 // Detection Status Text
                 VStack(spacing: 12) {
-                    Text(LocalizedString.noGoldDetected.localized)
+                    Text(detectorManager.getDetectionMessageKey().localized)
                         .font(.custom("Zodiak", size: 24))
                         .foregroundColor(.white)
-                        .id(localizationManager.currentLanguage)
+                        .id(localizationManager.currentLanguage + "_" + String(detectorManager.isMetalDetected))
                     
-                    Text(LocalizedString.pleaseCheckThoroughly.localized)
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(.white.opacity(0.7))
-                        .id(localizationManager.currentLanguage)
+                    if !detectorManager.isMetalDetected {
+                        Text(LocalizedString.pleaseCheckThoroughly.localized)
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(.white.opacity(0.7))
+                            .id(localizationManager.currentLanguage)
+                    }
                 }
                 .padding(.top, 32)
                 .opacity(detectorManager.detectionLevel > 10 ? 1.0 : 0.7)

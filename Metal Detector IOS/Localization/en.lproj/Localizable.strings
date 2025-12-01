@@ -16,6 +16,9 @@
 "language" = "Language";
 "share" = "Share";
 "rate" = "Rate";
+"rate_us" = "Rate Us";
+"not_now" = "Not Now";
+"how_do_you_feel_about_app" = "How do you feel about the app overall?";
 "privacy_policy" = "Privacy policy";
 "terms_of_use" = "Terms of use";
 "default" = "Default";
@@ -36,6 +39,11 @@
 
 // MARK: - Common Messages
 "no_gold_detected" = "No Gold detected,";
+"gold_detected_nearby" = "Gold detected nearby";
+"no_metal_detected" = "No metal detected,";
+"metal_detected" = "Metal detected";
+"no_stud_detected" = "No stud detected,";
+"stud_detected" = "Stud detected";
 "please_check_thoroughly" = "Please check thoroughly";
 "start_detection" = "Start Detection";
 "stop_detection" = "Stop Detection";

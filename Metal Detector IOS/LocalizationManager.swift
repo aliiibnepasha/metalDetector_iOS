@@ -154,6 +154,9 @@ struct LocalizedString {
     static let language = "language"
     static let share = "share"
     static let rate = "rate"
+    static let rateUs = "rate_us"
+    static let notNow = "not_now"
+    static let howDoYouFeelAboutApp = "how_do_you_feel_about_app"
     static let privacyPolicy = "privacy_policy"
     static let termsOfUse = "terms_of_use"
     static let defaultLabel = "default"
@@ -175,6 +178,11 @@ struct LocalizedString {
     
     // Common
     static let noGoldDetected = "no_gold_detected"
+    static let goldDetectedNearby = "gold_detected_nearby"
+    static let noMetalDetected = "no_metal_detected"
+    static let metalDetected = "metal_detected"
+    static let noStudDetected = "no_stud_detected"
+    static let studDetected = "stud_detected"
     static let pleaseCheckThoroughly = "please_check_thoroughly"
     static let startDetection = "start_detection"
     static let stopDetection = "stop_detection"

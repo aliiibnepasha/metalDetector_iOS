@@ -46,7 +46,7 @@ struct PaywallView: View {
                     // Title Text
                     VStack(spacing: 0) {
                         Text(LocalizedString.metalDetector.localized)
-                            .font(.custom("Zodiak", size: 30))
+                            .font(.custom("Zodiak", size: 25))
                             .foregroundColor(.white)
                             .tracking(-1.5)
                             .id(localizationManager.currentLanguage)

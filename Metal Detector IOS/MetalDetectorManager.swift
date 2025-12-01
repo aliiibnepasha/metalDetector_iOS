@@ -357,6 +357,13 @@ class MetalDetectorManager: ObservableObject {
             } else {
                 return LocalizedString.noStudDetected
             }
+        } else if currentDetectorTitle == "Handled Detector" {
+            // Handled Detector messages
+            if isMetalDetected {
+                return LocalizedString.handleDetected
+            } else {
+                return LocalizedString.noHandleDetected
+            }
         } else {
             // Default for Handheld Scanner and others
             if isMetalDetected {

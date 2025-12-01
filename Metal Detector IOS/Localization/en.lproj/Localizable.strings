@@ -44,6 +44,8 @@
 "metal_detected" = "Metal detected";
 "no_stud_detected" = "No stud detected,";
 "stud_detected" = "Stud detected";
+"no_handle_detected" = "No handle detected,";
+"handle_detected" = "Handle detected";
 "please_check_thoroughly" = "Please check thoroughly";
 "start_detection" = "Start Detection";
 "stop_detection" = "Stop Detection";

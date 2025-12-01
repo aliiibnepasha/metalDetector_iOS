@@ -183,6 +183,8 @@ struct LocalizedString {
     static let metalDetected = "metal_detected"
     static let noStudDetected = "no_stud_detected"
     static let studDetected = "stud_detected"
+    static let noHandleDetected = "no_handle_detected"
+    static let handleDetected = "handle_detected"
     static let pleaseCheckThoroughly = "please_check_thoroughly"
     static let startDetection = "start_detection"
     static let stopDetection = "stop_detection"

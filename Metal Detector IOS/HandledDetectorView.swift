@@ -13,6 +13,7 @@ struct HandledDetectorView: View {
     @StateObject private var localizationManager = LocalizationManager.shared
     @State private var soundEnabled = true
     @State private var vibrationEnabled = true
+    @State private var shakeOffset: CGFloat = 0
     
     var body: some View {
         ZStack {
@@ -106,12 +107,20 @@ struct HandledDetectorView: View {
                         .fill(Color(red: 43/255, green: 43/255, blue: 43/255))
                         .frame(width: 380, height: 222)
                     
-                    // Device Image
+                    // Device Image with Shake Animation
                     Image("Handle")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 201)
                         .rotationEffect(.degrees(19.507))
+                        .offset(x: shakeOffset, y: shakeOffset * 0.3)
+                        .rotationEffect(.degrees(shakeOffset * 0.2))
+                        .animation(
+                            detectorManager.isMetalDetected
+                                ? Animation.easeInOut(duration: 0.08).repeatForever(autoreverses: true)
+                                : .default,
+                            value: shakeOffset
+                        )
                 }
                 .padding(.top, 32)
                 
@@ -141,7 +150,44 @@ struct HandledDetectorView: View {
             // Sync with detectorManager
             soundEnabled = detectorManager.soundEnabled
             vibrationEnabled = detectorManager.vibrationEnabled
+            // Set mode for Handled Detector
+            detectorManager.setMode(for: "Handled Detector")
+            // Start detection
+            detectorManager.startDetection()
         }
+        .onDisappear {
+            // Stop detection when view disappears
+            detectorManager.stopDetection()
+            shakeOffset = 0
+        }
+        .onChange(of: detectorManager.isMetalDetected) { isDetected in
+            if isDetected {
+                // Start shake animation
+                withAnimation(.easeInOut(duration: 0.08).repeatForever(autoreverses: true)) {
+                    shakeOffset = 5
+                }
+            } else {
+                withAnimation {
+                    shakeOffset = 0
+                }
+            }
+        }
+    }
+}
+
+// Shake Effect Modifier
+struct ShakeEffect: GeometryEffect {
+    var shakes: Int
+    var animatableData: CGFloat {
+        get { CGFloat(shakes) }
+        set { shakes = Int(newValue) }
+    }
+    
+    func effectValue(size: CGSize) -> ProjectionTransform {
+        let xOffset = sin(CGFloat(shakes) * .pi * 2) * 5
+        let yOffset = cos(CGFloat(shakes) * .pi * 2) * 5
+        let angle = sin(CGFloat(shakes) * .pi * 4) * 3 * .pi / 180
+        return ProjectionTransform(CGAffineTransform(translationX: xOffset, y: yOffset).rotated(by: angle))
     }
 }
 

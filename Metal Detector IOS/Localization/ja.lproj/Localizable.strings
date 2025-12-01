@@ -1,0 +1,60 @@
+/* 
+  Localizable.strings (Japanese - Japan)
+  Metal Detector IOS
+*/
+
+// MARK: - Home Screen
+"metal_detector" = "金属探知機";
+"gold_detector" = "金探知機";
+"stud_finder" = "スタッドファインダー";
+"handled_detector" = "ハンドヘルド探知機";
+"digital_compass" = "デジタルコンパス";
+"bubble_level" = "バブルレベル";
+
+// MARK: - Settings
+"setting" = "設定";
+"language" = "言語";
+"share" = "共有";
+"rate" = "評価";
+"privacy_policy" = "プライバシーポリシー";
+"terms_of_use" = "利用規約";
+"default" = "デフォルト";
+
+// MARK: - Language Screen
+"select_your_language" = "言語を選択";
+"done" = "完了";
+
+// MARK: - Detector Views
+"meter_view" = "メーター表示";
+"graph_view" = "グラフ表示";
+"digital_view" = "デジタル表示";
+"sensor_view" = "センサー表示";
+"calibration_view" = "キャリブレーション表示";
+"magnetic_view" = "磁気表示";
+"compass_detector" = "コンパス探知機";
+"handled_detector_view" = "ハンドヘルド探知機";
+
+// MARK: - Common Messages
+"no_gold_detected" = "金が検出されませんでした、";
+"please_check_thoroughly" = "十分に確認してください";
+"start_detection" = "検出を開始";
+"stop_detection" = "検出を停止";
+
+// MARK: - Paywall
+"premium" = "プレミアム";
+"go_premium" = "プレミアムにアップグレード";
+"get_premium" = "プレミアムを取得";
+"continue_free" = "無料で続ける";
+"go_premium_for_6_dollars_month" = "月額6ドルでプレミアムにアップグレード";
+
+// MARK: - Intro Screens
+"next" = "次へ";
+"skip" = "スキップ";
+"get_started" = "始める";
+"metal_detector_gold_finder" = "金属探知機と金探知機";
+"detect_metal_accessories_gold" = "金属アクセサリーと金の材料を簡単に検出します。";
+"gold_metal_sensitivity_gauge" = "金と金属の感度ゲージ";
+"the_smart_way_to_find_north" = "北を見つけるスマートな方法";
+
+// MARK: - Premium Card
+"detect_hidden_treasures_faster" = "プレミアムモードで隠された宝物をより速く検出";

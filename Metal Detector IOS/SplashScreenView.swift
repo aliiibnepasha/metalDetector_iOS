@@ -10,6 +10,7 @@ import Lottie
 
 struct SplashScreenView: View {
     @State private var progress: CGFloat = 0.0
+    @ObservedObject private var localizationManager = LocalizationManager.shared
     var onComplete: () -> Void
     
     var body: some View {
@@ -29,10 +30,11 @@ struct SplashScreenView: View {
                         .frame(width: 300, height: 300)
                     
                     // App Title
-                    Text("Metal Detector Pro")
+                    Text(LocalizedString.metalDetector.localized)
                         .font(.system(size: 32, weight: .semibold, design: .default))
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
+                        .id(localizationManager.currentLanguage)
                     
                     // Loading Section
                     VStack(spacing: 12) {
@@ -61,9 +63,10 @@ struct SplashScreenView: View {
                         }
                         
                         // Loading text
-                        Text("Loading...")
+                        Text(LocalizedString.loading.localized)
                             .font(.system(size: 16, weight: .medium))
                             .foregroundColor(.white)
+                            .id(localizationManager.currentLanguage + "_splash_loading")
                     }
                 }
                 .padding(.bottom, 120)

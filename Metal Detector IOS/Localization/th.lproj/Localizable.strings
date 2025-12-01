@@ -1,0 +1,60 @@
+/* 
+  Localizable.strings (Thai - Thailand)
+  Metal Detector IOS
+*/
+
+// MARK: - Home Screen
+"metal_detector" = "เครื่องตรวจจับโลหะ";
+"gold_detector" = "เครื่องตรวจจับทอง";
+"stud_finder" = "เครื่องค้นหาสตั๊ด";
+"handled_detector" = "เครื่องตรวจจับแบบมือถือ";
+"digital_compass" = "เข็มทิศดิจิทัล";
+"bubble_level" = "ระดับน้ำ";
+
+// MARK: - Settings
+"setting" = "การตั้งค่า";
+"language" = "ภาษา";
+"share" = "แชร์";
+"rate" = "ให้คะแนน";
+"privacy_policy" = "นโยบายความเป็นส่วนตัว";
+"terms_of_use" = "เงื่อนไขการใช้งาน";
+"default" = "ค่าเริ่มต้น";
+
+// MARK: - Language Screen
+"select_your_language" = "เลือกภาษาของคุณ";
+"done" = "เสร็จสิ้น";
+
+// MARK: - Detector Views
+"meter_view" = "มุมมองมิเตอร์";
+"graph_view" = "มุมมองกราฟ";
+"digital_view" = "มุมมองดิจิทัล";
+"sensor_view" = "มุมมองเซ็นเซอร์";
+"calibration_view" = "มุมมองการสอบเทียบ";
+"magnetic_view" = "มุมมองแม่เหล็ก";
+"compass_detector" = "เครื่องตรวจจับเข็มทิศ";
+"handled_detector_view" = "เครื่องตรวจจับแบบมือถือ";
+
+// MARK: - Common Messages
+"no_gold_detected" = "ไม่พบทอง,";
+"please_check_thoroughly" = "กรุณาตรวจสอบอย่างละเอียด";
+"start_detection" = "เริ่มการตรวจจับ";
+"stop_detection" = "หยุดการตรวจจับ";
+
+// MARK: - Paywall
+"premium" = "พรีเมียม";
+"go_premium" = "อัพเกรดเป็นพรีเมียม";
+"get_premium" = "รับพรีเมียม";
+"continue_free" = "ดำเนินการต่อฟรี";
+"go_premium_for_6_dollars_month" = "อัพเกรดเป็นพรีเมียมด้วย 6$/ เดือน";
+
+// MARK: - Intro Screens
+"next" = "ถัดไป";
+"skip" = "ข้าม";
+"get_started" = "เริ่มต้น";
+"metal_detector_gold_finder" = "เครื่องตรวจจับโลหะและค้นหาทอง";
+"detect_metal_accessories_gold" = "ตรวจจับอุปกรณ์เสริมโลหะและวัสดุทองได้อย่างง่ายดาย";
+"gold_metal_sensitivity_gauge" = "เกจความไวทองและโลหะ";
+"the_smart_way_to_find_north" = "วิธีที่ชาญฉลาดในการหาทิศเหนือ";
+
+// MARK: - Premium Card
+"detect_hidden_treasures_faster" = "ตรวจจับสมบัติที่ซ่อนอยู่เร็วขึ้นด้วยโหมดพรีเมียม";

@@ -1,0 +1,60 @@
+/* 
+  Localizable.strings (Arabic)
+  Metal Detector IOS
+*/
+
+// MARK: - Home Screen
+"metal_detector" = "كاشف المعادن";
+"gold_detector" = "كاشف الذهب";
+"stud_finder" = "باحث عن المسامير";
+"handled_detector" = "كاشف يدوي";
+"digital_compass" = "بوصلة رقمية";
+"bubble_level" = "مستوى الفقاعة";
+
+// MARK: - Settings
+"setting" = "الإعدادات";
+"language" = "اللغة";
+"share" = "مشاركة";
+"rate" = "تقييم";
+"privacy_policy" = "سياسة الخصوصية";
+"terms_of_use" = "شروط الاستخدام";
+"default" = "افتراضي";
+
+// MARK: - Language Screen
+"select_your_language" = "اختر لغتك";
+"done" = "تم";
+
+// MARK: - Detector Views
+"meter_view" = "عرض العداد";
+"graph_view" = "عرض الرسم البياني";
+"digital_view" = "عرض رقمي";
+"sensor_view" = "عرض المستشعر";
+"calibration_view" = "عرض المعايرة";
+"magnetic_view" = "عرض مغناطيسي";
+"compass_detector" = "كاشف البوصلة";
+"handled_detector_view" = "كاشف يدوي";
+
+// MARK: - Common Messages
+"no_gold_detected" = "لم يتم اكتشاف الذهب،";
+"please_check_thoroughly" = "يرجى التحقق بدقة";
+"start_detection" = "بدء الكشف";
+"stop_detection" = "إيقاف الكشف";
+
+// MARK: - Paywall
+"premium" = "بريميوم";
+"go_premium" = "الترقية إلى بريميوم";
+"get_premium" = "الحصول على بريميوم";
+"continue_free" = "المتابعة مجاناً";
+"go_premium_for_6_dollars_month" = "الترقية إلى بريميوم مقابل 6 دولارات/شهر";
+
+// MARK: - Intro Screens
+"next" = "التالي";
+"skip" = "تخطي";
+"get_started" = "ابدأ";
+"metal_detector_gold_finder" = "كاشف المعادن وباحث الذهب";
+"detect_metal_accessories_gold" = "اكتشف اكسسوارات المعادن ومواد الذهب بسهولة.";
+"gold_metal_sensitivity_gauge" = "مقياس حساسية الذهب والمعادن";
+"the_smart_way_to_find_north" = "الطريقة الذكية للعثور على الشمال";
+
+// MARK: - Premium Card
+"detect_hidden_treasures_faster" = "اكتشف الكنوز المخفية بشكل أسرع مع وضع بريميوم";

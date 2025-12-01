@@ -11,6 +11,7 @@ import Combine
 
 struct BubbleLevelView: View {
     var onBackTap: () -> Void
+    @StateObject private var localizationManager = LocalizationManager.shared
     @StateObject private var motionManager = MotionManager()
     
     var body: some View {
@@ -32,9 +33,10 @@ struct BubbleLevelView: View {
                             .frame(width: 44, height: 44)
                     }
                     
-                    Text("Bubble Level")
-                        .font(.system(size: 20, weight: .bold, design: .serif))
+                    Text(LocalizedString.bubbleLevelView.localized)
+                        .font(.custom("Zodiak", size: 20))
                         .foregroundColor(.white)
+                        .id(localizationManager.currentLanguage)
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
                     

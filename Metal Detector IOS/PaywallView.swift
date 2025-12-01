@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct PaywallView: View {
+    @ObservedObject private var localizationManager = LocalizationManager.shared
     var onClose: () -> Void
     var onGoPremium: () -> Void
     var onContinueFree: () -> Void
@@ -44,15 +45,17 @@ struct PaywallView: View {
                 ZStack {
                     // Title Text
                     VStack(spacing: 0) {
-                        Text("Metal detector")
-                            .font(.system(size: 30, weight: .medium))
+                        Text(LocalizedString.metalDetector.localized)
+                            .font(.custom("Zodiak", size: 30))
                             .foregroundColor(.white)
                             .tracking(-1.5)
+                            .id(localizationManager.currentLanguage)
                         
                         // Premium Badge
-                        Text("Premium")
+                        Text(LocalizedString.premium.localized)
                             .font(.system(size: 14, weight: .regular))
                             .foregroundColor(.white)
+                            .id(localizationManager.currentLanguage)
                             .padding(.horizontal, 16)
                             .padding(.vertical, 10)
                             .background(Color(red: 32/255, green: 32/255, blue: 32/255))
@@ -130,14 +133,18 @@ struct PaywallView: View {
                     // Clean up timer when view disappears
                     animationTimer?.invalidate()
                 }
+                .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("LanguageChanged"))) { _ in
+                    // Force view refresh when language changes
+                }
                 
                 // What's Included Section
                 VStack(alignment: .leading, spacing: 24) {
                     // Section Title
                     HStack {
-                        Text("what's included")
+                        Text(LocalizedString.whatsIncluded.localized)
                             .font(.system(size: 18, weight: .medium))
                             .foregroundColor(.white)
+                            .id(localizationManager.currentLanguage)
                         
                         Spacer()
                         
@@ -154,11 +161,11 @@ struct PaywallView: View {
                     
                     // Features List
                     VStack(alignment: .leading, spacing: 16) {
-                        FeatureRow(text: "Remove Ads")
-                        FeatureRow(text: "Unlimited Scanning")
-                        FeatureRow(text: "Ultra-Accurate Detection")
-                        FeatureRow(text: "Gold & Precious Metal Scanner")
-                        FeatureRow(text: "24/7 help & support")
+                        FeatureRow(localizedKey: LocalizedString.removeAds)
+                        FeatureRow(localizedKey: LocalizedString.unlimitedScanning)
+                        FeatureRow(localizedKey: LocalizedString.ultraAccurateDetection)
+                        FeatureRow(localizedKey: LocalizedString.goldPreciousMetalScanner)
+                        FeatureRow(localizedKey: LocalizedString.helpSupport24_7)
                     }
                     .padding(.horizontal, 16)
                 }
@@ -180,8 +187,9 @@ struct PaywallView: View {
                                 .frame(height: 56)
                                 .clipShape(RoundedRectangle(cornerRadius: 58.76))
                             
-                            Text("Go premium for 6$/ month")
-                                .font(.system(size: 16, weight: .bold))
+                            Text(LocalizedString.goPremiumFor6DollarsMonth.localized)
+                                .font(.custom("Manrope_Bold", size: 16))
+                                .id(localizationManager.currentLanguage)
                                 .foregroundColor(Color(red: 21/255, green: 21/255, blue: 21/255))
                         }
                         .frame(maxWidth: .infinity)
@@ -192,9 +200,10 @@ struct PaywallView: View {
                     Button(action: {
                         onContinueFree()
                     }) {
-                        Text("or continue for free")
+                        Text(LocalizedString.orContinueForFree.localized)
                             .font(.system(size: 14, weight: .medium))
                             .foregroundColor(.white)
+                            .id(localizationManager.currentLanguage)
                     }
                 }
                 .padding(.horizontal, 16)
@@ -223,7 +232,8 @@ struct PaywallView: View {
 }
 
 struct FeatureRow: View {
-    let text: String
+    let localizedKey: String
+    @ObservedObject private var localizationManager = LocalizationManager.shared
     
     var body: some View {
         HStack(spacing: 12) {
@@ -233,9 +243,10 @@ struct FeatureRow: View {
                 .scaledToFit()
                 .frame(width: 24, height: 24)
             
-            Text(text)
+            Text(localizedKey.localized)
                 .font(.system(size: 16, weight: .medium))
                 .foregroundColor(.white)
+                .id(localizationManager.currentLanguage + "_" + localizedKey)
         }
     }
 }

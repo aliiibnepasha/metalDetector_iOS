@@ -1,0 +1,60 @@
+/* 
+  Localizable.strings (Malay)
+  Metal Detector IOS
+*/
+
+// MARK: - Home Screen
+"metal_detector" = "Pengesan Logam";
+"gold_detector" = "Pengesan Emas";
+"stud_finder" = "Pencari Tiang";
+"handled_detector" = "Pengesan Tangan";
+"digital_compass" = "Kompas Digital";
+"bubble_level" = "Tahap Gelembung";
+
+// MARK: - Settings
+"setting" = "Tetapan";
+"language" = "Bahasa";
+"share" = "Kongsi";
+"rate" = "Nilai";
+"privacy_policy" = "Dasar Privasi";
+"terms_of_use" = "Terma Penggunaan";
+"default" = "Lalai";
+
+// MARK: - Language Screen
+"select_your_language" = "Pilih Bahasa Anda";
+"done" = "Selesai";
+
+// MARK: - Detector Views
+"meter_view" = "Paparan Meter";
+"graph_view" = "Paparan Graf";
+"digital_view" = "Paparan Digital";
+"sensor_view" = "Paparan Sensor";
+"calibration_view" = "Paparan Kalibrasi";
+"magnetic_view" = "Paparan Magnetik";
+"compass_detector" = "Pengesan Kompas";
+"handled_detector_view" = "Pengesan Tangan";
+
+// MARK: - Common Messages
+"no_gold_detected" = "Tiada Emas Dikesan,";
+"please_check_thoroughly" = "Sila Semak dengan Teliti";
+"start_detection" = "Mula Pengesanan";
+"stop_detection" = "Hentikan Pengesanan";
+
+// MARK: - Paywall
+"premium" = "Premium";
+"go_premium" = "Naik Taraf ke Premium";
+"get_premium" = "Dapatkan Premium";
+"continue_free" = "Teruskan Percuma";
+"go_premium_for_6_dollars_month" = "Naik taraf ke premium dengan 6$/ bulan";
+
+// MARK: - Intro Screens
+"next" = "Seterusnya";
+"skip" = "langkau";
+"get_started" = "Mula";
+"metal_detector_gold_finder" = "Pengesan Logam & Pencari Emas";
+"detect_metal_accessories_gold" = "Kesan aksesori logam & bahan emas dengan mudah.";
+"gold_metal_sensitivity_gauge" = "Pengukur Sensitiviti Emas & Logam";
+"the_smart_way_to_find_north" = "Cara Pintar untuk Mencari Utara";
+
+// MARK: - Premium Card
+"detect_hidden_treasures_faster" = "Kesan harta tersembunyi dengan lebih cepat menggunakan mod Premium";

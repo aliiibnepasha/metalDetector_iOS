@@ -11,6 +11,7 @@ struct HomeView: View {
     var onSettingsTap: () -> Void
     var onDetectorTap: (String) -> Void
     var onProTap: (() -> Void)? = nil
+    @StateObject private var localizationManager = LocalizationManager.shared
     
     var body: some View {
         ZStack {
@@ -21,10 +22,11 @@ struct HomeView: View {
             VStack(spacing: 0) {
                 // Header
                 HStack {
-                    Text("Metal Detector")
-                        .font(.system(size: 24, weight: .bold, design: .serif))
+                    Text(LocalizedString.metalDetector.localized)
+                        .font(.custom("Zodiak", size: 24))
                         .foregroundColor(.white)
                         .padding(.leading, 16)
+                        .id(localizationManager.currentLanguage) // Force refresh on language change
                     
                     Spacer()
                     
@@ -74,7 +76,7 @@ struct HomeView: View {
                         // Gold Detector Card
                         FeatureCard(
                             backgroundImageName: "Gold Detector",
-                            title: "Gold Detector",
+                            title: LocalizedString.goldDetector.localized,
                             onTap: {
                                 onDetectorTap("Gold Detector")
                             }
@@ -83,7 +85,7 @@ struct HomeView: View {
                         // Metal Detector Card
                         FeatureCard(
                             backgroundImageName: "Metal Detector",
-                            title: "Metal Detector",
+                            title: LocalizedString.metalDetector.localized,
                             onTap: {
                                 onDetectorTap("Metal Detector")
                             }
@@ -92,7 +94,7 @@ struct HomeView: View {
                         // Stud Finder Card
                         FeatureCard(
                             backgroundImageName: "Stud Finder",
-                            title: "Stud Finder",
+                            title: LocalizedString.studFinder.localized,
                             onTap: {
                                 onDetectorTap("Stud Finder")
                             }
@@ -101,7 +103,7 @@ struct HomeView: View {
                         // Handled Detector Card
                         FeatureCard(
                             backgroundImageName: "Handled Detector",
-                            title: "Handled Detector",
+                            title: LocalizedString.handledDetector.localized,
                             onTap: {
                                 onDetectorTap("Handled Detector")
                             }
@@ -110,7 +112,7 @@ struct HomeView: View {
                         // Digital Compass Card
                         FeatureCard(
                             backgroundImageName: "Digital Compass",
-                            title: "Digital Compass",
+                            title: LocalizedString.digitalCompass.localized,
                             onTap: {
                                 onDetectorTap("Digital Compass")
                             }
@@ -119,7 +121,7 @@ struct HomeView: View {
                         // Bubble Level Card
                         FeatureCard(
                             backgroundImageName: "Bubble level",
-                            title: "Bubble level",
+                            title: LocalizedString.bubbleLevel.localized,
                             onTap: {
                                 onDetectorTap("Bubble level")
                             }
@@ -157,7 +159,7 @@ struct FeatureCard: View {
                     
                     // Text Overlay (center positioned, but with proper left padding)
                     Text(title)
-                        .font(.system(size: 20, weight: .bold))
+                        .font(.custom("Manrope_Bold", size: 20))
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
                     

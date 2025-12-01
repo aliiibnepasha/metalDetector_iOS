@@ -1,0 +1,60 @@
+/* 
+  Localizable.strings (Filipino - Philipino)
+  Metal Detector IOS
+*/
+
+// MARK: - Home Screen
+"metal_detector" = "Metal Detector";
+"gold_detector" = "Gold Detector";
+"stud_finder" = "Stud Finder";
+"handled_detector" = "Handheld Detector";
+"digital_compass" = "Digital Compass";
+"bubble_level" = "Bubble Level";
+
+// MARK: - Settings
+"setting" = "Mga Setting";
+"language" = "Wika";
+"share" = "Ibahagi";
+"rate" = "I-rate";
+"privacy_policy" = "Patakaran sa Privacy";
+"terms_of_use" = "Mga Tuntunin ng Paggamit";
+"default" = "Default";
+
+// MARK: - Language Screen
+"select_your_language" = "Pumili ng Iyong Wika";
+"done" = "Tapos na";
+
+// MARK: - Detector Views
+"meter_view" = "Tingnan ang Metro";
+"graph_view" = "Tingnan ang Graph";
+"digital_view" = "Digital na Tanawin";
+"sensor_view" = "Tingnan ang Sensor";
+"calibration_view" = "Tingnan ang Calibration";
+"magnetic_view" = "Magnetic na Tanawin";
+"compass_detector" = "Compass Detector";
+"handled_detector_view" = "Handheld Detector";
+
+// MARK: - Common Messages
+"no_gold_detected" = "Walang Nahanap na Ginto,";
+"please_check_thoroughly" = "Mangyaring Suriin nang Maingat";
+"start_detection" = "Simulan ang Pagtuklas";
+"stop_detection" = "Itigil ang Pagtuklas";
+
+// MARK: - Paywall
+"premium" = "Premium";
+"go_premium" = "I-upgrade sa Premium";
+"get_premium" = "Kumuha ng Premium";
+"continue_free" = "Magpatuloy nang Libre";
+"go_premium_for_6_dollars_month" = "I-upgrade sa premium para sa 6$/ buwan";
+
+// MARK: - Intro Screens
+"next" = "Susunod";
+"skip" = "laktawan";
+"get_started" = "Magsimula";
+"metal_detector_gold_finder" = "Metal Detector at Gold Finder";
+"detect_metal_accessories_gold" = "Madaling tuklasin ang mga metal accessories at gold materials.";
+"gold_metal_sensitivity_gauge" = "Gold & Metal Sensitivity Gauge";
+"the_smart_way_to_find_north" = "Ang Matalinong Paraan upang Hanapin ang Hilaga";
+
+// MARK: - Premium Card
+"detect_hidden_treasures_faster" = "Mabilis na tuklasin ang mga nakatagong kayamanan gamit ang Premium mode";

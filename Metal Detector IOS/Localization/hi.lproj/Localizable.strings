@@ -1,0 +1,60 @@
+/* 
+  Localizable.strings (Hindi)
+  Metal Detector IOS
+*/
+
+// MARK: - Home Screen
+"metal_detector" = "धातु डिटेक्टर";
+"gold_detector" = "सोना डिटेक्टर";
+"stud_finder" = "स्टड फाइंडर";
+"handled_detector" = "हैंडहेल्ड डिटेक्टर";
+"digital_compass" = "डिजिटल कम्पास";
+"bubble_level" = "बबल लेवल";
+
+// MARK: - Settings
+"setting" = "सेटिंग्स";
+"language" = "भाषा";
+"share" = "साझा करें";
+"rate" = "रेटिंग";
+"privacy_policy" = "गोपनीयता नीति";
+"terms_of_use" = "उपयोग की शर्तें";
+"default" = "डिफ़ॉल्ट";
+
+// MARK: - Language Screen
+"select_your_language" = "अपनी भाषा चुनें";
+"done" = "पूर्ण";
+
+// MARK: - Detector Views
+"meter_view" = "मीटर दृश्य";
+"graph_view" = "ग्राफ दृश्य";
+"digital_view" = "डिजिटल दृश्य";
+"sensor_view" = "सेंसर दृश्य";
+"calibration_view" = "कैलिब्रेशन दृश्य";
+"magnetic_view" = "चुंबकीय दृश्य";
+"compass_detector" = "कम्पास डिटेक्टर";
+"handled_detector_view" = "हैंडहेल्ड डिटेक्टर";
+
+// MARK: - Common Messages
+"no_gold_detected" = "कोई सोना पाया नहीं गया,";
+"please_check_thoroughly" = "कृपया अच्छी तरह से जांच करें";
+"start_detection" = "डिटेक्शन शुरू करें";
+"stop_detection" = "डिटेक्शन रोकें";
+
+// MARK: - Paywall
+"premium" = "प्रीमियम";
+"go_premium" = "प्रीमियम में अपग्रेड करें";
+"get_premium" = "प्रीमियम प्राप्त करें";
+"continue_free" = "मुफ्त जारी रखें";
+"go_premium_for_6_dollars_month" = "6$/महीने में प्रीमियम में अपग्रेड करें";
+
+// MARK: - Intro Screens
+"next" = "अगला";
+"skip" = "छोड़ें";
+"get_started" = "शुरू करें";
+"metal_detector_gold_finder" = "धातु डिटेक्टर और सोना खोजक";
+"detect_metal_accessories_gold" = "धातु सामान और सोने की सामग्री को आसानी से खोजें।";
+"gold_metal_sensitivity_gauge" = "सोना और धातु संवेदनशीलता गेज";
+"the_smart_way_to_find_north" = "उत्तर खोजने का स्मार्ट तरीका";
+
+// MARK: - Premium Card
+"detect_hidden_treasures_faster" = "प्रीमियम मोड के साथ छुपे खजाने को तेजी से खोजें";

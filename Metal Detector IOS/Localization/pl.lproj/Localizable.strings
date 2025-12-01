@@ -1,0 +1,60 @@
+/* 
+  Localizable.strings (Polish - Polski)
+  Metal Detector IOS
+*/
+
+// MARK: - Home Screen
+"metal_detector" = "Wykrywacz Metali";
+"gold_detector" = "Wykrywacz Złota";
+"stud_finder" = "Wykrywacz Słupków";
+"handled_detector" = "Wykrywacz Ręczny";
+"digital_compass" = "Kompas Cyfrowy";
+"bubble_level" = "Poziomica";
+
+// MARK: - Settings
+"setting" = "Ustawienia";
+"language" = "Język";
+"share" = "Udostępnij";
+"rate" = "Oceń";
+"privacy_policy" = "Polityka prywatności";
+"terms_of_use" = "Warunki użytkowania";
+"default" = "Domyślny";
+
+// MARK: - Language Screen
+"select_your_language" = "Wybierz swój Język";
+"done" = "Gotowe";
+
+// MARK: - Detector Views
+"meter_view" = "Widok Licznika";
+"graph_view" = "Widok Wykresu";
+"digital_view" = "Widok Cyfrowy";
+"sensor_view" = "Widok Czujnika";
+"calibration_view" = "Widok Kalibracji";
+"magnetic_view" = "Widok Magnetyczny";
+"compass_detector" = "Wykrywacz Kompasu";
+"handled_detector_view" = "Wykrywacz Ręczny";
+
+// MARK: - Common Messages
+"no_gold_detected" = "Nie wykryto złota,";
+"please_check_thoroughly" = "Proszę sprawdzić dokładnie";
+"start_detection" = "Rozpocznij Wykrywanie";
+"stop_detection" = "Zatrzymaj Wykrywanie";
+
+// MARK: - Paywall
+"premium" = "Premium";
+"go_premium" = "Przejdź na Premium";
+"get_premium" = "Uzyskaj Premium";
+"continue_free" = "Kontynuuj za Darmo";
+"go_premium_for_6_dollars_month" = "Przejdź na premium za 6$/ miesięcznie";
+
+// MARK: - Intro Screens
+"next" = "Dalej";
+"skip" = "pomiń";
+"get_started" = "Zacznij";
+"metal_detector_gold_finder" = "Wykrywacz Metali i Złota";
+"detect_metal_accessories_gold" = "Łatwo wykrywaj akcesoria metalowe i materiały ze złota.";
+"gold_metal_sensitivity_gauge" = "Miernik Czułości Złota i Metali";
+"the_smart_way_to_find_north" = "Inteligentny Sposób na Znalezienie Północy";
+
+// MARK: - Premium Card
+"detect_hidden_treasures_faster" = "Wykrywaj ukryte skarby szybciej dzięki trybowi Premium";

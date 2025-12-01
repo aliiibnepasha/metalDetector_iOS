@@ -1,0 +1,73 @@
+/* 
+  Localizable.strings (English - Base)
+  Metal Detector IOS
+*/
+
+// MARK: - Home Screen
+"metal_detector" = "Metal Detector";
+"gold_detector" = "Gold Detector";
+"stud_finder" = "Stud Finder";
+"handled_detector" = "Handled Detector";
+"digital_compass" = "Digital Compass";
+"bubble_level" = "Bubble level";
+
+// MARK: - Settings
+"setting" = "Setting";
+"language" = "Language";
+"share" = "Share";
+"rate" = "Rate";
+"privacy_policy" = "Privacy policy";
+"terms_of_use" = "Terms of use";
+"default" = "Default";
+
+// MARK: - Language Screen
+"select_your_language" = "Select your Language";
+"done" = "Done";
+
+// MARK: - Detector Views
+"meter_view" = "Meter view";
+"graph_view" = "Graph view";
+"digital_view" = "Digital view";
+"sensor_view" = "Sensor view";
+"calibration_view" = "Calibration view";
+"magnetic_view" = "Magnetic view";
+"compass_detector" = "Compass detector";
+"handled_detector_view" = "Handled detector";
+
+// MARK: - Common Messages
+"no_gold_detected" = "No Gold detected,";
+"please_check_thoroughly" = "Please check thoroughly";
+"start_detection" = "Start Detection";
+"stop_detection" = "Stop Detection";
+
+// MARK: - Paywall
+"premium" = "Premium";
+"go_premium" = "Go Premium";
+"get_premium" = "Get Premium";
+"continue_free" = "Continue Free";
+"or_continue_for_free" = "or continue for free";
+"go_premium_for_6_dollars_month" = "Go premium for 6$/ month";
+"whats_included" = "what's included";
+"remove_ads" = "Remove Ads";
+"unlimited_scanning" = "Unlimited Scanning";
+"ultra_accurate_detection" = "Ultra-Accurate Detection";
+"gold_precious_metal_scanner" = "Gold & Precious Metal Scanner";
+"24_7_help_support" = "24/7 help & support";
+
+// MARK: - Intro Screens
+"next" = "Next";
+"skip" = "skip";
+"get_started" = "Get Started";
+"metal_detector_gold_finder" = "Metal Detector & Gold Finder";
+"detect_metal_accessories_gold" = "Detect Metal Accessories & gold materials easily.";
+"gold_metal_sensitivity_gauge" = "Gold & Metal Sensitivity Gauge";
+"monitor_live_sensor_curves" = "Monitor live sensor curves and uncover hidden materials.";
+"the_smart_way_to_find_north" = "The Smart Way to Find North";
+"guided_by_precision" = "Guided by precision magnetic sensors in your pocket.";
+
+// MARK: - Splash Screen
+"metal_detector_pro" = "Metal Detector";
+"loading" = "Loading...";
+
+// MARK: - Premium Card
+"detect_hidden_treasures_faster" = "Detect hidden treasures faster with Premium mode";

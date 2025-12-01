@@ -1,0 +1,60 @@
+/* 
+  Localizable.strings (Portuguese - Portugues)
+  Metal Detector IOS
+*/
+
+// MARK: - Home Screen
+"metal_detector" = "Detector de Metais";
+"gold_detector" = "Detector de Ouro";
+"stud_finder" = "Localizador de Montantes";
+"handled_detector" = "Detector de Mão";
+"digital_compass" = "Bússola Digital";
+"bubble_level" = "Nível de Bolha";
+
+// MARK: - Settings
+"setting" = "Configurações";
+"language" = "Idioma";
+"share" = "Compartilhar";
+"rate" = "Avaliar";
+"privacy_policy" = "Política de Privacidade";
+"terms_of_use" = "Termos de Uso";
+"default" = "Padrão";
+
+// MARK: - Language Screen
+"select_your_language" = "Selecione seu Idioma";
+"done" = "Concluído";
+
+// MARK: - Detector Views
+"meter_view" = "Visualização do Medidor";
+"graph_view" = "Visualização do Gráfico";
+"digital_view" = "Visualização Digital";
+"sensor_view" = "Visualização do Sensor";
+"calibration_view" = "Visualização de Calibração";
+"magnetic_view" = "Visualização Magnética";
+"compass_detector" = "Detector de Bússola";
+"handled_detector_view" = "Detector de Mão";
+
+// MARK: - Common Messages
+"no_gold_detected" = "Nenhum Ouro Detectado,";
+"please_check_thoroughly" = "Por Favor Verifique Completamente";
+"start_detection" = "Iniciar Detecção";
+"stop_detection" = "Parar Detecção";
+
+// MARK: - Paywall
+"premium" = "Premium";
+"go_premium" = "Ir para Premium";
+"get_premium" = "Obter Premium";
+"continue_free" = "Continuar Grátis";
+"go_premium_for_6_dollars_month" = "Ir para premium por 6$/ mês";
+
+// MARK: - Intro Screens
+"next" = "Próximo";
+"skip" = "pular";
+"get_started" = "Começar";
+"metal_detector_gold_finder" = "Detector de Metais e Localizador de Ouro";
+"detect_metal_accessories_gold" = "Detecte facilmente acessórios metálicos e materiais de ouro.";
+"gold_metal_sensitivity_gauge" = "Medidor de Sensibilidade de Ouro e Metais";
+"the_smart_way_to_find_north" = "A Maneira Inteligente de Encontrar o Norte";
+
+// MARK: - Premium Card
+"detect_hidden_treasures_faster" = "Detecte tesouros escondidos mais rapidamente com o modo Premium";

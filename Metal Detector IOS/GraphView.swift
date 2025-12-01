@@ -10,9 +10,12 @@ import SwiftUI
 struct GraphView: View {
     var onBackTap: () -> Void
     @StateObject private var detectorManager = MetalDetectorManager.shared
+    @StateObject private var localizationManager = LocalizationManager.shared
     @State private var graphData: [Double] = []
     @State private var maxDataPoints = 50 // Keep last 50 readings
     @State private var cursorPosition: Double = 100.0 // X position of cursor (0-100)
+    @State private var soundEnabled = true
+    @State private var vibrationEnabled = true
     
     // Computed properties for cursor value and label
     private var selectedValue: Double {
@@ -53,22 +56,31 @@ struct GraphView: View {
                             .frame(width: 44, height: 44)
                     }
                     
-                    Text("Graph view")
-                        .font(.system(size: 24, weight: .bold, design: .serif))
+                    Text(LocalizedString.graphView.localized)
+                        .font(.custom("Zodiak", size: 24))
                         .foregroundColor(.white)
+                        .id(localizationManager.currentLanguage)
                     
                     Spacer()
                     
                     // Sound Button
                     Button(action: {
-                        // Handle sound action
+                        soundEnabled.toggle()
+                        detectorManager.setSoundEnabled(soundEnabled)
                     }) {
                         ZStack {
-                            Image("Pro Button Background")
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 40, height: 40)
-                                .clipShape(RoundedRectangle(cornerRadius: 30))
+                            // Conditional background: Yellow asset when ON, Gray when OFF
+                            if soundEnabled {
+                                Image("Pro Button Background")
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 40, height: 40)
+                                    .clipShape(RoundedRectangle(cornerRadius: 30))
+                            } else {
+                                Circle()
+                                    .fill(Color.gray.opacity(0.3))
+                                    .frame(width: 40, height: 40)
+                            }
                             
                             Image("Sound Icon")
                                 .resizable()
@@ -80,14 +92,22 @@ struct GraphView: View {
                     
                     // Vibration Button
                     Button(action: {
-                        // Handle vibration action
+                        vibrationEnabled.toggle()
+                        detectorManager.setVibrationEnabled(vibrationEnabled)
                     }) {
                         ZStack {
-                            Image("Pro Button Background")
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 40, height: 40)
-                                .clipShape(RoundedRectangle(cornerRadius: 30))
+                            // Conditional background: Yellow asset when ON, Gray when OFF
+                            if vibrationEnabled {
+                                Image("Pro Button Background")
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 40, height: 40)
+                                    .clipShape(RoundedRectangle(cornerRadius: 30))
+                            } else {
+                                Circle()
+                                    .fill(Color.gray.opacity(0.3))
+                                    .frame(width: 40, height: 40)
+                            }
                             
                             Image("Vibration Icon")
                                 .resizable()
@@ -122,13 +142,15 @@ struct GraphView: View {
                 
                 // Detection Status Text (moved closer to graph)
                 VStack(spacing: 12) {
-                    Text("No Gold detected,")
-                        .font(.system(size: 24, weight: .bold, design: .serif))
+                    Text(LocalizedString.noGoldDetected.localized)
+                        .font(.custom("Zodiak", size: 24))
                         .foregroundColor(.white)
+                        .id(localizationManager.currentLanguage)
                     
-                    Text("Please check thoroughly")
+                    Text(LocalizedString.pleaseCheckThoroughly.localized)
                         .font(.system(size: 14, weight: .medium))
                         .foregroundColor(.white.opacity(0.7))
+                        .id(localizationManager.currentLanguage)
                 }
                 .padding(.top, 36)
                 
@@ -142,6 +164,9 @@ struct GraphView: View {
             detectorManager.startDetection()
             // Initialize with empty array - will fill with real data
             graphData = []
+            // Sync with detectorManager
+            soundEnabled = detectorManager.soundEnabled
+            vibrationEnabled = detectorManager.vibrationEnabled
         }
         .onDisappear {
             detectorManager.stopDetection()

@@ -12,6 +12,7 @@ struct DetectorView: View {
     let detectorTitle: String
     var onBackTap: () -> Void
     @StateObject private var detectorManager = MetalDetectorManager.shared
+    @StateObject private var localizationManager = LocalizationManager.shared
     var onMeterViewTap: (() -> Void)? = nil
     var onGraphViewTap: (() -> Void)? = nil
     var onDigitalViewTap: (() -> Void)? = nil
@@ -40,8 +41,9 @@ struct DetectorView: View {
                         }
                         
                         Text(detectorTitle)
-                            .font(.system(size: 24, weight: .bold, design: .serif))
+                            .font(.custom("Zodiak", size: 24))
                             .foregroundColor(.white)
+                            .id(localizationManager.currentLanguage)
                         
                         Spacer()
                     }
@@ -56,7 +58,7 @@ struct DetectorView: View {
                             // Meter View
                             ViewCard(
                                 backgroundImageName: "Meter View Background",
-                                title: "Meter view",
+                                title: LocalizedString.meterView.localized,
                                 lottieName: "meter",
                                 onTap: {
                                     onMeterViewTap?()
@@ -66,7 +68,7 @@ struct DetectorView: View {
                             // Graph View
                             ViewCard(
                                 backgroundImageName: "Graph View Background",
-                                title: "Graph view",
+                                title: LocalizedString.graphView.localized,
                                 lottieName: "Graph Lottie Animation",
                                 onTap: {
                                     onGraphViewTap?()
@@ -79,7 +81,7 @@ struct DetectorView: View {
                             // Digital View
                             ViewCard(
                                 backgroundImageName: "Digital View Background",
-                                title: "Digital view",
+                                title: LocalizedString.digitalView.localized,
                                 lottieName: "Animated compass",
                                 onTap: {
                                     onDigitalViewTap?()
@@ -89,7 +91,7 @@ struct DetectorView: View {
                             // Sensor View
                             ViewCard(
                                 backgroundImageName: "Sensor View Background",
-                                title: "Sensor view",
+                                title: LocalizedString.sensorView.localized,
                                 lottieName: "sensor",
                                 onTap: {
                                     onSensorViewTap?()
@@ -102,7 +104,7 @@ struct DetectorView: View {
                             // Calibration View
                             ViewCard(
                                 backgroundImageName: "Calibration View Background",
-                                title: "Calibration view",
+                                title: LocalizedString.calibrationView.localized,
                                 lottieName: "Weighing Scale",
                                 onTap: {
                                     onCalibrationViewTap?()
@@ -112,7 +114,7 @@ struct DetectorView: View {
                             // Magnetic View
                             ViewCard(
                                 backgroundImageName: "Magnetic View Background",
-                                title: "Magnetic view",
+                                title: LocalizedString.magneticView.localized,
                                 lottieName: "Magnet",
                                 onTap: {
                                     onMagneticViewTap?()
@@ -172,10 +174,11 @@ struct ViewCard: View {
                     
                     // Title Text
                     Text(title)
-                        .font(.system(size: 16, weight: .semibold))
+                        .font(.custom("Manrope_Bold", size: 16))
                         .foregroundColor(.white)
                         .tracking(-0.48)
                         .padding(.bottom, 16)
+                        .id(LocalizationManager.shared.currentLanguage)
                 }
                 .frame(width: 184, height: 198)
             }

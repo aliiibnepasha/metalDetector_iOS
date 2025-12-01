@@ -9,8 +9,10 @@ import SwiftUI
 
 struct SettingsView: View {
     @State private var rotationAngle: Double = 0
+    @StateObject private var localizationManager = LocalizationManager.shared
     var onBackTap: () -> Void
     var onGetPremiumTap: (() -> Void)? = nil
+    var onLanguageTap: (() -> Void)? = nil
     
     var body: some View {
         ZStack {
@@ -32,9 +34,10 @@ struct SettingsView: View {
                                 .frame(width: 44, height: 44)
                         }
                         
-                        Text("Setting")
-                            .font(.system(size: 24, weight: .bold, design: .serif))
+                        Text(LocalizedString.setting.localized)
+                            .font(.custom("Zodiak", size: 24))
                             .foregroundColor(.white)
+                            .id(localizationManager.currentLanguage) // Force refresh on language change
                         
                         Spacer()
                     }
@@ -50,11 +53,11 @@ struct SettingsView: View {
                         
                         HStack {
                             VStack(alignment: .leading, spacing: 12) {
-                                Text("Metal Detector")
-                                    .font(.system(size: 18, weight: .semibold))
+                                Text(LocalizedString.metalDetector.localized)
+                                    .font(.custom("Manrope_Bold", size: 18))
                                     .foregroundColor(.white)
                                 
-                                Text("Detect hidden treasures faster with Premium mode")
+                                Text(LocalizedString.detectHiddenTreasuresFaster.localized)
                                     .font(.system(size: 14, weight: .medium))
                                     .foregroundColor(.white.opacity(0.7))
                                     .lineLimit(3)
@@ -77,8 +80,8 @@ struct SettingsView: View {
                                                 .scaledToFit()
                                                 .frame(width: 18, height: 18)
                                             
-                                            Text("Get Premium")
-                                                .font(.system(size: 12.94, weight: .semibold))
+                                            Text(LocalizedString.getPremium.localized)
+                                                .font(.custom("Manrope_Bold", size: 12.94))
                                                 .foregroundColor(.black)
                                                 
                                                 .tracking(-0.78)
@@ -120,8 +123,11 @@ struct SettingsView: View {
                             // Language
                             SettingsRow(
                                 iconName: "Language Icon",
-                                title: "Language",
-                                rightText: "Default"
+                                title: LocalizedString.language.localized,
+                                rightText: LocalizedString.defaultLabel.localized,
+                                onTap: {
+                                    onLanguageTap?()
+                                }
                             )
                             
                             Divider()
@@ -131,7 +137,7 @@ struct SettingsView: View {
                             // Share
                             SettingsRow(
                                 iconName: "Share Icon",
-                                title: "Share"
+                                title: LocalizedString.share.localized
                             )
                             
                             Divider()
@@ -141,7 +147,7 @@ struct SettingsView: View {
                             // Rate
                             SettingsRow(
                                 iconName: "Rate Icon",
-                                title: "Rate"
+                                title: LocalizedString.rate.localized
                             )
                             
                             Divider()
@@ -151,7 +157,7 @@ struct SettingsView: View {
                             // Privacy Policy
                             SettingsRow(
                                 iconName: "Privacy Icon",
-                                title: "Privacy policy"
+                                title: LocalizedString.privacyPolicy.localized
                             )
                             
                             Divider()
@@ -161,7 +167,7 @@ struct SettingsView: View {
                             // Terms of Use
                             SettingsRow(
                                 iconName: "Terms Icon",
-                                title: "Terms of use"
+                                title: LocalizedString.termsOfUse.localized
                             )
                         }
                         .padding(.vertical, 24)
@@ -177,10 +183,11 @@ struct SettingsRow: View {
     let iconName: String
     let title: String
     var rightText: String? = nil
+    var onTap: (() -> Void)? = nil
     
     var body: some View {
         Button(action: {
-            // Handle row tap
+            onTap?()
         }) {
             HStack {
                 Image(iconName)

@@ -1,0 +1,60 @@
+/* 
+  Localizable.strings (French - Francias)
+  Metal Detector IOS
+*/
+
+// MARK: - Home Screen
+"metal_detector" = "Détecteur de Métaux";
+"gold_detector" = "Détecteur d'Or";
+"stud_finder" = "Détecteur de Montants";
+"handled_detector" = "Détecteur Portable";
+"digital_compass" = "Boussole Numérique";
+"bubble_level" = "Niveau à Bulle";
+
+// MARK: - Settings
+"setting" = "Paramètres";
+"language" = "Langue";
+"share" = "Partager";
+"rate" = "Évaluer";
+"privacy_policy" = "Politique de confidentialité";
+"terms_of_use" = "Conditions d'utilisation";
+"default" = "Par défaut";
+
+// MARK: - Language Screen
+"select_your_language" = "Sélectionnez votre Langue";
+"done" = "Terminé";
+
+// MARK: - Detector Views
+"meter_view" = "Vue du Compteur";
+"graph_view" = "Vue Graphique";
+"digital_view" = "Vue Numérique";
+"sensor_view" = "Vue Capteur";
+"calibration_view" = "Vue de Calibration";
+"magnetic_view" = "Vue Magnétique";
+"compass_detector" = "Détecteur de Boussole";
+"handled_detector_view" = "Détecteur Portable";
+
+// MARK: - Common Messages
+"no_gold_detected" = "Aucun Or détecté,";
+"please_check_thoroughly" = "Veuillez vérifier minutieusement";
+"start_detection" = "Démarrer la Détection";
+"stop_detection" = "Arrêter la Détection";
+
+// MARK: - Paywall
+"premium" = "Premium";
+"go_premium" = "Passer en Premium";
+"get_premium" = "Obtenir Premium";
+"continue_free" = "Continuer Gratuitement";
+"go_premium_for_6_dollars_month" = "Passer en premium pour 6$/ mois";
+
+// MARK: - Intro Screens
+"next" = "Suivant";
+"skip" = "passer";
+"get_started" = "Commencer";
+"metal_detector_gold_finder" = "Détecteur de Métaux et Chercheur d'Or";
+"detect_metal_accessories_gold" = "Détectez facilement les accessoires métalliques et les matériaux en or.";
+"gold_metal_sensitivity_gauge" = "Jauge de Sensibilité Or et Métaux";
+"the_smart_way_to_find_north" = "Le Moyen Intelligent de Trouver le Nord";
+
+// MARK: - Premium Card
+"detect_hidden_treasures_faster" = "Détectez les trésors cachés plus rapidement avec le mode Premium";

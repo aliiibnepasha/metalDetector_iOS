@@ -21,6 +21,7 @@ enum IntroRoute: Hashable {
     case calibrationView
     case magneticView
     case paywall
+    case language
 }
 
 struct RootView: View {
@@ -111,6 +112,17 @@ struct RootView: View {
                             },
                             onGetPremiumTap: {
                                 navigationPath.append(IntroRoute.paywall)
+                            },
+                            onLanguageTap: {
+                                navigationPath.append(IntroRoute.language)
+                            }
+                        )
+                        .navigationBarBackButtonHidden(true)
+                        .navigationBarHidden(true)
+                    case .language:
+                        LanguageView(
+                            onBackTap: {
+                                navigationPath.removeLast()
                             }
                         )
                         .navigationBarBackButtonHidden(true)

@@ -9,28 +9,31 @@ import SwiftUI
 
 struct IntroOnboardingView: View {
     @State private var currentPage = 0
+    @ObservedObject private var localizationManager = LocalizationManager.shared
     var onGetStarted: () -> Void
     
-    let introPages = [
-        IntroPage(
-            imageName: "Phone_Air 1",
-            title: "Metal Detector & Gold Finder",
-            description: "Detector Metal Accessories & gold materials easily.",
-            descriptionWidth: 233
-        ),
-        IntroPage(
-            imageName: "Phone_Air (1) 1",
-            title: "Gold & Metal Sensitivity Gauge",
-            description: "Monitor live sensor curves and uncover hidden materials.",
-            descriptionWidth: 253
-        ),
-        IntroPage(
-            imageName: "415845897_8f37c68b-d006-49d8-9c53-8e9483be02fe 1",
-            title: "The Smart Way to Find North",
-            description: "Guided by precision magnetic sensors in your pocket.",
-            descriptionWidth: 241
-        )
-    ]
+    var introPages: [IntroPage] {
+        [
+            IntroPage(
+                imageName: "Phone_Air 1",
+                title: LocalizedString.metalDetectorGoldFinder.localized,
+                description: LocalizedString.detectMetalAccessoriesGold.localized,
+                descriptionWidth: 233
+            ),
+            IntroPage(
+                imageName: "Phone_Air (1) 1",
+                title: LocalizedString.goldMetalSensitivityGauge.localized,
+                description: LocalizedString.monitorLiveSensorCurves.localized,
+                descriptionWidth: 253
+            ),
+            IntroPage(
+                imageName: "415845897_8f37c68b-d006-49d8-9c53-8e9483be02fe 1",
+                title: LocalizedString.theSmartWayToFindNorth.localized,
+                description: LocalizedString.guidedByPrecision.localized,
+                descriptionWidth: 241
+            )
+        ]
+    }
     
     var body: some View {
         ZStack {
@@ -40,7 +43,7 @@ struct IntroOnboardingView: View {
             
             TabView(selection: $currentPage) {
                 ForEach(0..<introPages.count, id: \.self) { index in
-                    IntroPageView(page: introPages[index])
+                    IntroPageView(pageIndex: index)
                         .tag(index)
                 }
             }
@@ -96,11 +99,12 @@ struct IntroOnboardingView: View {
                             .frame(width: 271, height: 40)
                             
                             // Button text (changes based on page)
-                            Text(currentPage < introPages.count - 1 ? "Next" : "Get Started")
-                                .font(.system(size: 16, weight: .semibold))
+                            Text(currentPage < introPages.count - 1 ? LocalizedString.next.localized : LocalizedString.getStarted.localized)
+                                .font(.custom("Manrope_Bold", size: 16))
                                 .foregroundColor(.black)
                                 .tracking(-0.8)
                                 .animation(.none, value: currentPage)
+                                .id(localizationManager.currentLanguage)
                         }
                     }
                 }
@@ -108,42 +112,70 @@ struct IntroOnboardingView: View {
                 .padding(.horizontal, 36)
             }
             
-            // Skip Button (top right)
-            VStack {
-                HStack {
-                    Spacer()
-                    Button(action: {
-                        onGetStarted()
-                    }) {
-                        Text("skip")
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundColor(.white.opacity(0.6))
-                            .textCase(.lowercase)
+            // Skip Button (top right) - Hide on last page (Intro 3)
+            if currentPage < introPages.count - 1 {
+                VStack {
+                    HStack {
+                        Spacer()
+                        Button(action: {
+                            onGetStarted()
+                        }) {
+                            Text(LocalizedString.skip.localized)
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(.white.opacity(0.6))
+                                .textCase(.lowercase)
+                                .id(localizationManager.currentLanguage)
+                        }
+                        .padding(.trailing, 34)
+                        .padding(.top, 10)
                     }
-                    .padding(.trailing, 34)
-                    .padding(.top, 10)
+                    Spacer()
                 }
-                Spacer()
             }
         }
     }
 }
 
 struct IntroPage {
-    let imageName: String
-    let title: String
-    let description: String
-    let descriptionWidth: CGFloat
+    var imageName: String
+    var title: String
+    var description: String
+    var descriptionWidth: CGFloat
 }
 
 struct IntroPageView: View {
-    let page: IntroPage
+    let pageIndex: Int
+    @ObservedObject private var localizationManager = LocalizationManager.shared
+    
+    private var pageData: IntroPage {
+        let pages = [
+            IntroPage(
+                imageName: "Phone_Air 1",
+                title: LocalizedString.metalDetectorGoldFinder.localized,
+                description: LocalizedString.detectMetalAccessoriesGold.localized,
+                descriptionWidth: 233
+            ),
+            IntroPage(
+                imageName: "Phone_Air (1) 1",
+                title: LocalizedString.goldMetalSensitivityGauge.localized,
+                description: LocalizedString.monitorLiveSensorCurves.localized,
+                descriptionWidth: 253
+            ),
+            IntroPage(
+                imageName: "415845897_8f37c68b-d006-49d8-9c53-8e9483be02fe 1",
+                title: LocalizedString.theSmartWayToFindNorth.localized,
+                description: LocalizedString.guidedByPrecision.localized,
+                descriptionWidth: 241
+            )
+        ]
+        return pages[min(pageIndex, pages.count - 1)]
+    }
     
     var body: some View {
         ZStack {
             // Phone Image (positioned at top)
             VStack(alignment: .center) {
-                Image(page.imageName)
+                Image(pageData.imageName)
                     .resizable()
                     .scaledToFit()
                     .frame(width: 412, height: 700)
@@ -173,16 +205,50 @@ struct IntroPageView: View {
                 Spacer()
                 
                 VStack(spacing: 14.76) {
-                    Text(page.title)
-                        .font(.system(size: 38, weight: .bold, design: .serif))
-                        .foregroundColor(.white)
-                        .multilineTextAlignment(.center)
+                    // Title - Direct localized strings based on page index
+                    if pageIndex == 0 {
+                        Text(LocalizedString.metalDetectorGoldFinder.localized)
+                            .font(.custom("Zodiak", size: 38))
+                            .foregroundColor(.white)
+                            .multilineTextAlignment(.center)
+                            .id("title_\(localizationManager.currentLanguage)_\(pageIndex)")
+                    } else if pageIndex == 1 {
+                        Text(LocalizedString.goldMetalSensitivityGauge.localized)
+                            .font(.custom("Zodiak", size: 38))
+                            .foregroundColor(.white)
+                            .multilineTextAlignment(.center)
+                            .id("title_\(localizationManager.currentLanguage)_\(pageIndex)")
+                    } else {
+                        Text(LocalizedString.theSmartWayToFindNorth.localized)
+                            .font(.custom("Zodiak", size: 38))
+                            .foregroundColor(.white)
+                            .multilineTextAlignment(.center)
+                            .id("title_\(localizationManager.currentLanguage)_\(pageIndex)")
+                    }
                     
-                    Text(page.description)
-                        .font(.system(size: 16, weight: .medium))
-                        .foregroundColor(.white.opacity(0.7))
-                        .multilineTextAlignment(.center)
-                        .frame(width: page.descriptionWidth)
+                    // Description - Direct localized strings based on page index
+                    if pageIndex == 0 {
+                        Text(LocalizedString.detectMetalAccessoriesGold.localized)
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(.white.opacity(0.7))
+                            .multilineTextAlignment(.center)
+                            .frame(width: 233)
+                            .id("description_\(localizationManager.currentLanguage)_\(pageIndex)")
+                    } else if pageIndex == 1 {
+                        Text(LocalizedString.monitorLiveSensorCurves.localized)
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(.white.opacity(0.7))
+                            .multilineTextAlignment(.center)
+                            .frame(width: 253)
+                            .id("description_\(localizationManager.currentLanguage)_\(pageIndex)")
+                    } else {
+                        Text(LocalizedString.guidedByPrecision.localized)
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(.white.opacity(0.7))
+                            .multilineTextAlignment(.center)
+                            .frame(width: 241)
+                            .id("description_\(localizationManager.currentLanguage)_\(pageIndex)")
+                    }
                 }
                 .padding(.bottom, 120)
                 .padding(.horizontal, 36)

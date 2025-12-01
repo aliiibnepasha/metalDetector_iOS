@@ -1,0 +1,60 @@
+/* 
+  Localizable.strings (Turkish - Turkce)
+  Metal Detector IOS
+*/
+
+// MARK: - Home Screen
+"metal_detector" = "Metal Dedektörü";
+"gold_detector" = "Altın Dedektörü";
+"stud_finder" = "Kiriş Bulucu";
+"handled_detector" = "El Dedektörü";
+"digital_compass" = "Dijital Pusula";
+"bubble_level" = "Kabin Seviyesi";
+
+// MARK: - Settings
+"setting" = "Ayarlar";
+"language" = "Dil";
+"share" = "Paylaş";
+"rate" = "Değerlendir";
+"privacy_policy" = "Gizlilik Politikası";
+"terms_of_use" = "Kullanım Şartları";
+"default" = "Varsayılan";
+
+// MARK: - Language Screen
+"select_your_language" = "Dilinizi Seçin";
+"done" = "Tamamlandı";
+
+// MARK: - Detector Views
+"meter_view" = "Sayaç Görünümü";
+"graph_view" = "Grafik Görünümü";
+"digital_view" = "Dijital Görünüm";
+"sensor_view" = "Sensör Görünümü";
+"calibration_view" = "Kalibrasyon Görünümü";
+"magnetic_view" = "Manyetik Görünüm";
+"compass_detector" = "Pusula Dedektörü";
+"handled_detector_view" = "El Dedektörü";
+
+// MARK: - Common Messages
+"no_gold_detected" = "Altın Tespit Edilmedi,";
+"please_check_thoroughly" = "Lütfen Dikkatlice Kontrol Edin";
+"start_detection" = "Tespiti Başlat";
+"stop_detection" = "Tespiti Durdur";
+
+// MARK: - Paywall
+"premium" = "Premium";
+"go_premium" = "Premium'a Geç";
+"get_premium" = "Premium Al";
+"continue_free" = "Ücretsiz Devam Et";
+"go_premium_for_6_dollars_month" = "Aylık 6$ ile premium'a geç";
+
+// MARK: - Intro Screens
+"next" = "İleri";
+"skip" = "atla";
+"get_started" = "Başla";
+"metal_detector_gold_finder" = "Metal Dedektörü ve Altın Bulucu";
+"detect_metal_accessories_gold" = "Metal aksesuarları ve altın malzemeleri kolayca tespit edin.";
+"gold_metal_sensitivity_gauge" = "Altın ve Metal Hassasiyet Ölçeri";
+"the_smart_way_to_find_north" = "Kuzeyi Bulmanın Akıllı Yolu";
+
+// MARK: - Premium Card
+"detect_hidden_treasures_faster" = "Premium mod ile gizli hazineleri daha hızlı tespit edin";

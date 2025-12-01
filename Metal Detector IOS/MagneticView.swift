@@ -10,6 +10,9 @@ import SwiftUI
 struct MagneticView: View {
     var onBackTap: () -> Void
     @StateObject private var detectorManager = MetalDetectorManager.shared
+    @StateObject private var localizationManager = LocalizationManager.shared
+    @State private var soundEnabled = true
+    @State private var vibrationEnabled = true
     
     // Computed properties for capsule fill levels
     private var firstCapsuleFill: Double {
@@ -56,22 +59,31 @@ struct MagneticView: View {
                             .frame(width: 44, height: 44)
                     }
                     
-                    Text("Magnetic view")
-                        .font(.system(size: 24, weight: .bold, design: .serif))
+                    Text(LocalizedString.magneticView.localized)
+                        .font(.custom("Zodiak", size: 24))
                         .foregroundColor(.white)
+                        .id(localizationManager.currentLanguage)
                     
                     Spacer()
                     
                     // Sound Button
                     Button(action: {
-                        // Handle sound action
+                        soundEnabled.toggle()
+                        detectorManager.setSoundEnabled(soundEnabled)
                     }) {
                         ZStack {
-                            Image("Pro Button Background")
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 40, height: 40)
-                                .clipShape(RoundedRectangle(cornerRadius: 30))
+                            // Conditional background: Yellow asset when ON, Gray when OFF
+                            if soundEnabled {
+                                Image("Pro Button Background")
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 40, height: 40)
+                                    .clipShape(RoundedRectangle(cornerRadius: 30))
+                            } else {
+                                Circle()
+                                    .fill(Color.gray.opacity(0.3))
+                                    .frame(width: 40, height: 40)
+                            }
                             
                             Image("Sound Icon")
                                 .resizable()
@@ -83,14 +95,22 @@ struct MagneticView: View {
                     
                     // Vibration Button
                     Button(action: {
-                        // Handle vibration action
+                        vibrationEnabled.toggle()
+                        detectorManager.setVibrationEnabled(vibrationEnabled)
                     }) {
                         ZStack {
-                            Image("Pro Button Background")
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 40, height: 40)
-                                .clipShape(RoundedRectangle(cornerRadius: 30))
+                            // Conditional background: Yellow asset when ON, Gray when OFF
+                            if vibrationEnabled {
+                                Image("Pro Button Background")
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 40, height: 40)
+                                    .clipShape(RoundedRectangle(cornerRadius: 30))
+                            } else {
+                                Circle()
+                                    .fill(Color.gray.opacity(0.3))
+                                    .frame(width: 40, height: 40)
+                            }
                             
                             Image("Vibration Icon")
                                 .resizable()
@@ -130,13 +150,15 @@ struct MagneticView: View {
                             
                             // Detection Status Text
                             VStack(spacing: 12) {
-                                Text("No Gold detected,")
-                                    .font(.system(size: 24, weight: .bold, design: .serif))
+                                Text(LocalizedString.noGoldDetected.localized)
+                                    .font(.custom("Zodiak", size: 24))
                                     .foregroundColor(.white)
+                                    .id(localizationManager.currentLanguage)
                                 
-                                Text("Please check thoroughly")
+                                Text(LocalizedString.pleaseCheckThoroughly.localized)
                                     .font(.system(size: 14, weight: .medium))
                                     .foregroundColor(.white.opacity(0.7))
+                                    .id(localizationManager.currentLanguage)
                             }
                         }
                         .padding(.vertical, 32)
@@ -191,8 +213,9 @@ struct MagneticView: View {
                     Button(action: {
                         detectorManager.startDetection()
                     }) {
-                        Text("Start Detection")
-                            .font(.system(size: 18, weight: .semibold))
+                        Text(LocalizedString.startDetection.localized)
+                            .font(.custom("Manrope_Bold", size: 18))
+                            .id(localizationManager.currentLanguage)
                             .foregroundColor(.black)
                             .tracking(-0.54)
                             .frame(maxWidth: .infinity)
@@ -205,8 +228,9 @@ struct MagneticView: View {
                     Button(action: {
                         detectorManager.stopDetection()
                     }) {
-                        Text("Stop Detection")
-                            .font(.system(size: 18, weight: .semibold))
+                        Text(LocalizedString.stopDetection.localized)
+                            .font(.custom("Manrope_Bold", size: 18))
+                            .id(localizationManager.currentLanguage)
                             .foregroundColor(.black)
                             .tracking(-0.54)
                             .frame(maxWidth: .infinity)
@@ -223,6 +247,11 @@ struct MagneticView: View {
                 Spacer()
                     .frame(height: 40)
             }
+        }
+        .onAppear {
+            // Sync with detectorManager
+            soundEnabled = detectorManager.soundEnabled
+            vibrationEnabled = detectorManager.vibrationEnabled
         }
         // Note: MagneticView has its own Start/Stop buttons, so no auto-start here
         // Detection starts/stops manually via buttons

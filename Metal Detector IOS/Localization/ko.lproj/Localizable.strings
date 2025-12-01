@@ -1,0 +1,60 @@
+/* 
+  Localizable.strings (Korean)
+  Metal Detector IOS
+*/
+
+// MARK: - Home Screen
+"metal_detector" = "금속 탐지기";
+"gold_detector" = "금 탐지기";
+"stud_finder" = "스터드 파인더";
+"handled_detector" = "휴대용 탐지기";
+"digital_compass" = "디지털 나침반";
+"bubble_level" = "수평계";
+
+// MARK: - Settings
+"setting" = "설정";
+"language" = "언어";
+"share" = "공유";
+"rate" = "평가";
+"privacy_policy" = "개인정보 보호정책";
+"terms_of_use" = "이용 약관";
+"default" = "기본값";
+
+// MARK: - Language Screen
+"select_your_language" = "언어를 선택하세요";
+"done" = "완료";
+
+// MARK: - Detector Views
+"meter_view" = "미터 뷰";
+"graph_view" = "그래프 뷰";
+"digital_view" = "디지털 뷰";
+"sensor_view" = "센서 뷰";
+"calibration_view" = "보정 뷰";
+"magnetic_view" = "자기 뷰";
+"compass_detector" = "나침반 탐지기";
+"handled_detector_view" = "휴대용 탐지기";
+
+// MARK: - Common Messages
+"no_gold_detected" = "금이 감지되지 않았습니다,";
+"please_check_thoroughly" = "철저히 확인해 주세요";
+"start_detection" = "탐지 시작";
+"stop_detection" = "탐지 중지";
+
+// MARK: - Paywall
+"premium" = "프리미엄";
+"go_premium" = "프리미엄으로 업그레이드";
+"get_premium" = "프리미엄 받기";
+"continue_free" = "무료로 계속";
+"go_premium_for_6_dollars_month" = "월 6달러로 프리미엄으로 업그레이드";
+
+// MARK: - Intro Screens
+"next" = "다음";
+"skip" = "건너뛰기";
+"get_started" = "시작하기";
+"metal_detector_gold_finder" = "금속 탐지기 및 금 찾기";
+"detect_metal_accessories_gold" = "금속 액세서리와 금 재료를 쉽게 감지합니다.";
+"gold_metal_sensitivity_gauge" = "금 및 금속 감도 게이지";
+"the_smart_way_to_find_north" = "북쪽을 찾는 스마트한 방법";
+
+// MARK: - Premium Card
+"detect_hidden_treasures_faster" = "프리미엄 모드로 숨겨진 보물을 더 빠르게 감지";

@@ -10,6 +10,7 @@ import SwiftUI
 struct MeterView: View {
     var onBackTap: () -> Void
     @StateObject private var detectorManager = MetalDetectorManager.shared
+    @StateObject private var localizationManager = LocalizationManager.shared
     @State private var soundEnabled = true
     @State private var vibrationEnabled = true
     
@@ -32,9 +33,10 @@ struct MeterView: View {
                             .frame(width: 44, height: 44)
                     }
                     
-                    Text("Meter view")
-                        .font(.system(size: 24, weight: .bold, design: .serif))
+                    Text(LocalizedString.meterView.localized)
+                        .font(.custom("Zodiak", size: 24))
                         .foregroundColor(.white)
+                        .id(localizationManager.currentLanguage)
                     
                     Spacer()
                     
@@ -44,11 +46,18 @@ struct MeterView: View {
                         detectorManager.setSoundEnabled(soundEnabled)
                     }) {
                         ZStack {
-                            Image("Pro Button Background")
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 40, height: 40)
-                                .clipShape(RoundedRectangle(cornerRadius: 30))
+                            // Conditional background: Yellow asset when ON, Gray when OFF
+                            if soundEnabled {
+                                Image("Pro Button Background")
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 40, height: 40)
+                                    .clipShape(RoundedRectangle(cornerRadius: 30))
+                            } else {
+                                Circle()
+                                    .fill(Color.gray.opacity(0.3))
+                                    .frame(width: 40, height: 40)
+                            }
                             
                             Image("Sound Icon")
                                 .resizable()
@@ -64,11 +73,18 @@ struct MeterView: View {
                         detectorManager.setVibrationEnabled(vibrationEnabled)
                     }) {
                         ZStack {
-                            Image("Pro Button Background")
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 40, height: 40)
-                                .clipShape(RoundedRectangle(cornerRadius: 30))
+                            // Conditional background: Yellow asset when ON, Gray when OFF
+                            if vibrationEnabled {
+                                Image("Pro Button Background")
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 40, height: 40)
+                                    .clipShape(RoundedRectangle(cornerRadius: 30))
+                            } else {
+                                Circle()
+                                    .fill(Color.gray.opacity(0.3))
+                                    .frame(width: 40, height: 40)
+                            }
                             
                             Image("Vibration Icon")
                                 .resizable()
@@ -92,23 +108,21 @@ struct MeterView: View {
                             .frame(height: 350)
                             // Overlay needle directly on meter at exact pivot position
                             .overlay(
-                                // Needle Image - Circle pivot absolutely FIXED at meter bottom center
-                                Image("Meter Needle") // User will provide this asset name
+                                Image("Meter Needle")
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 100, height: 100)
-                                    // Rotate around anchor point (circle pivot)
                                     .rotationEffect(
                                         .degrees(detectorManager.getMeterNeedleRotation()),
-                                        anchor: UnitPoint(x: 0.2, y: 0.1) // Circle pivot location
+                                        anchor: UnitPoint(x: 0.26, y: 0.47)   // EXACT PIVOT
                                     )
-                                    .animation(.easeOut(duration: 0.2), value: detectorManager.getMeterNeedleRotation())
-                                    // Position anchor point at bottom center of meter
-                                    // Anchor (0.3, 0.3) = 30px from top-left = 20px offset from center
-                                    .offset(x: 20, y: 30) // Align anchor to bottom center: X center, Y bottom
-                                ,
-                                alignment: .bottom // Align to bottom of meter
+                                    .offset(x: 11, y: -38)  // adjust left-right as needed
+                                    .animation(.easeOut(duration: 0.2), value: detectorManager.getMeterNeedleRotation()),
+                                alignment: .bottom
                             )
+
+
+
                         // CIRCLE PIVOT: Fixed at meter bottom center (X: center, Y: bottom)
                         // NARROW TIP: Rotates around fixed circle pivot
                         // Range: -170 (MIN) to 90 (MAX) degrees (260 degrees total)
@@ -121,13 +135,15 @@ struct MeterView: View {
                 
                 // Detection Status Text
                 VStack(spacing: 12) {
-                    Text("No Gold detected,")
-                        .font(.system(size: 24, weight: .bold, design: .serif))
+                    Text(LocalizedString.noGoldDetected.localized)
+                        .font(.custom("Zodiak", size: 24))
                         .foregroundColor(.white)
+                        .id(localizationManager.currentLanguage)
                     
-                    Text("Please check thoroughly")
+                    Text(LocalizedString.pleaseCheckThoroughly.localized)
                         .font(.system(size: 14, weight: .medium))
                         .foregroundColor(.white.opacity(0.7))
+                        .id(localizationManager.currentLanguage)
                 }
                 .padding(.top, 32)
                 .opacity(detectorManager.detectionLevel > 10 ? 1.0 : 0.7)
@@ -172,6 +188,9 @@ struct MeterView: View {
         .onAppear {
             // Start detection when view appears
             detectorManager.startDetection()
+            // Sync with detectorManager
+            soundEnabled = detectorManager.soundEnabled
+            vibrationEnabled = detectorManager.vibrationEnabled
         }
         .onDisappear {
             // Stop detection when leaving view

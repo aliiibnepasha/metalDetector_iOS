@@ -1,0 +1,60 @@
+/* 
+  Localizable.strings (Chinese Simplified - China)
+  Metal Detector IOS
+*/
+
+// MARK: - Home Screen
+"metal_detector" = "金属探测器";
+"gold_detector" = "黄金探测器";
+"stud_finder" = "螺柱查找器";
+"handled_detector" = "手持探测器";
+"digital_compass" = "数字指南针";
+"bubble_level" = "气泡水平仪";
+
+// MARK: - Settings
+"setting" = "设置";
+"language" = "语言";
+"share" = "分享";
+"rate" = "评分";
+"privacy_policy" = "隐私政策";
+"terms_of_use" = "使用条款";
+"default" = "默认";
+
+// MARK: - Language Screen
+"select_your_language" = "选择您的语言";
+"done" = "完成";
+
+// MARK: - Detector Views
+"meter_view" = "仪表视图";
+"graph_view" = "图表视图";
+"digital_view" = "数字视图";
+"sensor_view" = "传感器视图";
+"calibration_view" = "校准视图";
+"magnetic_view" = "磁场视图";
+"compass_detector" = "指南针探测器";
+"handled_detector_view" = "手持探测器";
+
+// MARK: - Common Messages
+"no_gold_detected" = "未检测到黄金，";
+"please_check_thoroughly" = "请彻底检查";
+"start_detection" = "开始检测";
+"stop_detection" = "停止检测";
+
+// MARK: - Paywall
+"premium" = "高级版";
+"go_premium" = "升级到高级版";
+"get_premium" = "获取高级版";
+"continue_free" = "继续免费";
+"go_premium_for_6_dollars_month" = "以6美元/月升级到高级版";
+
+// MARK: - Intro Screens
+"next" = "下一步";
+"skip" = "跳过";
+"get_started" = "开始";
+"metal_detector_gold_finder" = "金属探测器与黄金查找器";
+"detect_metal_accessories_gold" = "轻松检测金属配件和黄金材料。";
+"gold_metal_sensitivity_gauge" = "黄金与金属敏感度测量仪";
+"the_smart_way_to_find_north" = "找到北方的智能方式";
+
+// MARK: - Premium Card
+"detect_hidden_treasures_faster" = "使用高级模式更快地检测隐藏的宝藏";

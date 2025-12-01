@@ -12,6 +12,7 @@ import Combine
 struct CompassDetectorView: View {
     var onBackTap: () -> Void
     @StateObject private var locationManager = LocationManager()
+    @StateObject private var localizationManager = LocalizationManager.shared
     
     var body: some View {
         ZStack {
@@ -32,9 +33,10 @@ struct CompassDetectorView: View {
                             .frame(width: 44, height: 44)
                     }
                     
-                    Text("Compass Detector")
-                        .font(.system(size: 20, weight: .bold, design: .serif))
+                    Text(LocalizedString.compassDetectorView.localized)
+                        .font(.custom("Zodiak", size: 20))
                         .foregroundColor(.white)
+                        .id(localizationManager.currentLanguage)
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
                     

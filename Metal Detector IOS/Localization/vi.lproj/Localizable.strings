@@ -1,0 +1,60 @@
+/* 
+  Localizable.strings (Vietnamese)
+  Metal Detector IOS
+*/
+
+// MARK: - Home Screen
+"metal_detector" = "Máy Dò Kim Loại";
+"gold_detector" = "Máy Dò Vàng";
+"stud_finder" = "Máy Tìm Đinh Tán";
+"handled_detector" = "Máy Dò Cầm Tay";
+"digital_compass" = "La Bàn Kỹ Thuật Số";
+"bubble_level" = "Ống Nước";
+
+// MARK: - Settings
+"setting" = "Cài Đặt";
+"language" = "Ngôn Ngữ";
+"share" = "Chia Sẻ";
+"rate" = "Đánh Giá";
+"privacy_policy" = "Chính Sách Bảo Mật";
+"terms_of_use" = "Điều Khoản Sử Dụng";
+"default" = "Mặc Định";
+
+// MARK: - Language Screen
+"select_your_language" = "Chọn Ngôn Ngữ của Bạn";
+"done" = "Xong";
+
+// MARK: - Detector Views
+"meter_view" = "Xem Đồng Hồ";
+"graph_view" = "Xem Biểu Đồ";
+"digital_view" = "Xem Kỹ Thuật Số";
+"sensor_view" = "Xem Cảm Biến";
+"calibration_view" = "Xem Hiệu Chuẩn";
+"magnetic_view" = "Xem Từ Tính";
+"compass_detector" = "Máy Dò La Bàn";
+"handled_detector_view" = "Máy Dò Cầm Tay";
+
+// MARK: - Common Messages
+"no_gold_detected" = "Không Phát Hiện Vàng,";
+"please_check_thoroughly" = "Vui Lòng Kiểm Tra Kỹ Lưỡng";
+"start_detection" = "Bắt Đầu Dò";
+"stop_detection" = "Dừng Dò";
+
+// MARK: - Paywall
+"premium" = "Premium";
+"go_premium" = "Nâng Cấp Premium";
+"get_premium" = "Nhận Premium";
+"continue_free" = "Tiếp Tục Miễn Phí";
+"go_premium_for_6_dollars_month" = "Nâng cấp premium với 6$/ tháng";
+
+// MARK: - Intro Screens
+"next" = "Tiếp Theo";
+"skip" = "bỏ qua";
+"get_started" = "Bắt Đầu";
+"metal_detector_gold_finder" = "Máy Dò Kim Loại & Tìm Vàng";
+"detect_metal_accessories_gold" = "Dễ dàng phát hiện phụ kiện kim loại và vật liệu vàng.";
+"gold_metal_sensitivity_gauge" = "Thang Đo Độ Nhạy Vàng & Kim Loại";
+"the_smart_way_to_find_north" = "Cách Thông Minh Để Tìm Hướng Bắc";
+
+// MARK: - Premium Card
+"detect_hidden_treasures_faster" = "Phát hiện kho báu ẩn nhanh hơn với chế độ Premium";

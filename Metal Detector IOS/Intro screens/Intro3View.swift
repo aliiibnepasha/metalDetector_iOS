@@ -10,6 +10,7 @@ import SwiftUI
 struct Intro3View: View {
     var onGetStarted: () -> Void
     var onSkip: () -> Void
+    @ObservedObject private var localizationManager = LocalizationManager.shared
     
     var body: some View {
         ZStack {
@@ -51,17 +52,19 @@ struct Intro3View: View {
                 VStack(spacing: 24) {
                     // Title and Description
                     VStack(spacing: 14.76) {
-                        Text("The Smart Way to Find North")
-                            .font(.system(size: 38, weight: .bold, design: .serif))
+                        Text(LocalizedString.theSmartWayToFindNorth.localized)
+                            .font(.custom("Zodiak", size: 38))
                             .foregroundColor(.white)
                             .multilineTextAlignment(.center)
+                            .id(localizationManager.currentLanguage)
                             
                         
-                        Text("Guided by precision magnetic sensors in your pocket.")
+                        Text(LocalizedString.guidedByPrecision.localized)
                             .font(.system(size: 16, weight: .medium))
                             .foregroundColor(.white.opacity(0.7))
                             .multilineTextAlignment(.center)
                             .frame(width: 241)
+                            .id(localizationManager.currentLanguage)
                     }
                     
                     // Pagination Dots (third one is active)
@@ -107,10 +110,11 @@ struct Intro3View: View {
                             .frame(width: 271, height: 40)
                             
                             // Button text
-                            Text("Get Started")
-                                .font(.system(size: 16, weight: .semibold))
+                            Text(LocalizedString.getStarted.localized)
+                                .font(.custom("Manrope_Bold", size: 16))
                                 .foregroundColor(.black)
                                 .tracking(-0.8)
+                                .id(localizationManager.currentLanguage)
                         }
                     }
                 }
@@ -125,10 +129,11 @@ struct Intro3View: View {
                     Button(action: {
                         onSkip()
                     }) {
-                        Text("skip")
-                            .font(.system(size: 14, weight: .medium))
+                        Text(LocalizedString.skip.localized)
+                            .font(.custom("Manrope_Bold", size: 14))
                             .foregroundColor(.white.opacity(0.6))
                             .textCase(.lowercase)
+                            .id(localizationManager.currentLanguage)
                     }
                     .padding(.trailing, 34)
                     .padding(.top, 10)

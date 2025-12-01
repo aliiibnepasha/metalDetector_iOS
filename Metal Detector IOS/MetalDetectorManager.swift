@@ -294,15 +294,24 @@ class MetalDetectorManager: ObservableObject {
     // MARK: - Helper Methods for Views
     func getMeterNeedleRotation() -> Double {
         // Convert detection level (0-100) to meter needle rotation
-        // Starting position: -170 degrees (MIN position - needle tip at MIN segment end)
-        // Ending position: 90 degrees (MAX position)
-        // Range: -170 (MIN) to 90 (MAX) degrees = 260 degrees total
-        return -170 + (detectionLevel / 100.0) * 260.0
+        // Starting position: -170 degrees (MIN position)
+        // Ending position: 15 degrees (MAX position - minimal rotation to stay well within meter)
+        // Range: -170 (MIN) to 15 (MAX) degrees = 185 degrees total
+        let clamped = max(0, min(detectionLevel, 100))
+        let angle = -170 + (clamped / 100.0) * 185.0
+        return max(-170, min(angle, 15)) // Clamp between MIN and MAX - minimal rotation
     }
+
+
     
     func getCalibrationNeedleRotation() -> Double {
-        // Similar to meter view
-        return getMeterNeedleRotation()
+        // Convert detection level (0-100) to calibration needle rotation
+        // Starting position: -170 degrees (MIN position)
+        // Ending position: 90 degrees (MAX position - full meter range)
+        // Range: -170 (MIN) to 90 (MAX) degrees = 260 degrees total (full meter)
+        let clamped = max(0, min(detectionLevel, 100))
+        let angle = -170 + (clamped / 100.0) * 260.0
+        return max(-170, min(angle, 90)) // Full range rotation for calibration meter
     }
     
     func getGraphDataPoint() -> Double {

@@ -9,6 +9,10 @@ import SwiftUI
 
 struct HandledDetectorView: View {
     var onBackTap: () -> Void
+    @StateObject private var detectorManager = MetalDetectorManager.shared
+    @StateObject private var localizationManager = LocalizationManager.shared
+    @State private var soundEnabled = true
+    @State private var vibrationEnabled = true
     
     var body: some View {
         ZStack {
@@ -29,24 +33,33 @@ struct HandledDetectorView: View {
                             .frame(width: 44, height: 44)
                     }
                     
-                    Text("Handled detector")
-                        .font(.system(size: 20, weight: .bold, design: .serif))
+                    Text(LocalizedString.handledDetectorView.localized)
+                        .font(.custom("Zodiak", size: 20))
                         .foregroundColor(.white)
                         .lineLimit(1)
+                        .id(localizationManager.currentLanguage)
                         .minimumScaleFactor(0.8)
                     
                     Spacer()
                     
                     // Sound Button
                     Button(action: {
-                        // Handle sound action
+                        soundEnabled.toggle()
+                        detectorManager.setSoundEnabled(soundEnabled)
                     }) {
                         ZStack {
-                            Image("Pro Button Background")
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 40, height: 40)
-                                .clipShape(RoundedRectangle(cornerRadius: 30))
+                            // Conditional background: Yellow asset when ON, Gray when OFF
+                            if soundEnabled {
+                                Image("Pro Button Background")
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 40, height: 40)
+                                    .clipShape(RoundedRectangle(cornerRadius: 30))
+                            } else {
+                                Circle()
+                                    .fill(Color.gray.opacity(0.3))
+                                    .frame(width: 40, height: 40)
+                            }
                             
                             Image("Sound Icon")
                                 .resizable()
@@ -58,14 +71,22 @@ struct HandledDetectorView: View {
                     
                     // Vibration Button
                     Button(action: {
-                        // Handle vibration action
+                        vibrationEnabled.toggle()
+                        detectorManager.setVibrationEnabled(vibrationEnabled)
                     }) {
                         ZStack {
-                            Image("Pro Button Background")
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 40, height: 40)
-                                .clipShape(RoundedRectangle(cornerRadius: 30))
+                            // Conditional background: Yellow asset when ON, Gray when OFF
+                            if vibrationEnabled {
+                                Image("Pro Button Background")
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 40, height: 40)
+                                    .clipShape(RoundedRectangle(cornerRadius: 30))
+                            } else {
+                                Circle()
+                                    .fill(Color.gray.opacity(0.3))
+                                    .frame(width: 40, height: 40)
+                            }
                             
                             Image("Vibration Icon")
                                 .resizable()
@@ -96,13 +117,15 @@ struct HandledDetectorView: View {
                 
                 // Status Text
                 VStack(spacing: 12) {
-                    Text("No Gold detected,")
-                        .font(.system(size: 24, weight: .bold, design: .serif))
+                    Text(LocalizedString.noGoldDetected.localized)
+                        .font(.custom("Zodiak", size: 24))
                         .foregroundColor(.white)
+                        .id(localizationManager.currentLanguage)
                     
-                    Text("Please check thoroughly")
+                    Text(LocalizedString.pleaseCheckThoroughly.localized)
                         .font(.system(size: 14, weight: .medium))
                         .foregroundColor(.white.opacity(0.7))
+                        .id(localizationManager.currentLanguage)
                 }
                 .padding(.top, 24)
                 
@@ -111,6 +134,11 @@ struct HandledDetectorView: View {
                 Spacer()
                     .frame(height: 40)
             }
+        }
+        .onAppear {
+            // Sync with detectorManager
+            soundEnabled = detectorManager.soundEnabled
+            vibrationEnabled = detectorManager.vibrationEnabled
         }
     }
 }

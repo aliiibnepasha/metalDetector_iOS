@@ -115,7 +115,7 @@ struct DigitalView: View {
                         .scaledToFit()
                         .frame(width: 130, height:130)
                         .rotationEffect(.degrees(detectorManager.getMeterNeedleRotation() + 90), anchor: .bottom)
-                        .offset(x: 1, y: -12) // Position at top of the meter circle, slightly to the right
+                        .offset(x: 53, y: -55) // Position at top of the meter circle, slightly to the right
                         .animation(.easeOut(duration: 0.2), value: detectorManager.detectionLevel)
                     
                     // Center value display (separate, inside the main gauge center)

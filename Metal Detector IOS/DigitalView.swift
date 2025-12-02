@@ -110,13 +110,27 @@ struct DigitalView: View {
                     
                     // Top rotatable needle (smaller circle with triangle pointer at TOP of meter)
                     // This rotates to indicate values on the main gauge below
-                    Image("Digital Meter Needle") // User will provide this asset name
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 130, height:130)
-                        .rotationEffect(.degrees(detectorManager.getMeterNeedleRotation() + 90), anchor: .bottom)
-                        .offset(x: 53, y: -55) // Position at top of the meter circle, slightly to the right
-                        .animation(.easeOut(duration: 0.2), value: detectorManager.detectionLevel)
+                    GeometryReader { geometry in
+                        Image("Digital Meter Needle") // User will provide this asset name
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 130, height: 130)
+                            // Rotate needle: starting at 0 position (5 o'clock / right side of meter)
+                            // Pivot point fixed at center of the circle in needle image so only needle rotates, not the circle
+                            .rotationEffect(
+                                .degrees(detectorManager.getDigitalMeterNeedleRotation() - 150), // -150 to align needle tip with 0 position (5 o'clock), then rotate 0-330 degrees clockwise
+                                anchor: UnitPoint(x: 0.49, y: 0.56) // Fixed pivot at center of circle in needle image
+                            )
+                            // Position needle so pivot point (center of circle) aligns with meter center
+                            // Anchor (0.5, 0.7) in 130x130 image = (65, 91) from top-left
+                            // To fix anchor at meter center (145, 145), position center at: (145-0, 145-6) = (145, 139)
+                            .position(
+                                x: geometry.size.width / 2, // Center X
+                                y: geometry.size.height / 2 - 6 // Center Y - offset to align pivot (adjust if needed)
+                            )
+                            .animation(.easeOut(duration: 0.2), value: detectorManager.detectionLevel)
+                    }
+                    .frame(width: 290, height: 290)
                     
                     // Center value display (separate, inside the main gauge center)
                     ZStack {
@@ -129,10 +143,11 @@ struct DigitalView: View {
                                     .stroke(Color(red: 0.99, green: 0.78, blue: 0.23), lineWidth: 2)
                             )
                         
-                        // Value text (percentage/reading)
-                        Text(String(format: "%.1f", detectorManager.magneticFieldStrength))
+                        // Value text (percentage based on detection level 0% to 100%)
+                        Text("\(Int(detectorManager.detectionLevel))%")
                             .font(.system(size: 36, weight: .bold, design: .serif))
                             .foregroundColor(.white)
+                            .animation(.easeOut(duration: 0.2), value: detectorManager.detectionLevel)
                     }
                     // Center circle stays at the center of the main gauge
                 }
@@ -147,12 +162,10 @@ struct DigitalView: View {
                         .foregroundColor(.white)
                         .id(localizationManager.currentLanguage + "_" + String(detectorManager.isMetalDetected))
                     
-                    if !detectorManager.isMetalDetected {
-                        Text(LocalizedString.pleaseCheckThoroughly.localized)
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundColor(.white.opacity(0.7))
-                            .id(localizationManager.currentLanguage)
-                    }
+                    Text(detectorManager.getSubtitleMessageKey().localized)
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(.white.opacity(0.7))
+                        .id(localizationManager.currentLanguage + "_subtitle_" + String(detectorManager.isMetalDetected))
                 }
                 .padding(.top, 16)
                 

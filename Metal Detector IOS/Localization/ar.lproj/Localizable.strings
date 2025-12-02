@@ -37,6 +37,10 @@
 // MARK: - Common Messages
 "no_gold_detected" = "لم يتم اكتشاف الذهب،";
 "please_check_thoroughly" = "يرجى التحقق بدقة";
+"gold_object_nearby_keep_scanning" = "كائن ذهبي قريب، استمر في المسح...";
+"metal_object_nearby_keep_scanning" = "كائن معدني قريب، استمر في المسح...";
+"stud_object_nearby_keep_scanning" = "كائن عمود قريب، استمر في المسح...";
+"handle_object_nearby_keep_scanning" = "كائن مقبض قريب، استمر في المسح...";
 "start_detection" = "بدء الكشف";
 "stop_detection" = "إيقاف الكشف";
 

@@ -127,3 +127,4 @@ let text = LocalizationManager.shared.localizedString("metal_detector")
 - **Language codes**: Use ISO 639-1 codes (en, fr, pl, etc.)
 - **Testing**: Change device language in Settings → General → Language & Region to test
 
+

@@ -37,6 +37,10 @@
 // MARK: - Common Messages
 "no_gold_detected" = "Kein Gold erkannt,";
 "please_check_thoroughly" = "Bitte gründlich überprüfen";
+"gold_object_nearby_keep_scanning" = "Goldobjekt in der Nähe, weiter scannen...";
+"metal_object_nearby_keep_scanning" = "Metallobjekt in der Nähe, weiter scannen...";
+"stud_object_nearby_keep_scanning" = "Ständerobjekt in der Nähe, weiter scannen...";
+"handle_object_nearby_keep_scanning" = "Griffobjekt in der Nähe, weiter scannen...";
 "start_detection" = "Erkennung Starten";
 "stop_detection" = "Erkennung Stoppen";
 

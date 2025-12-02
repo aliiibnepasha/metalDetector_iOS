@@ -155,12 +155,10 @@ struct MagneticView: View {
                                     .foregroundColor(.white)
                                     .id(localizationManager.currentLanguage + "_" + String(detectorManager.isMetalDetected))
                                 
-                                if !detectorManager.isMetalDetected {
-                                    Text(LocalizedString.pleaseCheckThoroughly.localized)
-                                        .font(.system(size: 14, weight: .medium))
-                                        .foregroundColor(.white.opacity(0.7))
-                                        .id(localizationManager.currentLanguage)
-                                }
+                                Text(detectorManager.getSubtitleMessageKey().localized)
+                                    .font(.system(size: 14, weight: .medium))
+                                    .foregroundColor(.white.opacity(0.7))
+                                    .id(localizationManager.currentLanguage + "_subtitle_" + String(detectorManager.isMetalDetected))
                             }
                         }
                         .padding(.vertical, 32)
@@ -254,6 +252,10 @@ struct MagneticView: View {
             // Sync with detectorManager
             soundEnabled = detectorManager.soundEnabled
             vibrationEnabled = detectorManager.vibrationEnabled
+        }
+        .onDisappear {
+            // Stop detection when user navigates away from this view
+            detectorManager.stopDetection()
         }
         // Note: MagneticView has its own Start/Stop buttons, so no auto-start here
         // Detection starts/stops manually via buttons

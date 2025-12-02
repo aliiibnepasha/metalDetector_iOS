@@ -37,6 +37,10 @@
 // MARK: - Common Messages
 "no_gold_detected" = "Walang Nahanap na Ginto,";
 "please_check_thoroughly" = "Mangyaring Suriin nang Maingat";
+"gold_object_nearby_keep_scanning" = "Bagay na ginto malapit, patuloy na mag-scan...";
+"metal_object_nearby_keep_scanning" = "Bagay na metal malapit, patuloy na mag-scan...";
+"stud_object_nearby_keep_scanning" = "Bagay na stud malapit, patuloy na mag-scan...";
+"handle_object_nearby_keep_scanning" = "Bagay na hawakan malapit, patuloy na mag-scan...";
 "start_detection" = "Simulan ang Pagtuklas";
 "stop_detection" = "Itigil ang Pagtuklas";
 

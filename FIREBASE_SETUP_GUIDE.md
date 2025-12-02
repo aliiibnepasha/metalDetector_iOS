@@ -76,3 +76,4 @@ if firebaseManager.isAuthenticated {
 - Can be converted to permanent accounts later if needed
 - Perfect for analytics and user tracking without login
 
+

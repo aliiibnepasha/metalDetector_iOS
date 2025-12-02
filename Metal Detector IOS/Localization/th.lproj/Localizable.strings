@@ -37,6 +37,10 @@
 // MARK: - Common Messages
 "no_gold_detected" = "ไม่พบทอง,";
 "please_check_thoroughly" = "กรุณาตรวจสอบอย่างละเอียด";
+"gold_object_nearby_keep_scanning" = "วัตถุทองอยู่ใกล้ๆ ตรวจสอบต่อไป...";
+"metal_object_nearby_keep_scanning" = "วัตถุโลหะอยู่ใกล้ๆ ตรวจสอบต่อไป...";
+"stud_object_nearby_keep_scanning" = "วัตถุสตั๊ดอยู่ใกล้ๆ ตรวจสอบต่อไป...";
+"handle_object_nearby_keep_scanning" = "วัตถุด้ามจับอยู่ใกล้ๆ ตรวจสอบต่อไป...";
 "start_detection" = "เริ่มการตรวจจับ";
 "stop_detection" = "หยุดการตรวจจับ";
 

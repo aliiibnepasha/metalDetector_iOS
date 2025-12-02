@@ -12,10 +12,11 @@ struct GraphView: View {
     @StateObject private var detectorManager = MetalDetectorManager.shared
     @StateObject private var localizationManager = LocalizationManager.shared
     @State private var graphData: [Double] = []
-    @State private var maxDataPoints = 50 // Keep last 50 readings
+    @State private var maxDataPoints = 100 // Keep last 100 readings for smoother graph
     @State private var cursorPosition: Double = 100.0 // X position of cursor (0-100)
     @State private var soundEnabled = true
     @State private var vibrationEnabled = true
+    @State private var updateTimer: Timer?
     
     // Computed properties for cursor value and label
     private var selectedValue: Double {
@@ -147,12 +148,10 @@ struct GraphView: View {
                         .foregroundColor(.white)
                         .id(localizationManager.currentLanguage + "_" + String(detectorManager.isMetalDetected))
                     
-                    if !detectorManager.isMetalDetected {
-                        Text(LocalizedString.pleaseCheckThoroughly.localized)
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundColor(.white.opacity(0.7))
-                            .id(localizationManager.currentLanguage)
-                    }
+                    Text(detectorManager.getSubtitleMessageKey().localized)
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(.white.opacity(0.7))
+                        .id(localizationManager.currentLanguage + "_subtitle_" + String(detectorManager.isMetalDetected))
                 }
                 .padding(.top, 36)
                 
@@ -169,20 +168,40 @@ struct GraphView: View {
             // Sync with detectorManager
             soundEnabled = detectorManager.soundEnabled
             vibrationEnabled = detectorManager.vibrationEnabled
+            
+            // Start timer to continuously update graph with frequency-based data
+            updateTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
+                let currentLevel = detectorManager.detectionLevel
+                if !currentLevel.isNaN && !currentLevel.isInfinite {
+                    // Add natural frequency variations to create realistic graph waves
+                    // When detection is high, ensure graph reaches maximum height (50 on Y-axis)
+                    // Scale variations based on detection level - higher detection = larger variations
+                    let variationScale = max(1.0, currentLevel / 20.0) // Scale variations with detection
+                    let baseVariation = sin(Date().timeIntervalSince1970 * 10) * 3 * variationScale // Frequency wave
+                    let randomVariation = Double.random(in: -1.5...1.5) * variationScale // Small random noise
+                    // Amplify detection level to use full graph range (0-50 on Y-axis)
+                    // When detection happens, ensure graph reaches maximum height (50)
+                    // Increase amplification so even moderate detection (20-30%) reaches top (50)
+                    let amplificationFactor: Double = 3.5  // Increased from 2.5 to reach 50 more easily
+                    let amplifiedLevel = currentLevel > 0 ? min(100, currentLevel * amplificationFactor) : currentLevel
+                    let graphValue = max(0, min(100, amplifiedLevel + baseVariation + randomVariation))
+                    
+                    DispatchQueue.main.async {
+                        graphData.append(graphValue)
+                        if graphData.count > maxDataPoints {
+                            graphData.removeFirst()
+                        }
+                        // Keep cursor at latest point
+                        cursorPosition = 100.0
+                    }
+                }
+            }
         }
         .onDisappear {
             detectorManager.stopDetection()
-        }
-        .onReceive(detectorManager.$magneticFieldStrength) { newValue in
-            // Update graph data with new reading
-            if !newValue.isNaN && !newValue.isInfinite {
-                graphData.append(newValue)
-                if graphData.count > maxDataPoints {
-                    graphData.removeFirst()
-                }
-                // Move cursor to latest point
-                cursorPosition = 100.0
-            }
+            // Stop timer when view disappears
+            updateTimer?.invalidate()
+            updateTimer = nil
         }
     }
 }
@@ -219,6 +238,7 @@ struct GraphContainer: View {
     private let paddingTop: CGFloat = 68
     private let paddingBottom: CGFloat = 78
     private let paddingRight: CGFloat = 44
+    private let bottomPadding: CGFloat = 20  // Space above X-axis labels (matches GraphGrid)
     
     var body: some View {
         ZStack {
@@ -234,17 +254,23 @@ struct GraphContainer: View {
                 // Grid Lines
                 GraphGrid()
                 
-                // Y-axis Labels
-                VStack(alignment: .leading, spacing: 22.892) {
-                    ForEach([50, 40, 30, 20, 10, 0], id: \.self) { value in
-                        Text("\(value)")
-                            .font(.system(size: 9.157, weight: .semibold))
-                            .foregroundColor(Color(red: 124/255, green: 124/255, blue: 124/255))
-                            .tracking(0.8699)
-                    }
+                // Y-axis Labels - align perfectly with grid lines
+                let usableTop = paddingTop
+                let usableBottom = paddingTop + graphHeight - bottomPadding
+                let usableHeight = usableBottom - usableTop
+                
+                ForEach(Array([50, 40, 30, 20, 10, 0].enumerated()), id: \.element) { index, value in
+                    // Calculate Y position matching grid line exactly
+                    // index 0 (value 50) at top, index 5 (value 0) at bottom
+                    let lineY = usableTop + (CGFloat(5 - index) / 5.0) * usableHeight
+                    
+                    Text("\(value)")
+                        .font(.system(size: 9.157, weight: .semibold))
+                        .foregroundColor(Color(red: 124/255, green: 124/255, blue: 124/255))
+                        .tracking(0.8699)
+                        .offset(y: lineY - 4.5) // Center text on grid line (half font height ~9px)
+                        .padding(.leading, 23.29)
                 }
-                .padding(.leading, 23.29)
-                .padding(.top, 38.67)
                 
                 // X-axis Labels
                 HStack(spacing: 44) {
@@ -306,24 +332,44 @@ struct GraphContainer: View {
 }
 
 struct GraphGrid: View {
+    // Graph area constants - should match GraphContainer
+    private let graphWidth: CGFloat = 290
+    private let graphHeight: CGFloat = 164
+    private let paddingLeft: CGFloat = 46
+    private let paddingTop: CGFloat = 68
+    private let bottomPadding: CGFloat = 20  // Reduced padding for better alignment
+    
     var body: some View {
         ZStack {
-            // Horizontal grid lines
+            // Horizontal grid lines - properly aligned with Y-axis labels
+            // Graph area starts at paddingTop (68) and has graphHeight (164)
+            // Space from top to useable area
+            let usableTop = paddingTop
+            let usableBottom = paddingTop + graphHeight - bottomPadding
+            let usableHeight = usableBottom - usableTop
+            
             ForEach(0..<6) { index in
+                // Y-axis values: 0, 10, 20, 30, 40, 50
+                // Map index 0 (value 50) to top, index 5 (value 0) to bottom
+                let lineY = usableTop + (CGFloat(5 - index) / 5.0) * usableHeight
+                
                 Rectangle()
-                    .fill(Color.white.opacity(0.1))
+                    .fill(Color.white.opacity(0.12))
                     .frame(height: 1)
-                    .offset(y: 38.67 + CGFloat(index) * 22.892)
-                    .padding(.horizontal, 46)
+                    .offset(y: lineY)
+                    .padding(.horizontal, paddingLeft)
             }
             
-            // Vertical grid lines
+            // Vertical grid lines - aligned with X-axis values (0, 20, 40, 60, 80, 100)
             ForEach(0..<6) { index in
+                let lineX = paddingLeft + (CGFloat(index) / 5.0) * graphWidth
+                
                 Rectangle()
-                    .fill(Color.white.opacity(0.1))
+                    .fill(Color.white.opacity(0.12))
                     .frame(width: 1)
-                    .offset(x: 46.93 + CGFloat(index) * 44)
-                    .padding(.vertical, 38.67)
+                    .offset(x: lineX)
+                    .frame(height: graphHeight)
+                    .offset(y: paddingTop)
             }
         }
     }
@@ -335,20 +381,53 @@ struct GraphLine: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()
         
-        guard data.count > 1 else { return path }
+        guard !data.isEmpty else { return path }
         
-        let maxValue: Double = 50
-        let stepX = rect.width / CGFloat(data.count - 1)
+        // Scale based on Y-axis labels (0-50) to match graph grid
+        let maxValue: Double = 50  // Y-axis shows 0-50
+        let minValue: Double = 0
+        
+        // Use smooth curves for better graph appearance
+        let stepX = data.count > 1 ? rect.width / CGFloat(data.count - 1) : 0
+        
+        // Normalize Y values to graph height (0 at bottom, maxValue at top)
+        // Convert detection level (0-100) to graph scale (0-50) - use FULL range
+        // Add offset to ensure line stays above bottom numbers (X-axis labels)
+        func normalizeY(_ value: Double) -> CGFloat {
+            // Scale detection level (0-100) to graph Y-axis (0-50) - ensure full range usage
+            // When value = 0, scaledValue = 0 (bottom)
+            // When value = 100, scaledValue = 50 (top of graph)
+            let scaledValue = (value / 100.0) * maxValue
+            let normalized = (scaledValue - minValue) / (maxValue - minValue)
+            
+            // Calculate Y position - align with grid lines
+            // Bottom (0) should be at usableBottom, top (50) should be at usableTop
+            let bottomPadding: CGFloat = 20  // Space above X-axis labels
+            let usableTop: CGFloat = 0
+            let usableBottom = rect.height - bottomPadding
+            let usableHeight = usableBottom - usableTop
+            
+            // Map normalized value (0-1) to usable height
+            // normalized 0 (bottom) = usableBottom, normalized 1 (top) = usableTop
+            let yPosition = usableBottom - (CGFloat(normalized) * usableHeight)
+            
+            // Ensure Y stays within usable bounds
+            return max(usableTop, min(usableBottom, yPosition))
+        }
         
         // Start point
-        let firstY = rect.height - (CGFloat(data[0] / maxValue) * rect.height)
-        path.move(to: CGPoint(x: 0, y: firstY))
+        if !data.isEmpty {
+            let firstY = normalizeY(data[0])
+            path.move(to: CGPoint(x: 0, y: firstY))
+        }
         
-        // Draw line through all points
-        for index in 1..<data.count {
-            let x = CGFloat(index) * stepX
-            let y = rect.height - (CGFloat(data[index] / maxValue) * rect.height)
-            path.addLine(to: CGPoint(x: x, y: y))
+        // Draw smooth line through all points
+        if data.count > 1 {
+            for index in 1..<data.count {
+                let x = CGFloat(index) * stepX
+                let y = normalizeY(data[index])
+                path.addLine(to: CGPoint(x: x, y: y))
+            }
         }
         
         return path
@@ -364,9 +443,34 @@ struct GraphCursor: View {
     
     // Calculate the actual Y position on the graph line
     private var lineYPosition: CGFloat {
-        let maxValue: Double = 50
-        let yValue = CGFloat(selectedValue / maxValue) * graphHeight
-        // Ensure Y stays within graph bounds
+        let maxValue: Double = 50  // Y-axis shows 0-50
+        let minValue: Double = 0
+        
+        // Convert detection level (0-100) to graph scale (0-50)
+        // Apply amplification to match graph line scaling
+        let amplificationFactor: Double = 3.5
+        let amplifiedValue = selectedValue > 0 ? min(100, selectedValue * amplificationFactor) : selectedValue
+        let scaledValue = (amplifiedValue / 100.0) * maxValue
+        let normalized = (scaledValue - minValue) / (maxValue - minValue)
+        
+        // Align with grid lines - same calculation as graph line
+        let bottomPadding: CGFloat = 20  // Space above X-axis labels
+        let usableTop: CGFloat = 0
+        let usableBottom = graphHeight - bottomPadding
+        let usableHeight = usableBottom - usableTop
+        let yPosition = usableBottom - (CGFloat(normalized) * usableHeight)
+        return max(usableTop, min(usableBottom, yPosition))
+    }
+    
+    // Get the actual data point Y position for cursor alignment
+    private func getYPositionForDataPoint(_ dataIndex: Int) -> CGFloat {
+        guard dataIndex >= 0 && dataIndex < data.count else { return 0 }
+        
+        let maxValue: Double = 50  // Y-axis shows 0-50
+        let value = data[dataIndex]
+        let scaledValue = (value / 100.0) * maxValue
+        let normalized = scaledValue / maxValue
+        let yValue = CGFloat(normalized) * graphHeight
         return max(0, min(graphHeight, graphHeight - yValue))
     }
     
@@ -376,6 +480,9 @@ struct GraphCursor: View {
             // Ensure X stays within graph bounds
             let clampedX = max(0, min(graphWidth, xPosition))
             
+            // Calculate actual Y position on the graph line at this X position
+            let actualYPosition = calculateYAtX(clampedX)
+            
             ZStack {
                 // Vertical cursor line (only within graph bounds)
                 Rectangle()
@@ -384,7 +491,7 @@ struct GraphCursor: View {
                     .offset(x: clampedX)
                 
                 // Circle indicator at intersection with graph line
-                // Ensure circle stays within graph bounds
+                // Ensure circle stays within graph bounds and aligns with actual line position
                 Circle()
                     .fill(
                         LinearGradient(
@@ -404,10 +511,56 @@ struct GraphCursor: View {
                     )
                     .offset(
                         x: clampedX - 9.6,
-                        y: lineYPosition - 9.6
+                        y: actualYPosition - 9.6
                     )
             }
         }
+    }
+    
+    // Calculate the actual Y position on the graph line at a given X coordinate
+    private func calculateYAtX(_ xPosition: CGFloat) -> CGFloat {
+        let bottomPadding: CGFloat = 20  // Space above X-axis labels
+        
+        guard !data.isEmpty else { 
+            return graphHeight - bottomPadding
+        }
+        
+        let maxValue: Double = 50  // Y-axis shows 0-50
+        let stepX = data.count > 1 ? graphWidth / CGFloat(data.count - 1) : 0
+        let usableTop: CGFloat = 0
+        let usableBottom = graphHeight - bottomPadding
+        let usableHeight = usableBottom - usableTop
+        
+        if stepX == 0 || data.count == 1 {
+            // Single point or no points
+            let value = data[0]
+            let scaledValue = (value / 100.0) * maxValue
+            let normalized = scaledValue / maxValue
+            let yPosition = usableBottom - (CGFloat(normalized) * usableHeight)
+            return max(usableTop, min(usableBottom, yPosition))
+        }
+        
+        // Find which two data points surround this X position
+        let dataIndex = xPosition / stepX
+        let lowerIndex = Int(dataIndex)
+        let upperIndex = min(lowerIndex + 1, data.count - 1)
+        let clampedLowerIndex = max(0, min(lowerIndex, data.count - 1))
+        
+        let value: Double
+        if clampedLowerIndex == upperIndex {
+            value = data[clampedLowerIndex]
+        } else {
+            // Linear interpolation between two points
+            let fraction = dataIndex - Double(clampedLowerIndex)
+            let lowerValue = data[clampedLowerIndex]
+            let upperValue = data[upperIndex]
+            value = lowerValue * (1 - fraction) + upperValue * fraction
+        }
+        
+        let scaledValue = (value / 100.0) * maxValue
+        let normalized = scaledValue / maxValue
+        let yPosition = usableBottom - (CGFloat(normalized) * usableHeight)
+        return max(usableTop, min(usableBottom, yPosition))
     }
 }
 

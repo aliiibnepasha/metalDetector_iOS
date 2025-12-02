@@ -37,6 +37,10 @@
 // MARK: - Common Messages
 "no_gold_detected" = "Nenhum Ouro Detectado,";
 "please_check_thoroughly" = "Por Favor Verifique Completamente";
+"gold_object_nearby_keep_scanning" = "Objeto de ouro próximo, continue escaneando...";
+"metal_object_nearby_keep_scanning" = "Objeto de metal próximo, continue escaneando...";
+"stud_object_nearby_keep_scanning" = "Objeto de montante próximo, continue escaneando...";
+"handle_object_nearby_keep_scanning" = "Objeto de alça próximo, continue escaneando...";
 "start_detection" = "Iniciar Detecção";
 "stop_detection" = "Parar Detecção";
 

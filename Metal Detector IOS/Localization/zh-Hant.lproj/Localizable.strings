@@ -37,6 +37,10 @@
 // MARK: - Common Messages
 "no_gold_detected" = "未檢測到黃金，";
 "please_check_thoroughly" = "請徹底檢查";
+"gold_object_nearby_keep_scanning" = "附近有金物體，請繼續掃描...";
+"metal_object_nearby_keep_scanning" = "附近有金屬物體，請繼續掃描...";
+"stud_object_nearby_keep_scanning" = "附近有立柱物體，請繼續掃描...";
+"handle_object_nearby_keep_scanning" = "附近有手柄物體，請繼續掃描...";
 "start_detection" = "開始檢測";
 "stop_detection" = "停止檢測";
 

@@ -37,6 +37,10 @@
 // MARK: - Common Messages
 "no_gold_detected" = "Không Phát Hiện Vàng,";
 "please_check_thoroughly" = "Vui Lòng Kiểm Tra Kỹ Lưỡng";
+"gold_object_nearby_keep_scanning" = "Vật thể vàng gần đó, tiếp tục quét...";
+"metal_object_nearby_keep_scanning" = "Vật thể kim loại gần đó, tiếp tục quét...";
+"stud_object_nearby_keep_scanning" = "Vật thể thanh gần đó, tiếp tục quét...";
+"handle_object_nearby_keep_scanning" = "Vật thể tay cầm gần đó, tiếp tục quét...";
 "start_detection" = "Bắt Đầu Dò";
 "stop_detection" = "Dừng Dò";
 

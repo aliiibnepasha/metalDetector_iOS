@@ -133,3 +133,4 @@ After setting up in Xcode:
 2. Test by changing language in the app
 3. All views should update automatically using LocalizationManager
 
+

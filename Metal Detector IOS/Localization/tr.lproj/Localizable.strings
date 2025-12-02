@@ -37,6 +37,10 @@
 // MARK: - Common Messages
 "no_gold_detected" = "Altın Tespit Edilmedi,";
 "please_check_thoroughly" = "Lütfen Dikkatlice Kontrol Edin";
+"gold_object_nearby_keep_scanning" = "Yakında altın nesne var, taramaya devam edin...";
+"metal_object_nearby_keep_scanning" = "Yakında metal nesne var, taramaya devam edin...";
+"stud_object_nearby_keep_scanning" = "Yakında çıta nesne var, taramaya devam edin...";
+"handle_object_nearby_keep_scanning" = "Yakında sap nesne var, taramaya devam edin...";
 "start_detection" = "Tespiti Başlat";
 "stop_detection" = "Tespiti Durdur";
 

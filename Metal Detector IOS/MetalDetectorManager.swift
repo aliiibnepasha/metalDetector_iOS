@@ -307,13 +307,23 @@ class MetalDetectorManager: ObservableObject {
     
     // MARK: - Helper Methods for Views
     func getMeterNeedleRotation() -> Double {
-        // Convert detection level (0-100) to meter needle rotation
+        // Convert detection level (0-100) to meter needle rotation for Meter View
         // Starting position: -170 degrees (MIN position)
         // Ending position: 15 degrees (MAX position - minimal rotation to stay well within meter)
         // Range: -170 (MIN) to 15 (MAX) degrees = 185 degrees total
         let clamped = max(0, min(detectionLevel, 100))
         let angle = -170 + (clamped / 100.0) * 185.0
         return max(-170, min(angle, 15)) // Clamp between MIN and MAX - minimal rotation
+    }
+    
+    func getDigitalMeterNeedleRotation() -> Double {
+        // Convert detection level (0-100) to meter needle rotation for Digital View
+        // Starting position: 0 degrees (0 mark on meter - 5 o'clock position)
+        // Ending position: 330 degrees (330 mark on meter - full clockwise rotation)
+        // Range: 0 to 330 degrees = 330 degrees total (matches meter scale 0-330)
+        let clamped = max(0, min(detectionLevel, 100))
+        let angle = (clamped / 100.0) * 330.0 // Rotate from 0 to 330 degrees based on detection level
+        return max(0, min(angle, 330)) // Clamp between 0 and 330 degrees
     }
 
 
@@ -371,6 +381,28 @@ class MetalDetectorManager: ObservableObject {
             } else {
                 return LocalizedString.noMetalDetected
             }
+        }
+    }
+    
+    // MARK: - Get Subtitle Message Key (for detected state)
+    func getSubtitleMessageKey() -> String {
+        if isMetalDetected {
+            // Show specific "keep scanning" message based on detector type
+            switch currentDetectorTitle {
+            case "Gold Detector":
+                return LocalizedString.goldObjectNearbyKeepScanning
+            case "Metal Detector":
+                return LocalizedString.metalObjectNearbyKeepScanning
+            case "Stud Finder":
+                return LocalizedString.studObjectNearbyKeepScanning
+            case "Handled Detector":
+                return LocalizedString.handleObjectNearbyKeepScanning
+            default:
+                return LocalizedString.metalObjectNearbyKeepScanning
+            }
+        } else {
+            // Show "Please check thoroughly" when not detected
+            return LocalizedString.pleaseCheckThoroughly
         }
     }
 }

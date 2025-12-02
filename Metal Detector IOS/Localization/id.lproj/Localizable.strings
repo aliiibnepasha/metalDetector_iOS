@@ -37,6 +37,10 @@
 // MARK: - Common Messages
 "no_gold_detected" = "Tidak Ada Emas Terdeteksi,";
 "please_check_thoroughly" = "Silakan Periksa dengan Teliti";
+"gold_object_nearby_keep_scanning" = "Objek emas di dekatnya, lanjutkan memindai...";
+"metal_object_nearby_keep_scanning" = "Objek logam di dekatnya, lanjutkan memindai...";
+"stud_object_nearby_keep_scanning" = "Objek tiang di dekatnya, lanjutkan memindai...";
+"handle_object_nearby_keep_scanning" = "Objek gagang di dekatnya, lanjutkan memindai...";
 "start_detection" = "Mulai Deteksi";
 "stop_detection" = "Hentikan Deteksi";
 

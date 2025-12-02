@@ -37,6 +37,10 @@
 // MARK: - Common Messages
 "no_gold_detected" = "金が検出されませんでした、";
 "please_check_thoroughly" = "十分に確認してください";
+"gold_object_nearby_keep_scanning" = "金の物体が近くにあります。スキャンを続けてください...";
+"metal_object_nearby_keep_scanning" = "金属の物体が近くにあります。スキャンを続けてください...";
+"stud_object_nearby_keep_scanning" = "スタッドの物体が近くにあります。スキャンを続けてください...";
+"handle_object_nearby_keep_scanning" = "ハンドルの物体が近くにあります。スキャンを続けてください...";
 "start_detection" = "検出を開始";
 "stop_detection" = "検出を停止";
 

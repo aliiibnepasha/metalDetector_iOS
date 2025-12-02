@@ -186,6 +186,10 @@ struct LocalizedString {
     static let noHandleDetected = "no_handle_detected"
     static let handleDetected = "handle_detected"
     static let pleaseCheckThoroughly = "please_check_thoroughly"
+    static let goldObjectNearbyKeepScanning = "gold_object_nearby_keep_scanning"
+    static let metalObjectNearbyKeepScanning = "metal_object_nearby_keep_scanning"
+    static let studObjectNearbyKeepScanning = "stud_object_nearby_keep_scanning"
+    static let handleObjectNearbyKeepScanning = "handle_object_nearby_keep_scanning"
     static let startDetection = "start_detection"
     static let stopDetection = "stop_detection"
     

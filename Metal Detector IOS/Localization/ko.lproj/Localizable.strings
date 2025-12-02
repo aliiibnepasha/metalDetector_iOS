@@ -37,6 +37,10 @@
 // MARK: - Common Messages
 "no_gold_detected" = "금이 감지되지 않았습니다,";
 "please_check_thoroughly" = "철저히 확인해 주세요";
+"gold_object_nearby_keep_scanning" = "금 물체가 가까이 있습니다. 계속 스캔하세요...";
+"metal_object_nearby_keep_scanning" = "금속 물체가 가까이 있습니다. 계속 스캔하세요...";
+"stud_object_nearby_keep_scanning" = "스터드 물체가 가까이 있습니다. 계속 스캔하세요...";
+"handle_object_nearby_keep_scanning" = "핸들 물체가 가까이 있습니다. 계속 스캔하세요...";
 "start_detection" = "탐지 시작";
 "stop_detection" = "탐지 중지";
 

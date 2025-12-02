@@ -47,6 +47,10 @@
 "no_handle_detected" = "No handle detected,";
 "handle_detected" = "Handle detected";
 "please_check_thoroughly" = "Please check thoroughly";
+"gold_object_nearby_keep_scanning" = "Gold object nearby keep scanning...";
+"metal_object_nearby_keep_scanning" = "Metal object nearby keep scanning...";
+"stud_object_nearby_keep_scanning" = "Stud object nearby keep scanning...";
+"handle_object_nearby_keep_scanning" = "Handle object nearby keep scanning...";
 "start_detection" = "Start Detection";
 "stop_detection" = "Stop Detection";
 

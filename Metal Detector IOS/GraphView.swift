@@ -13,30 +13,9 @@ struct GraphView: View {
     @StateObject private var localizationManager = LocalizationManager.shared
     @State private var graphData: [Double] = []
     @State private var maxDataPoints = 100 // Keep last 100 readings for smoother graph
-    @State private var cursorPosition: Double = 100.0 // X position of cursor (0-100)
     @State private var soundEnabled = true
     @State private var vibrationEnabled = true
     @State private var updateTimer: Timer?
-    
-    // Computed properties for cursor value and label
-    private var selectedValue: Double {
-        let index = (cursorPosition / 100.0) * Double(graphData.count - 1)
-        let lowerIndex = Int(index)
-        let upperIndex = min(lowerIndex + 1, graphData.count - 1)
-        let fraction = index - Double(lowerIndex)
-        
-        if lowerIndex == upperIndex {
-            return graphData[lowerIndex]
-        }
-        
-        // Linear interpolation
-        return graphData[lowerIndex] * (1 - fraction) + graphData[upperIndex] * fraction
-    }
-    
-    private var selectedLabel: String {
-        // Format label based on selected value
-        return String(format: "Day %.0f-%.1fk", cursorPosition, selectedValue / 10.0)
-    }
     
     var body: some View {
         ZStack {
@@ -123,23 +102,9 @@ struct GraphView: View {
                 .padding(.bottom, 8)
                 
                 // Graph Container
-                GraphContainer(
-                    data: graphData,
-                    cursorPosition: $cursorPosition
-                )
+                GraphContainer(data: graphData)
                 .frame(width: 380, height: 325)
                 .padding(.top, 0)
-                .gesture(
-                    DragGesture(minimumDistance: 0)
-                        .onChanged { value in
-                            let containerWidth: CGFloat = 380
-                            let paddingLeft: CGFloat = 46
-                            let graphWidth: CGFloat = 290
-                            let xPosition = value.location.x - paddingLeft
-                            let clampedX = max(0, min(graphWidth, xPosition))
-                            cursorPosition = Double(clampedX / graphWidth * 100.0)
-                        }
-                )
                 
                 // Detection Status Text (moved closer to graph)
                 VStack(spacing: 12) {
@@ -179,11 +144,12 @@ struct GraphView: View {
                     let variationScale = max(1.0, currentLevel / 20.0) // Scale variations with detection
                     let baseVariation = sin(Date().timeIntervalSince1970 * 10) * 3 * variationScale // Frequency wave
                     let randomVariation = Double.random(in: -1.5...1.5) * variationScale // Small random noise
-                    // Amplify detection level to use full graph range (0-50 on Y-axis)
-                    // When detection happens, ensure graph reaches maximum height (50)
-                    // Increase amplification so even moderate detection (20-30%) reaches top (50)
-                    let amplificationFactor: Double = 3.5  // Increased from 2.5 to reach 50 more easily
+                    // Map detection level to graph range (0-50) - matching Android approach
+                    // Android maps sensor values (40-330 µT) to (0-50)
+                    // We'll map detection level (0-100%) to (0-50) with proper scaling
+                    let amplificationFactor: Double = 2.0  // Scale to use full range
                     let amplifiedLevel = currentLevel > 0 ? min(100, currentLevel * amplificationFactor) : currentLevel
+                    // Add natural frequency variations for realistic graph
                     let graphValue = max(0, min(100, amplifiedLevel + baseVariation + randomVariation))
                     
                     DispatchQueue.main.async {
@@ -191,8 +157,6 @@ struct GraphView: View {
                         if graphData.count > maxDataPoints {
                             graphData.removeFirst()
                         }
-                        // Keep cursor at latest point
-                        cursorPosition = 100.0
                     }
                 }
             }
@@ -208,29 +172,6 @@ struct GraphView: View {
 
 struct GraphContainer: View {
     let data: [Double]
-    @Binding var cursorPosition: Double
-    
-    // Computed properties for cursor
-    private var selectedValue: Double {
-        // Safety check - return 0 if data is empty
-        guard !data.isEmpty else { return 0 }
-        
-        let index = (cursorPosition / 100.0) * Double(data.count - 1)
-        let lowerIndex = Int(index)
-        let clampedLowerIndex = max(0, min(lowerIndex, data.count - 1))
-        let upperIndex = min(clampedLowerIndex + 1, data.count - 1)
-        let fraction = index - Double(clampedLowerIndex)
-        
-        if clampedLowerIndex == upperIndex {
-            return data[clampedLowerIndex]
-        }
-        
-        return data[clampedLowerIndex] * (1 - fraction) + data[upperIndex] * fraction
-    }
-    
-    private var selectedLabel: String {
-        return String(format: "Day %.0f-%.1fk", cursorPosition, selectedValue / 10.0)
-    }
     
     private let graphWidth: CGFloat = 290
     private let graphHeight: CGFloat = 164
@@ -251,78 +192,98 @@ struct GraphContainer: View {
                 )
             
             ZStack(alignment: .topLeading) {
-                // Grid Lines
+                // Grid Lines (drawn first, behind everything)
                 GraphGrid()
                 
-                // Y-axis Labels - align perfectly with grid lines
-                let usableTop = paddingTop
-                let usableBottom = paddingTop + graphHeight - bottomPadding
-                let usableHeight = usableBottom - usableTop
+                // Y-axis Labels - same as X-axis: 0, 20, 40, 60, 80, 100
+                // Aligned from bottom like X-axis
+                // Graph area: paddingTop (68) to paddingTop + graphHeight (232)
+                // Total height: 164 pixels, divided into 5 intervals for 6 labels
+                let graphBottom = paddingTop + graphHeight // 232
+                let graphTop = paddingTop // 68
+                let graphHeight = 164.0
+                let labelSpacing = graphHeight / 5.0 // 32.8 pixels spacing
                 
-                ForEach(Array([50, 40, 30, 20, 10, 0].enumerated()), id: \.element) { index, value in
-                    // Calculate Y position matching grid line exactly
-                    // index 0 (value 50) at top, index 5 (value 0) at bottom
-                    let lineY = usableTop + (CGFloat(5 - index) / 5.0) * usableHeight
-                    
+                ForEach(Array([0, 20, 40, 60, 80, 100].enumerated()), id: \.element) { index, value in
+                    // Calculate Y position: 0 at bottom, 100 at top
+                    // Bottom label (0) at graphBottom, top label (100) at graphTop
+                    let labelY = graphBottom - (CGFloat(index) * labelSpacing)
                     Text("\(value)")
                         .font(.system(size: 9.157, weight: .semibold))
-                        .foregroundColor(Color(red: 124/255, green: 124/255, blue: 124/255))
+                        .foregroundColor(.white) // White labels matching Android
                         .tracking(0.8699)
-                        .offset(y: lineY - 4.5) // Center text on grid line (half font height ~9px)
+                        .offset(y: labelY - 4.5) // Center text on label position (half font height)
                         .padding(.leading, 23.29)
                 }
                 
-                // X-axis Labels
+                // X-axis Labels - (0, 20, 40, 60, 80, 100)
                 HStack(spacing: 44) {
                     ForEach([0, 20, 40, 60, 80, 100], id: \.self) { value in
                         Text("\(value)")
                             .font(.system(size: 9.157, weight: .semibold))
-                            .foregroundColor(Color(red: 124/255, green: 124/255, blue: 124/255))
+                            .foregroundColor(.white) // White labels matching Android
                             .tracking(0.8699)
                     }
                 }
                 .padding(.leading, 46.93)
                 .padding(.top, 246.66)
                 
-                // Graph Area
+                // Graph Area - Golden Yellow Line
                 ZStack {
-                    // Graph Line
-                    GraphLine(data: data)
-                        .stroke(
-                            LinearGradient(
-                                gradient: Gradient(colors: [
-                                    Color(red: 1.0, green: 0.85, blue: 0.0),
-                                    Color(red: 0.99, green: 0.78, blue: 0.23)
-                                ]),
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            ),
-                            style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round)
-                        )
-                        .frame(width: graphWidth, height: graphHeight)
-                        .padding(.leading, paddingLeft)
-                        .padding(.top, paddingTop)
+                    // Graph Line - Golden Yellow (matching Android: 0xFFFFD700)
+                    if !data.isEmpty {
+                        GraphLine(data: data)
+                            .stroke(
+                                Color(red: 1.0, green: 0.843, blue: 0.0), // Golden Yellow #FFD700
+                                style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round)
+                            )
+                            .frame(width: graphWidth, height: graphHeight)
+                            .padding(.leading, paddingLeft)
+                            .padding(.top, paddingTop)
+                    }
                     
-                    // Cursor Line and Indicator
-                    GraphCursor(
-                        cursorPosition: cursorPosition,
-                        selectedValue: selectedValue,
-                        data: data,
-                        graphWidth: graphWidth,
-                        graphHeight: graphHeight
-                    )
-                    .padding(.leading, paddingLeft)
-                    .padding(.top, paddingTop)
-                    
-                    // Label above cursor
-                    if cursorPosition >= 0 && cursorPosition <= 100 {
-                        Text(selectedLabel)
+                    // Latest Point - Vertical Line and Circular Marker (matching Android)
+                    if !data.isEmpty {
+                        let latestValue = data.last!
+                        let graphBottom = paddingTop + graphHeight // 232
+                        let graphTop = paddingTop // 68
+                        let usableHeight = graphHeight // 164
+                        
+                        // Calculate latest point position - value is already 0-100, map to graph height
+                        let normalized = latestValue / 100.0 // 0-1 range
+                        let markerY = graphBottom - (CGFloat(normalized) * usableHeight)
+                        let markerX = paddingLeft + graphWidth // Latest point at right edge
+                        
+                        // Vertical white line from marker to top
+                        Rectangle()
+                            .fill(Color.white)
+                            .frame(width: 2, height: graphTop - 10) // Line from top to just above marker
+                            .offset(x: markerX, y: (graphTop - 10) / 2)
+                        
+                        // Circular marker - Yellow outer with white center
+                        ZStack {
+                            // Outer yellow circle
+                            Circle()
+                                .fill(Color(red: 1.0, green: 0.843, blue: 0.0))
+                                .frame(width: 18, height: 18)
+                            
+                            // Inner white circle
+                            Circle()
+                                .fill(Color.white)
+                                .frame(width: 10, height: 10)
+                        }
+                        .offset(x: markerX - 9, y: markerY - 9)
+                        
+                        // Label above - "Day X-Yk" format (matching Android)
+                        let dayNumber = data.count
+                        let valueK = latestValue / 10.0
+                        Text(String(format: "Day %d-%.1fk", dayNumber, valueK))
                             .font(.system(size: 11.446, weight: .semibold))
                             .foregroundColor(.white)
                             .tracking(1.0873)
                             .offset(
-                                x: paddingLeft + (CGFloat(cursorPosition) / 100.0 * graphWidth) - 190,
-                                y: paddingTop - 30
+                                x: markerX - 40,
+                                y: graphTop - 25
                             )
                     }
                 }
@@ -337,40 +298,46 @@ struct GraphGrid: View {
     private let graphHeight: CGFloat = 164
     private let paddingLeft: CGFloat = 46
     private let paddingTop: CGFloat = 68
-    private let bottomPadding: CGFloat = 20  // Reduced padding for better alignment
     
     var body: some View {
         ZStack {
-            // Horizontal grid lines - properly aligned with Y-axis labels
-            // Graph area starts at paddingTop (68) and has graphHeight (164)
-            // Space from top to useable area
-            let usableTop = paddingTop
-            let usableBottom = paddingTop + graphHeight - bottomPadding
-            let usableHeight = usableBottom - usableTop
+            // Horizontal grid lines - aligned with Y-axis labels (0, 20, 40, 60, 80, 100)
+            // Move all lines up by adjusting the bottom position
+            let graphBottom = paddingTop + graphHeight // 232
+            let graphTop = paddingTop // 68
+            let graphHeightValue = 164.0
+            let labelSpacing = graphHeightValue / 5.0 // 32.8 pixels spacing
+            let upShift: CGFloat = 82 // Move horizontal lines up by 82 pixels
+            let verticalUpShift: CGFloat = 4 // Move vertical lines down (less up shift = more down)
             
             ForEach(0..<6) { index in
-                // Y-axis values: 0, 10, 20, 30, 40, 50
-                // Map index 0 (value 50) to top, index 5 (value 0) to bottom
-                let lineY = usableTop + (CGFloat(5 - index) / 5.0) * usableHeight
+                // Calculate grid line Y position to perfectly align with labels
+                // Index 0 = label 0 (bottom), Index 5 = label 100 (top)
+                // Shift all lines up
+                let lineY = (graphBottom - (CGFloat(index) * labelSpacing)) - upShift
                 
                 Rectangle()
-                    .fill(Color.white.opacity(0.12))
+                    .fill(Color.white.opacity(0.5)) // Matching Android: gray with 0.5 alpha
                     .frame(height: 1)
                     .offset(y: lineY)
                     .padding(.horizontal, paddingLeft)
             }
             
-            // Vertical grid lines - aligned with X-axis values (0, 20, 40, 60, 80, 100)
-            ForEach(0..<6) { index in
-                let lineX = paddingLeft + (CGFloat(index) / 5.0) * graphWidth
-                
-                Rectangle()
-                    .fill(Color.white.opacity(0.12))
-                    .frame(width: 1)
-                    .offset(x: lineX)
-                    .frame(height: graphHeight)
-                    .offset(y: paddingTop)
-            }
+            // Vertical grid lines - Only keep the rightmost line (at 100 position)
+            // Remove first 2 lines, keep only the last one
+            let lineX = paddingLeft + graphWidth // Rightmost position (100)
+            
+            Rectangle()
+                .fill(Color.white.opacity(0.5)) // Matching Android: gray with 0.5 alpha
+                .frame(width: 1, height: graphHeight)
+                .offset(x: lineX, y: paddingTop - verticalUpShift)
+            
+            // X-axis line at bottom (horizontal line) - matching Android
+            Rectangle()
+                .fill(Color.white)
+                .frame(height: 2)
+                .offset(y: paddingTop + graphHeight)
+                .padding(.horizontal, paddingLeft)
         }
     }
 }
@@ -383,8 +350,8 @@ struct GraphLine: Shape {
         
         guard !data.isEmpty else { return path }
         
-        // Scale based on Y-axis labels (0-50) to match graph grid
-        let maxValue: Double = 50  // Y-axis shows 0-50
+        // Scale based on Y-axis labels (0-100) to match graph grid
+        let maxValue: Double = 100  // Y-axis shows 0-100 (same as X-axis)
         let minValue: Double = 0
         
         // Use smooth curves for better graph appearance
@@ -394,25 +361,26 @@ struct GraphLine: Shape {
         // Convert detection level (0-100) to graph scale (0-50) - use FULL range
         // Add offset to ensure line stays above bottom numbers (X-axis labels)
         func normalizeY(_ value: Double) -> CGFloat {
-            // Scale detection level (0-100) to graph Y-axis (0-50) - ensure full range usage
+            // Scale detection level (0-100) to graph Y-axis (0-100) - ensure full range usage
             // When value = 0, scaledValue = 0 (bottom)
-            // When value = 100, scaledValue = 50 (top of graph)
-            let scaledValue = (value / 100.0) * maxValue
+            // When value = 100, scaledValue = 100 (top of graph)
+            let scaledValue = value // Already in 0-100 range, no scaling needed
             let normalized = (scaledValue - minValue) / (maxValue - minValue)
             
-            // Calculate Y position - align with grid lines
-            // Bottom (0) should be at usableBottom, top (50) should be at usableTop
-            let bottomPadding: CGFloat = 20  // Space above X-axis labels
-            let usableTop: CGFloat = 0
-            let usableBottom = rect.height - bottomPadding
-            let usableHeight = usableBottom - usableTop
+            // Calculate Y position - align with grid lines perfectly
+            // Y-axis labels: 0, 20, 40, 60, 80, 100 with spacing of graphHeight/5
+            let graphBottom = rect.height - 20 // Leave bottom padding for X-axis labels
+            let graphTop: CGFloat = 0
+            let usableHeight = graphBottom - graphTop
+            let downShift: CGFloat = 20 // Shift line down slightly
             
-            // Map normalized value (0-1) to usable height
-            // normalized 0 (bottom) = usableBottom, normalized 1 (top) = usableTop
-            let yPosition = usableBottom - (CGFloat(normalized) * usableHeight)
+            // Map normalized value (0-1) to label-aligned positions
+            // normalized 0 (bottom, value 0) = graphBottom, normalized 1 (top, value 100) = graphTop
+            // Add downShift to move line down
+            let yPosition = graphBottom - (CGFloat(normalized) * usableHeight) + downShift
             
-            // Ensure Y stays within usable bounds
-            return max(usableTop, min(usableBottom, yPosition))
+            // Ensure Y stays within bounds
+            return max(graphTop, min(graphBottom + downShift, yPosition))
         }
         
         // Start point
@@ -434,135 +402,6 @@ struct GraphLine: Shape {
     }
 }
 
-struct GraphCursor: View {
-    let cursorPosition: Double
-    let selectedValue: Double
-    let data: [Double]
-    let graphWidth: CGFloat
-    let graphHeight: CGFloat
-    
-    // Calculate the actual Y position on the graph line
-    private var lineYPosition: CGFloat {
-        let maxValue: Double = 50  // Y-axis shows 0-50
-        let minValue: Double = 0
-        
-        // Convert detection level (0-100) to graph scale (0-50)
-        // Apply amplification to match graph line scaling
-        let amplificationFactor: Double = 3.5
-        let amplifiedValue = selectedValue > 0 ? min(100, selectedValue * amplificationFactor) : selectedValue
-        let scaledValue = (amplifiedValue / 100.0) * maxValue
-        let normalized = (scaledValue - minValue) / (maxValue - minValue)
-        
-        // Align with grid lines - same calculation as graph line
-        let bottomPadding: CGFloat = 20  // Space above X-axis labels
-        let usableTop: CGFloat = 0
-        let usableBottom = graphHeight - bottomPadding
-        let usableHeight = usableBottom - usableTop
-        let yPosition = usableBottom - (CGFloat(normalized) * usableHeight)
-        return max(usableTop, min(usableBottom, yPosition))
-    }
-    
-    // Get the actual data point Y position for cursor alignment
-    private func getYPositionForDataPoint(_ dataIndex: Int) -> CGFloat {
-        guard dataIndex >= 0 && dataIndex < data.count else { return 0 }
-        
-        let maxValue: Double = 50  // Y-axis shows 0-50
-        let value = data[dataIndex]
-        let scaledValue = (value / 100.0) * maxValue
-        let normalized = scaledValue / maxValue
-        let yValue = CGFloat(normalized) * graphHeight
-        return max(0, min(graphHeight, graphHeight - yValue))
-    }
-    
-    var body: some View {
-        GeometryReader { geometry in
-            let xPosition = CGFloat(cursorPosition / 100.0) * graphWidth
-            // Ensure X stays within graph bounds
-            let clampedX = max(0, min(graphWidth, xPosition))
-            
-            // Calculate actual Y position on the graph line at this X position
-            let actualYPosition = calculateYAtX(clampedX)
-            
-            ZStack {
-                // Vertical cursor line (only within graph bounds)
-                Rectangle()
-                    .fill(Color(red: 124/255, green: 124/255, blue: 124/255).opacity(0.5))
-                    .frame(width: 1, height: graphHeight)
-                    .offset(x: clampedX)
-                
-                // Circle indicator at intersection with graph line
-                // Ensure circle stays within graph bounds and aligns with actual line position
-                Circle()
-                    .fill(
-                        LinearGradient(
-                            gradient: Gradient(colors: [
-                                Color(red: 1.0, green: 0.85, blue: 0.0),
-                                Color(red: 0.99, green: 0.78, blue: 0.23)
-                            ]),
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(width: 19.199, height: 19.199)
-                    .overlay(
-                        Circle()
-                            .fill(Color.white)
-                            .frame(width: 8, height: 8)
-                    )
-                    .offset(
-                        x: clampedX - 9.6,
-                        y: actualYPosition - 9.6
-                    )
-            }
-        }
-    }
-    
-    // Calculate the actual Y position on the graph line at a given X coordinate
-    private func calculateYAtX(_ xPosition: CGFloat) -> CGFloat {
-        let bottomPadding: CGFloat = 20  // Space above X-axis labels
-        
-        guard !data.isEmpty else { 
-            return graphHeight - bottomPadding
-        }
-        
-        let maxValue: Double = 50  // Y-axis shows 0-50
-        let stepX = data.count > 1 ? graphWidth / CGFloat(data.count - 1) : 0
-        let usableTop: CGFloat = 0
-        let usableBottom = graphHeight - bottomPadding
-        let usableHeight = usableBottom - usableTop
-        
-        if stepX == 0 || data.count == 1 {
-            // Single point or no points
-            let value = data[0]
-            let scaledValue = (value / 100.0) * maxValue
-            let normalized = scaledValue / maxValue
-            let yPosition = usableBottom - (CGFloat(normalized) * usableHeight)
-            return max(usableTop, min(usableBottom, yPosition))
-        }
-        
-        // Find which two data points surround this X position
-        let dataIndex = xPosition / stepX
-        let lowerIndex = Int(dataIndex)
-        let upperIndex = min(lowerIndex + 1, data.count - 1)
-        let clampedLowerIndex = max(0, min(lowerIndex, data.count - 1))
-        
-        let value: Double
-        if clampedLowerIndex == upperIndex {
-            value = data[clampedLowerIndex]
-        } else {
-            // Linear interpolation between two points
-            let fraction = dataIndex - Double(clampedLowerIndex)
-            let lowerValue = data[clampedLowerIndex]
-            let upperValue = data[upperIndex]
-            value = lowerValue * (1 - fraction) + upperValue * fraction
-        }
-        
-        let scaledValue = (value / 100.0) * maxValue
-        let normalized = scaledValue / maxValue
-        let yPosition = usableBottom - (CGFloat(normalized) * usableHeight)
-        return max(usableTop, min(usableBottom, yPosition))
-    }
-}
 
 #Preview {
     GraphView(onBackTap: {})

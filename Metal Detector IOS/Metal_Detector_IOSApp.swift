@@ -7,6 +7,7 @@
 
 import SwiftUI
 import FirebaseCore
+import GoogleMobileAds
 
 @main
 struct Metal_Detector_IOSApp: App {
@@ -18,6 +19,13 @@ struct Metal_Detector_IOSApp: App {
         if FirebaseApp.app() == nil {
             FirebaseApp.configure()
         }
+        
+        // Initialize Google Mobile Ads SDK
+        // SDK auto-initializes from Info.plist GADApplicationIdentifier
+        // No explicit initialization needed - SDK handles it automatically
+        #if DEBUG
+        print("🧪 AdMob: Using test ad IDs (Debug mode)")
+        #endif
         
         // Start anonymous authentication
         FirebaseManager.shared.checkAndSignInAnonymously()

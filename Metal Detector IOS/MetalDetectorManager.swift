@@ -61,6 +61,10 @@ class MetalDetectorManager: ObservableObject {
     private let vibrationCooldown: TimeInterval = 0.5 // 500ms cooldown between vibrations
     private let soundCooldown: TimeInterval = 0.8 // 800ms cooldown between sounds
     
+    // ✅ FIX 3: Magnetometer freeze detection variables
+    private var lastField: Double = 0.0
+    private var lastUpdateTime: Date = Date()
+    
     private init() {
         setupAudioPlayer()
         requestPermissions()
@@ -120,6 +124,32 @@ class MetalDetectorManager: ObservableObject {
                 pow(magneticField.z, 2)
             ) // Already in µT - NO * 1000 multiplication!
             
+            // ✅ FIX 3: Magnetometer freeze detection
+            // Check if sensor is stuck/frozen (same reading for too long)
+            let currentTime = Date()
+            var shouldProcess = true
+            
+            if abs(self.lastField - totalField) < 0.01 {
+                if currentTime.timeIntervalSince(self.lastUpdateTime) > 0.8 {
+                    // Sensor appears frozen, restart detection completely
+                    self.motionManager.stopMagnetometerUpdates()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+                        guard let self = self else { return }
+                        print("🔄 Magnetometer refreshed (freeze detected)")
+                        // Restart detection
+                        self.isDetecting = false
+                        self.startDetection()
+                    }
+                    shouldProcess = false // Skip processing this update
+                }
+            } else {
+                self.lastUpdateTime = currentTime
+            }
+            self.lastField = totalField
+            
+            // Skip processing if freeze was detected
+            guard shouldProcess else { return }
+            
             // Calibrate baseline first
             if !self.isCalibrated {
                 self.calibrationReadings.append(totalField)
@@ -129,6 +159,11 @@ class MetalDetectorManager: ObservableObject {
                     self.isCalibrated = true
                     print("✅ Calibrated baseline: \(self.baseMagneticField) µT (Mode: \(self.currentMode.rawValue))")
                 }
+            } else {
+                // ✅ FIX 1: Baseline auto-adjust (slow exponential smoothing)
+                // This prevents stuck detection by allowing baseline to drift slowly
+                let alpha = 0.02 // Very slow smoothing factor
+                self.baseMagneticField = (alpha * totalField) + ((1 - alpha) * self.baseMagneticField)
             }
             
             // Update published property (triggers UI updates)
@@ -148,6 +183,15 @@ class MetalDetectorManager: ObservableObject {
         isDetecting = false
         magneticFieldStrength = 0.0
         detectionLevel = 0.0
+        isMetalDetected = false
+        
+        // Reset freeze detection variables
+        lastField = 0.0
+        lastUpdateTime = Date()
+        
+        // ✅ FIX 4: Stop sound when detection stops
+        audioPlayer?.stop()
+        audioPlayer?.currentTime = 0
     }
     
     // MARK: - Update Detection Level (0-100)
@@ -239,10 +283,18 @@ class MetalDetectorManager: ObservableObject {
                 lastVibrationTime = now
             }
         } else {
-            // Reset detection state when below threshold
-            DispatchQueue.main.async {
-                if self.detectionLevel < 10 {
+            // ✅ FIX 2: Detection reset ko easy banao
+            // Reset detection when difference is below 60% of threshold (smooth reset)
+            let resetThreshold = adjustedThreshold * 0.6
+            if difference < resetThreshold {
+                DispatchQueue.main.async {
                     self.isMetalDetected = false
+                    
+                    // ✅ FIX 4: Sound ko stop karo jab metal door ho
+                    if let player = self.audioPlayer, player.isPlaying {
+                        player.stop()
+                        player.currentTime = 0
+                    }
                 }
             }
         }

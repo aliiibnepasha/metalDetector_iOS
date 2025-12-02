@@ -6,14 +6,19 @@
 //
 
 import SwiftUI
+import StoreKit
 
 struct PaywallView: View {
     @ObservedObject private var localizationManager = LocalizationManager.shared
+    @StateObject private var iapManager = IAPManager.shared
     var onClose: () -> Void
     var onGoPremium: () -> Void
     var onContinueFree: () -> Void
     @State private var rotationAngle: Double = 0
     @State private var animationTimer: Timer?
+    @State private var isPurchasing = false
+    @State private var showError = false
+    @State private var errorMessage = ""
     
     var body: some View {
         ZStack {
@@ -125,10 +130,6 @@ struct PaywallView: View {
                     )
                 }
                 .frame(height: 300)
-                .onAppear {
-                    // Start continuous rotation animation
-                    startRotationAnimation()
-                }
                 .onDisappear {
                     // Clean up timer when view disappears
                     animationTimer?.invalidate()
@@ -175,26 +176,40 @@ struct PaywallView: View {
                 
                 // Go Premium Button Section
                 VStack(spacing: 12) {
-                    // Go Premium Button (background from assets)
+                    // Go Premium Button (background from assets) with real price
                     Button(action: {
-                        onGoPremium()
+                        handlePurchase()
                     }) {
                         ZStack {
                             // Button background from assets
-                            Image("Go Premium Button Background") // User will provide asset name
+                            Image("Go Premium Button Background")
                                 .resizable()
                                 .scaledToFill()
                                 .frame(height: 56)
                                 .clipShape(RoundedRectangle(cornerRadius: 58.76))
                             
-                            Text(LocalizedString.goPremiumFor6DollarsMonth.localized)
-                                .font(.custom("Manrope_Bold", size: 16))
-                                .id(localizationManager.currentLanguage)
-                                .foregroundColor(Color(red: 21/255, green: 21/255, blue: 21/255))
+                            // Show real price or loading state
+                            if isPurchasing {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle(tint: Color(red: 21/255, green: 21/255, blue: 21/255)))
+                            } else if let product = iapManager.monthlyProduct {
+                                // Show "Get premium for" + real price from StoreKit
+                                Text("\(LocalizedString.getPremium.localized) for \(product.displayPrice)/\(LocalizedString.month.localized)")
+                                    .font(.custom("Manrope_Bold", size: 16))
+                                    .foregroundColor(Color(red: 21/255, green: 21/255, blue: 21/255))
+                                    .id(localizationManager.currentLanguage + "_premium_price")
+                            } else {
+                                // Fallback if product not loaded
+                                Text(LocalizedString.goPremiumFor6DollarsMonth.localized)
+                                    .font(.custom("Manrope_Bold", size: 16))
+                                    .id(localizationManager.currentLanguage)
+                                    .foregroundColor(Color(red: 21/255, green: 21/255, blue: 21/255))
+                            }
                         }
                         .frame(maxWidth: .infinity)
                         .frame(height: 56)
                     }
+                    .disabled(isPurchasing || iapManager.isLoading)
                     
                     // Continue for free
                     Button(action: {
@@ -209,6 +224,22 @@ struct PaywallView: View {
                 .padding(.horizontal, 16)
                 .padding(.bottom, 40)
             }
+        }
+        .onAppear {
+            // Start loading animation
+            startRotationAnimation()
+            
+            // Load products when view appears
+            if iapManager.products.isEmpty {
+                Task {
+                    await iapManager.loadProducts()
+                }
+            }
+        }
+        .alert("Error", isPresented: $showError) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(errorMessage)
         }
     }
     
@@ -225,6 +256,35 @@ struct PaywallView: View {
                 self.rotationAngle += 0.2 // 360 degrees / (30 seconds * 60 FPS) ≈ 0.2 per frame
                 if self.rotationAngle >= 360 {
                     self.rotationAngle = 0 // Reset to keep it continuous
+                }
+            }
+        }
+    }
+    
+    // MARK: - Handle Purchase
+    private func handlePurchase() {
+        guard let product = iapManager.monthlyProduct else {
+            errorMessage = "Product not available. Please try again."
+            showError = true
+            return
+        }
+        
+        isPurchasing = true
+        
+        Task {
+            do {
+                let success = try await iapManager.purchase(product)
+                await MainActor.run {
+                    isPurchasing = false
+                    if success {
+                        onGoPremium()
+                    }
+                }
+            } catch {
+                await MainActor.run {
+                    isPurchasing = false
+                    errorMessage = error.localizedDescription
+                    showError = true
                 }
             }
         }

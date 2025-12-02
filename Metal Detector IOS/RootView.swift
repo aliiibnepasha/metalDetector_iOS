@@ -27,15 +27,44 @@ enum IntroRoute: Hashable {
 struct RootView: View {
     @State private var navigationPath = NavigationPath()
     @State private var showSplash = true
+    @State private var showInterstitial = false
+    @ObservedObject private var adManager = AdManager.shared
+    @AppStorage("hasSelectedLanguage") private var hasSelectedLanguage = false
+    @AppStorage("hasSeenIntro") private var hasSeenIntro = false
     
     var body: some View {
         ZStack {
             NavigationStack(path: $navigationPath) {
-                IntroOnboardingView(
-                    onGetStarted: {
-                        navigationPath.append(IntroRoute.home)
+                // Default view - IntroOnboardingView or Home based on flow
+                Group {
+                    if hasSeenIntro {
+                        // User has seen intro, go to home
+                        HomeView(
+                            onSettingsTap: {
+                                navigationPath.append(IntroRoute.settings)
+                            },
+                            onDetectorTap: { title in
+                                navigationPath.append(IntroRoute.detector(title))
+                            },
+                            onProTap: {
+                                navigationPath.append(IntroRoute.paywall)
+                            }
+                        )
+                        .navigationBarBackButtonHidden(true)
+                        .navigationBarHidden(true)
+                    } else {
+                        // Show intro screens (will be shown after language selection)
+                        IntroOnboardingView(
+                            onGetStarted: {
+                                hasSeenIntro = true
+                                var newPath = NavigationPath()
+                                newPath.append(IntroRoute.home)
+                                navigationPath = newPath
+                            }
+                        )
+                        .opacity(hasSelectedLanguage ? 1 : 0) // Hide until language selected
                     }
-                )
+                }
                 .navigationDestination(for: IntroRoute.self) { route in
                     switch route {
                     case .home:
@@ -122,7 +151,18 @@ struct RootView: View {
                     case .language:
                         LanguageView(
                             onBackTap: {
-                                navigationPath.removeLast()
+                                // Don't allow back from language screen on first launch
+                                if hasSelectedLanguage {
+                                    navigationPath.removeLast()
+                                }
+                            },
+                            onDone: {
+                                hasSelectedLanguage = true
+                                // After language selection, navigate to intro screens
+                                // Clear navigation path to show intro screens as default view
+                                var newPath = NavigationPath()
+                                navigationPath = newPath
+                                // Intro screens will be shown as default view
                             }
                         )
                         .navigationBarBackButtonHidden(true)
@@ -202,10 +242,31 @@ struct RootView: View {
                 SplashScreenView(onComplete: {
                     withAnimation {
                         showSplash = false
+                        // After splash, show interstitial ad if ready
+                        showInterstitialAd {
+                            // After ad (or if ad not ready), navigate to language screen if not selected
+                            if !hasSelectedLanguage {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                    navigationPath.append(IntroRoute.language)
+                                }
+                            }
+                        }
                     }
                 })
                 .transition(.opacity)
             }
+        }
+        .onAppear {
+            // Pre-load interstitial ad when app starts
+            adManager.loadSplashInterstitial()
+        }
+    }
+    
+    // MARK: - Show Interstitial Ad
+    private func showInterstitialAd(completion: @escaping () -> Void) {
+        adManager.showSplashInterstitial {
+            // Ad dismissed or failed, proceed with navigation
+            completion()
         }
     }
 }

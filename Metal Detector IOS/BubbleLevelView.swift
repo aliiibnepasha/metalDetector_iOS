@@ -98,12 +98,13 @@ struct BubbleLevelView: View {
                                     .scaledToFit()
                                     .frame(width: 297, height: 74)
                                 
-                                // Bubble - moves based on X axis (roll)
+                                // Bubble - moves based on X axis (roll) with smooth animation
                                 Circle()
                                     .fill(Color.white.opacity(0.3))
                                     .stroke(Color.black.opacity(0.6), lineWidth: 0.681)
                                     .frame(width: 32, height: 32)
                                     .offset(x: motionManager.bubbleHorizontalOffset, y: 0)
+                                    .animation(.spring(response: 0.3, dampingFraction: 0.7, blendDuration: 0.2), value: motionManager.bubbleHorizontalOffset)
                             }
                             .frame(width: 297, height: 74)
                             
@@ -124,12 +125,13 @@ struct BubbleLevelView: View {
                                 .scaledToFit()
                                 .frame(width: 259, height: 259)
                             
-                            // Bubble - moves based on pitch and roll
+                            // Bubble - moves based on pitch and roll with smooth animation
                             Circle()
                                 .fill(Color.white.opacity(0.3))
                                 .stroke(Color.black.opacity(0.6), lineWidth: 0.674)
                                 .frame(width: 32, height: 32)
                                 .offset(x: motionManager.bubbleCircularOffsetX, y: motionManager.bubbleCircularOffsetY)
+                                .animation(.spring(response: 0.3, dampingFraction: 0.7, blendDuration: 0.2), value: motionManager.bubbleCircularOffsetX + motionManager.bubbleCircularOffsetY)
                         }
                         .padding(.leading, 16)
                         
@@ -149,12 +151,13 @@ struct BubbleLevelView: View {
                                     .scaledToFit()
                                     .frame(width: 74, height: 294)
                                 
-                                // Bubble - moves based on Y axis (pitch)
+                                // Bubble - moves based on Y axis (pitch) with smooth animation
                                 Circle()
                                     .fill(Color.white.opacity(0.3))
                                     .stroke(Color.black.opacity(0.6), lineWidth: 0.674)
                                     .frame(width: 32, height: 32)
                                     .offset(x: 0, y: motionManager.bubbleVerticalOffset)
+                                    .animation(.spring(response: 0.3, dampingFraction: 0.7, blendDuration: 0.2), value: motionManager.bubbleVerticalOffset)
                             }
                             .frame(width: 74, height: 294)
                             
@@ -211,7 +214,8 @@ class MotionManager: ObservableObject {
     
     func startMotionUpdates() {
         if motionManager.isDeviceMotionAvailable {
-            motionManager.deviceMotionUpdateInterval = 0.1
+            // Higher update frequency for smoother movement
+            motionManager.deviceMotionUpdateInterval = 0.016 // ~60 FPS for smooth updates
             motionManager.startDeviceMotionUpdates(to: .main) { [weak self] (motion, error) in
                 guard let self = self, let motion = motion else { return }
                 
@@ -229,18 +233,23 @@ class MotionManager: ObservableObject {
                     self.angleY = pitch
                     self.angleZ = yaw
                     
-                    // Update bubble positions
+                    // Update bubble positions with smooth interpolation
                     // Clamp values to reasonable range (-30 to 30 degrees for bubble movement)
                     let clampedRoll = max(-30, min(30, roll))
                     let clampedPitch = max(-30, min(30, pitch))
                     
-                    // Map angles to bubble offsets
-                    self.bubbleHorizontalOffset = CGFloat(clampedRoll / 30.0) * self.maxHorizontalOffset
-                    self.bubbleVerticalOffset = CGFloat(clampedPitch / 30.0) * self.maxVerticalOffset
+                    // Smooth interpolation for more natural movement (ease-in-out effect)
+                    let targetHorizontalOffset = CGFloat(clampedRoll / 30.0) * self.maxHorizontalOffset
+                    let targetVerticalOffset = CGFloat(clampedPitch / 30.0) * self.maxVerticalOffset
+                    let targetCircularX = CGFloat(clampedRoll / 30.0) * self.maxCircularOffset
+                    let targetCircularY = CGFloat(clampedPitch / 30.0) * self.maxCircularOffset
                     
-                    // Circular bubble uses both roll and pitch
-                    self.bubbleCircularOffsetX = CGFloat(clampedRoll / 30.0) * self.maxCircularOffset
-                    self.bubbleCircularOffsetY = CGFloat(clampedPitch / 30.0) * self.maxCircularOffset
+                    // Apply smooth interpolation (0.15 = smoothness factor, higher = smoother but slower response)
+                    let smoothingFactor: CGFloat = 0.25
+                    self.bubbleHorizontalOffset += (targetHorizontalOffset - self.bubbleHorizontalOffset) * smoothingFactor
+                    self.bubbleVerticalOffset += (targetVerticalOffset - self.bubbleVerticalOffset) * smoothingFactor
+                    self.bubbleCircularOffsetX += (targetCircularX - self.bubbleCircularOffsetX) * smoothingFactor
+                    self.bubbleCircularOffsetY += (targetCircularY - self.bubbleCircularOffsetY) * smoothingFactor
                 }
             }
         }

@@ -10,7 +10,9 @@ import Lottie
 
 struct SplashScreenView: View {
     @State private var progress: CGFloat = 0.0
+    @State private var isAdLoading: Bool = true
     @ObservedObject private var localizationManager = LocalizationManager.shared
+    @ObservedObject private var adManager = AdManager.shared
     var onComplete: () -> Void
     
     var body: some View {
@@ -70,9 +72,29 @@ struct SplashScreenView: View {
                     }
                 }
                 .padding(.bottom, 120)
+                
+                Spacer()
+                
+                // Banner Ad at bottom with shimmer effect while loading
+                ZStack {
+                    // Shimmer effect while ad is loading
+                    if isAdLoading {
+                        AdShimmerView()
+                            .frame(height: 50)
+                            .padding(.bottom, 20)
+                    }
+                    
+                    // Actual banner ad
+                    BannerAdView(adUnitID: AdConfig.bannerSplash, isLoading: $isAdLoading)
+                        .frame(height: 50)
+                        .padding(.bottom, 20)
+                        .opacity(isAdLoading ? 0 : 1)
+                }
             }
         }
         .onAppear {
+            // Start loading interstitial ad in background
+            adManager.loadSplashInterstitial()
             // Start loading animation
             startLoading()
         }
@@ -82,14 +104,14 @@ struct SplashScreenView: View {
         // Reset progress to 0%
         progress = 0.0
         
-        // Smooth animation from 0% to 100%
+        // Smooth animation from 0% to 100% - increased duration for ad loading
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            withAnimation(.linear(duration: 3.0)) {
+            withAnimation(.linear(duration: 4.5)) { // Increased from 3.0 to 4.5 seconds
                 progress = 1.0
             }
             
-            // Navigate to intro1 after loading completes
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3.1) {
+            // Navigate to intro1 after loading completes - give more time for ads to load
+            DispatchQueue.main.asyncAfter(deadline: .now() + 4.6) { // Increased from 3.1 to 4.6 seconds
                 onComplete()
             }
         }

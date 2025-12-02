@@ -200,6 +200,7 @@ struct LocalizedString {
     static let continueFree = "continue_free"
     static let orContinueForFree = "or_continue_for_free"
     static let goPremiumFor6DollarsMonth = "go_premium_for_6_dollars_month"
+    static let month = "month"
     static let whatsIncluded = "whats_included"
     static let removeAds = "remove_ads"
     static let unlimitedScanning = "unlimited_scanning"

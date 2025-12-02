@@ -24,6 +24,7 @@
 		5D8889062EDDF1900057C2CF /* FirebaseRemoteConfig in Frameworks */ = {isa = PBXBuildFile; productRef = 5D8889052EDDF1900057C2CF /* FirebaseRemoteConfig */; };
 		5D8889082EDDF1900057C2CF /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 5D8889072EDDF1900057C2CF /* FirebaseStorage */; };
 		5D88890A2EDDF1900057C2CF /* FirebaseStorageCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = 5D8889092EDDF1900057C2CF /* FirebaseStorageCombine-Community */; };
+		5D8889A92EDF08670057C2CF /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 5D8889A82EDF08670057C2CF /* GoogleMobileAds */; };
 		5DE395432ED826D000672CDC /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 5DE395422ED826D000672CDC /* Lottie */; };
 /* End PBXBuildFile section */
 
@@ -45,6 +46,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5D8889002EDDF1900057C2CF /* FirebaseFirestoreCombine-Community in Frameworks */,
+				5D8889A92EDF08670057C2CF /* GoogleMobileAds in Frameworks */,
 				5D8889022EDDF1900057C2CF /* FirebaseInstallations in Frameworks */,
 				5D8888EE2EDDF1900057C2CF /* FirebaseAnalyticsIdentitySupport in Frameworks */,
 				5D8888EA2EDDF1900057C2CF /* FirebaseAnalytics in Frameworks */,
@@ -122,6 +124,7 @@
 				5D8889052EDDF1900057C2CF /* FirebaseRemoteConfig */,
 				5D8889072EDDF1900057C2CF /* FirebaseStorage */,
 				5D8889092EDDF1900057C2CF /* FirebaseStorageCombine-Community */,
+				5D8889A82EDF08670057C2CF /* GoogleMobileAds */,
 			);
 			productName = "Metal Detector IOS";
 			productReference = 5DE395282ED824A300672CDC /* Metal Detector IOS.app */;
@@ -173,6 +176,7 @@
 			packageReferences = (
 				5DE395412ED826D000672CDC /* XCRemoteSwiftPackageReference "lottie-spm" */,
 				5D8888E82EDDF1900057C2CF /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				5D8889A72EDF08670057C2CF /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 5DE395292ED824A300672CDC /* Products */;
@@ -428,6 +432,14 @@
 				minimumVersion = 12.6.0;
 			};
 		};
+		5D8889A72EDF08670057C2CF /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/googleads/swift-package-manager-google-mobile-ads.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.14.0;
+			};
+		};
 		5DE395412ED826D000672CDC /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/airbnb/lottie-spm.git";
@@ -523,6 +535,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 5D8888E82EDDF1900057C2CF /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = "FirebaseStorageCombine-Community";
+		};
+		5D8889A82EDF08670057C2CF /* GoogleMobileAds */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5D8889A72EDF08670057C2CF /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */;
+			productName = GoogleMobileAds;
 		};
 		5DE395422ED826D000672CDC /* Lottie */ = {
 			isa = XCSwiftPackageProductDependency;

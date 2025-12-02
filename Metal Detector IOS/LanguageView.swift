@@ -16,6 +16,7 @@ struct Language: Identifiable {
 
 struct LanguageView: View {
     var onBackTap: () -> Void
+    var onDone: (() -> Void)? = nil
     @StateObject private var localizationManager = LocalizationManager.shared
     @State private var selectedLanguage: String
     @State private var languages: [Language] = [
@@ -40,8 +41,9 @@ struct LanguageView: View {
         Language(name: "malay", flagImageName: "Malaysia Flag")
     ]
     
-    init(onBackTap: @escaping () -> Void) {
+    init(onBackTap: @escaping () -> Void, onDone: (() -> Void)? = nil) {
         self.onBackTap = onBackTap
+        self.onDone = onDone
         // Initialize selected language from current app language
         let currentCode = LocalizationManager.shared.currentLanguage
         _selectedLanguage = State(initialValue: LocalizationManager.shared.languageName(for: currentCode))
@@ -67,7 +69,12 @@ struct LanguageView: View {
                     
                     // Done Button
                     Button(action: {
-                        onBackTap()
+                        // Call onDone if provided, otherwise just go back
+                        if let onDone = onDone {
+                            onDone()
+                        } else {
+                            onBackTap()
+                        }
                     }) {
                         Text(LocalizedString.done.localized)
                             .font(.system(size: 16, weight: .semibold))

@@ -65,7 +65,7 @@ struct IntroOnboardingView: View {
                                 .animation(.smooth(duration: 0.3), value: currentPage)
                         }
                     }
-                    .padding(.top, 32)
+                    .padding(.top, 48)
                     
                     // Action Button (stays in same place, text changes)
                     Button(action: {

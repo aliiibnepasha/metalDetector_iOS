@@ -99,7 +99,7 @@ struct MeterView: View {
                 .padding(.horizontal, 16)
                 .padding(.top, 20)
                 
-                // Meter Container
+                // Meter Container (moved up)
                 GeometryReader { geometry in
                     ZStack {
                         // Meter Image (Min to Max scale)
@@ -133,9 +133,9 @@ struct MeterView: View {
                 }
                 .frame(height: 350)
                 .padding(.horizontal, 30)
-                .padding(.top, 40)
+                .padding(.top, 10) // Further reduced to move meter up more
                 
-                // Detection Status Text
+                // Detection Status Text (moved up closer to meter)
                 VStack(spacing: 12) {
                     Text(detectorManager.getDetectionMessageKey().localized)
                         .font(.custom("Zodiak", size: 24))
@@ -147,12 +147,10 @@ struct MeterView: View {
                         .foregroundColor(.white.opacity(0.7))
                         .id(localizationManager.currentLanguage + "_subtitle_" + String(detectorManager.isMetalDetected))
                 }
-                .padding(.top, 32)
+                .padding(.top, -19) // Even more reduced to move closer to meter
                 .opacity(detectorManager.detectionLevel > 10 ? 1.0 : 0.7)
                 
-                Spacer()
-                
-                // Total Detection Card
+                // Total Detection Card (moved up)
                 RoundedRectangle(cornerRadius: 20)
                     .fill(Color(red: 43/255, green: 43/255, blue: 43/255))
                     .frame(width: 380, height: 80)
@@ -173,18 +171,19 @@ struct MeterView: View {
                             }
                         }
                     )
-                    .padding(.top, 24)
+                    .padding(.top, 4) // Even more reduced to move closer to detection text
                 
-                // Axis Detection Cards (These would need individual axis data from manager)
-                // For now showing total field strength variations
+                // Axis Detection Cards (moved up closer to Total Detection Card)
                 HStack(spacing: 12) {
                     AxisCard(title: "X-axis", value: String(format: "%.0f", detectorManager.magneticFieldStrength * 0.4))
                     AxisCard(title: "Y-axis", value: String(format: "%.0f", detectorManager.magneticFieldStrength * 0.5))
                     AxisCard(title: "Z-axis", value: String(format: "%.0f", detectorManager.magneticFieldStrength * 0.6))
                 }
                 .padding(.horizontal, 16)
-                .padding(.top, 12)
+                .padding(.top, 8) // Reduced from 12 to move closer to Total Detection Card
                 .padding(.bottom, 24)
+                
+                Spacer() // Keep spacer at bottom for ad spacing
             }
             
             // Bottom Native Ad (Fixed at bottom, doesn't scroll)

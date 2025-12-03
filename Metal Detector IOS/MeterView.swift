@@ -12,6 +12,7 @@ struct MeterView: View {
     @StateObject private var detectorManager = MetalDetectorManager.shared
     @StateObject private var localizationManager = LocalizationManager.shared
     @StateObject private var adManager = AdManager.shared
+    @StateObject private var iapManager = IAPManager.shared
     @State private var soundEnabled = true
     @State private var vibrationEnabled = true
     @State private var isBottomAdLoading = true
@@ -186,26 +187,28 @@ struct MeterView: View {
                 Spacer() // Keep spacer at bottom for ad spacing
             }
             
-            // Bottom Native Ad (Fixed at bottom, doesn't scroll)
-            VStack {
-                Spacer()
-                
-                ZStack {
-                    // Shimmer effect while ad is loading
-                    if isBottomAdLoading {
-                        AdShimmerView()
+            // Bottom Native Ad (Fixed at bottom, doesn't scroll) - Only show if not premium
+            if !iapManager.isPremium {
+                VStack {
+                    Spacer()
+                    
+                    ZStack {
+                        // Shimmer effect while ad is loading
+                        if isBottomAdLoading {
+                            AdShimmerView()
+                                .frame(height: 100)
+                                .padding(.horizontal, 16)
+                        }
+                        
+                        // Actual native ad
+                        NativeAdView(adUnitID: AdConfig.nativeModelView, isLoading: $isBottomAdLoading)
                             .frame(height: 100)
                             .padding(.horizontal, 16)
+                            .opacity(isBottomAdLoading ? 0 : 1)
                     }
-                    
-                    // Actual native ad
-                    NativeAdView(adUnitID: AdConfig.nativeModelView, isLoading: $isBottomAdLoading)
-                        .frame(height: 100)
-                        .padding(.horizontal, 16)
-                        .opacity(isBottomAdLoading ? 0 : 1)
+                    .padding(.bottom, 8)
+                    .background(Color.black) // Ensure background matches
                 }
-                .padding(.bottom, 8)
-                .background(Color.black) // Ensure background matches
             }
         }
         .onAppear {
@@ -218,11 +221,11 @@ struct MeterView: View {
             // Pre-load interstitial ad for future use
             adManager.loadGeneralInterstitial()
             
-            // Show ad when meter view appears
+            // Show ad when meter view appears (only first time, not on back navigation)
             // Small delay to ensure view is fully loaded
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 if adManager.isInterstitialReady {
-                    adManager.showGeneralInterstitial {
+                    adManager.showGeneralInterstitial(forView: "MeterView") {
                         // Ad closed, continue with meter view
                         print("✅ MeterView: Ad dismissed, meter view ready")
                     }

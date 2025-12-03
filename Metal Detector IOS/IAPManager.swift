@@ -26,9 +26,17 @@ class IAPManager: ObservableObject {
         // Start listening for transaction updates
         updateListenerTask = listenForTransactions()
         
-        // Load products on initialization
+        // Load products and check subscription status on initialization
         Task {
             await loadProducts()
+            await updatePurchasedProducts()
+        }
+        
+        // Check subscription status periodically (every 30 seconds)
+        Timer.scheduledTimer(withTimeInterval: 30.0, repeats: true) { [weak self] _ in
+            Task { @MainActor in
+                await self?.updatePurchasedProducts()
+            }
         }
     }
     

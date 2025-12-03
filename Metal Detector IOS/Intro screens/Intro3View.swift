@@ -87,27 +87,12 @@ struct Intro3View: View {
                         onGetStarted()
                     }) {
                         ZStack {
-                            // Outer border
-                            RoundedRectangle(cornerRadius: 18.76)
-                                .stroke(Color(red: 0.9, green: 0.63, blue: 0.13), lineWidth: 0.065)
+                            // Button background from assets (same as paywall)
+                            Image("Go Premium Button Background")
+                                .resizable()
+                                .scaledToFill()
                                 .frame(width: 275, height: 44)
-                            
-                            // Inner border
-                            RoundedRectangle(cornerRadius: 18.76)
-                                .stroke(Color(red: 0.95, green: 0.84, blue: 0.42).opacity(0.59), lineWidth: 0.97)
-                                .frame(width: 271, height: 40)
-                            
-                            // Gradient fill
-                            LinearGradient(
-                                gradient: Gradient(colors: [
-                                    Color(red: 1.0, green: 0.85, blue: 0.0),
-                                    Color(red: 0.99, green: 0.78, blue: 0.23)
-                                ]),
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                            .clipShape(RoundedRectangle(cornerRadius: 18.76))
-                            .frame(width: 271, height: 40)
+                                .clipShape(RoundedRectangle(cornerRadius: 18.76))
                             
                             // Button text
                             Text(LocalizedString.getStarted.localized)

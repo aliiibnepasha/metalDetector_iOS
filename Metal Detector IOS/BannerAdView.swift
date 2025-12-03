@@ -22,6 +22,16 @@ struct BannerAdView: UIViewRepresentable {
         bannerView.adUnitID = adUnitID
         bannerView.delegate = context.coordinator
         
+        // Don't load ads if user is premium
+        let iapManager = IAPManager.shared
+        if iapManager.isPremium {
+            DispatchQueue.main.async {
+                isLoading = false
+            }
+            bannerView.isHidden = true
+            return bannerView
+        }
+        
         // Get root view controller
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
            let rootViewController = windowScene.windows.first?.rootViewController {

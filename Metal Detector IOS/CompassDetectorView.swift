@@ -14,6 +14,7 @@ struct CompassDetectorView: View {
     @StateObject private var locationManager = LocationManager()
     @StateObject private var localizationManager = LocalizationManager.shared
     @StateObject private var adManager = AdManager.shared
+    @StateObject private var iapManager = IAPManager.shared
     @State private var isBottomAdLoading = true
     
     var body: some View {
@@ -110,11 +111,11 @@ struct CompassDetectorView: View {
                 
                 // Information Cards with real values
                 HStack(spacing: 12) {
-                    // Card 1 - East Direction (Bearing to East)
-                    InfoCard(value: String(format: "%.1f°E", locationManager.eastBearing))
+                    // Card 1 - Direction where red needle is pointing (N, S, E, W, NE, SE, SW, NW)
+                    InfoCard(value: locationManager.directionString)
                     
-                    // Card 2 - North Direction (Bearing to North)
-                    InfoCard(value: String(format: "%.0f°N", locationManager.northBearing))
+                    // Card 2 - Degrees only (no letter suffix)
+                    InfoCard(value: String(format: "%.0f°", locationManager.northBearing))
                     
                     // Card 3 - Magnetic Heading
                     InfoCard(value: String(format: "%.0f°M", locationManager.heading))
@@ -123,26 +124,28 @@ struct CompassDetectorView: View {
                 .padding(.bottom, 120) // Increased padding to account for ad height (100px) + spacing
             }
             
-            // Bottom Native Ad (Fixed at bottom, doesn't scroll)
-            VStack {
-                Spacer()
-                
-                ZStack {
-                    // Shimmer effect while ad is loading
-                    if isBottomAdLoading {
-                        AdShimmerView()
+            // Bottom Native Ad (Fixed at bottom, doesn't scroll) - Only show if not premium
+            if !iapManager.isPremium {
+                VStack {
+                    Spacer()
+                    
+                    ZStack {
+                        // Shimmer effect while ad is loading
+                        if isBottomAdLoading {
+                            AdShimmerView()
+                                .frame(height: 100)
+                                .padding(.horizontal, 16)
+                        }
+                        
+                        // Actual native ad
+                        NativeAdView(adUnitID: AdConfig.nativeModelView, isLoading: $isBottomAdLoading)
                             .frame(height: 100)
                             .padding(.horizontal, 16)
+                            .opacity(isBottomAdLoading ? 0 : 1)
                     }
-                    
-                    // Actual native ad
-                    NativeAdView(adUnitID: AdConfig.nativeModelView, isLoading: $isBottomAdLoading)
-                        .frame(height: 100)
-                        .padding(.horizontal, 16)
-                        .opacity(isBottomAdLoading ? 0 : 1)
+                    .padding(.bottom, 8)
+                    .background(Color.black) // Ensure background matches
                 }
-                .padding(.bottom, 8)
-                .background(Color.black) // Ensure background matches
             }
         }
         .onAppear {
@@ -152,11 +155,11 @@ struct CompassDetectorView: View {
             // Pre-load interstitial ad for future use
             adManager.loadGeneralInterstitial()
             
-            // Show ad when compass detector view appears
+            // Show ad when compass detector view appears (only first time, not on back navigation)
             // Small delay to ensure view is fully loaded
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 if adManager.isInterstitialReady {
-                    adManager.showGeneralInterstitial {
+                    adManager.showGeneralInterstitial(forView: "CompassDetectorView") {
                         // Ad closed, continue with compass detector view
                         print("✅ CompassDetectorView: Ad dismissed, compass detector view ready")
                     }
@@ -193,6 +196,43 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     // Published values for info cards
     @Published var eastBearing: Double = 0.0   // Bearing to East (90 degrees from North)
     @Published var northBearing: Double = 0.0  // Bearing to North (0 degrees)
+    
+    // Computed property to get direction string based on where red needle is pointing on the compass dial
+    var directionString: String {
+        // The compass needle always points to magnetic North
+        // When device faces North (heading = 0), red needle points to N (top of dial)
+        // When device faces East (heading = 90), red needle points to W (left of dial)
+        // So: direction on dial = (360 - heading) % 360
+        
+        // Use smoothHeading for smooth direction changes
+        let normalizedHeading = (smoothHeading + 360).truncatingRemainder(dividingBy: 360)
+        
+        // The direction where the red needle points on the compass dial
+        // Needle rotation: -smoothHeading - 20.0
+        // When heading = 0, rotation = -20, needle should point to N
+        // So we need to account for this offset
+        let dialAngle = (360.0 - normalizedHeading + 20.0).truncatingRemainder(dividingBy: 360.0)
+        
+        // Convert angle to direction string
+        // 0° = N, 45° = NE, 90° = E, 135° = SE, 180° = S, 225° = SW, 270° = W, 315° = NW
+        if dialAngle >= 337.5 || dialAngle < 22.5 {
+            return "N"
+        } else if dialAngle >= 22.5 && dialAngle < 67.5 {
+            return "NE"
+        } else if dialAngle >= 67.5 && dialAngle < 112.5 {
+            return "E"
+        } else if dialAngle >= 112.5 && dialAngle < 157.5 {
+            return "SE"
+        } else if dialAngle >= 157.5 && dialAngle < 202.5 {
+            return "S"
+        } else if dialAngle >= 202.5 && dialAngle < 247.5 {
+            return "SW"
+        } else if dialAngle >= 247.5 && dialAngle < 292.5 {
+            return "W"
+        } else { // dialAngle >= 292.5 && dialAngle < 337.5
+            return "NW"
+        }
+    }
     
     // Smoothing factor for heading interpolation
     private let smoothingFactor: Double = 0.15

@@ -188,8 +188,14 @@ struct PaywallView: View {
                                 .frame(height: 56)
                                 .clipShape(RoundedRectangle(cornerRadius: 58.76))
                             
-                            // Show real price or loading state
-                            if isPurchasing {
+                            // Show real price or loading state or subscription status
+                            if iapManager.isPremium {
+                                // User already subscribed
+                                Text("You already subscribed")
+                                    .font(.custom("Manrope_Bold", size: 16))
+                                    .foregroundColor(Color(red: 21/255, green: 21/255, blue: 21/255))
+                                    .id(localizationManager.currentLanguage + "_subscribed")
+                            } else if isPurchasing {
                                 ProgressView()
                                     .progressViewStyle(CircularProgressViewStyle(tint: Color(red: 21/255, green: 21/255, blue: 21/255)))
                             } else if let product = iapManager.monthlyProduct {
@@ -209,7 +215,7 @@ struct PaywallView: View {
                         .frame(maxWidth: .infinity)
                         .frame(height: 56)
                     }
-                    .disabled(isPurchasing || iapManager.isLoading)
+                    .disabled(iapManager.isPremium || isPurchasing || iapManager.isLoading)
                     
                     // Continue for free
                     Button(action: {
@@ -228,6 +234,11 @@ struct PaywallView: View {
         .onAppear {
             // Start loading animation
             startRotationAnimation()
+            
+            // Check subscription status
+            Task {
+                await iapManager.updatePurchasedProducts()
+            }
             
             // Load products when view appears
             if iapManager.products.isEmpty {

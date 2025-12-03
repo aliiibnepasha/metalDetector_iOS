@@ -53,6 +53,7 @@ struct IntroOnboardingView: View {
             // Fixed Bottom Content (Button and Dots)
             VStack {
                 Spacer()
+                    .frame(minHeight: 20)
                 
                 VStack(spacing: 24) {
                     // Pagination Dots
@@ -64,6 +65,7 @@ struct IntroOnboardingView: View {
                                 .animation(.smooth(duration: 0.3), value: currentPage)
                         }
                     }
+                    .padding(.top, 32)
                     
                     // Action Button (stays in same place, text changes)
                     Button(action: {
@@ -76,27 +78,12 @@ struct IntroOnboardingView: View {
                         }
                     }) {
                         ZStack {
-                            // Outer border
-                            RoundedRectangle(cornerRadius: 18.76)
-                                .stroke(Color(red: 0.9, green: 0.63, blue: 0.13), lineWidth: 0.065)
+                            // Button background from assets (same as paywall)
+                            Image("Go Premium Button Background")
+                                .resizable()
+                                .scaledToFill()
                                 .frame(width: 275, height: 44)
-                            
-                            // Inner border
-                            RoundedRectangle(cornerRadius: 18.76)
-                                .stroke(Color(red: 0.95, green: 0.84, blue: 0.42).opacity(0.59), lineWidth: 0.97)
-                                .frame(width: 271, height: 40)
-                            
-                            // Gradient fill
-                            LinearGradient(
-                                gradient: Gradient(colors: [
-                                    Color(red: 1.0, green: 0.85, blue: 0.0),
-                                    Color(red: 0.99, green: 0.78, blue: 0.23)
-                                ]),
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                            .clipShape(RoundedRectangle(cornerRadius: 18.76))
-                            .frame(width: 271, height: 40)
+                                .clipShape(RoundedRectangle(cornerRadius: 18.76))
                             
                             // Button text (changes based on page)
                             Text(currentPage < introPages.count - 1 ? LocalizedString.next.localized : LocalizedString.getStarted.localized)
@@ -111,28 +98,34 @@ struct IntroOnboardingView: View {
                 .padding(.bottom, 40)
                 .padding(.horizontal, 36)
             }
-            
-            // Skip Button (top right) - Hide on last page (Intro 3)
-            if currentPage < introPages.count - 1 {
-                VStack {
-                    HStack {
-                        Spacer()
-                        Button(action: {
-                            onGetStarted()
-                        }) {
-                            Text(LocalizedString.skip.localized)
-                                .font(.system(size: 14, weight: .medium))
-                                .foregroundColor(.white.opacity(0.6))
-                                .textCase(.lowercase)
-                                .id(localizationManager.currentLanguage)
-                        }
-                        .padding(.trailing, 34)
-                        .padding(.top, 10)
-                    }
-                    Spacer()
-                }
-            }
         }
+        .overlay(
+            // Skip Button (top right) - Hide on last page (Intro 3)
+            Group {
+                if currentPage < introPages.count - 1 {
+                    VStack {
+                        HStack {
+                            Spacer()
+                            Button(action: {
+                                onGetStarted()
+                            }) {
+                                Text(LocalizedString.skip.localized)
+                                    .font(.system(size: 14, weight: .medium))
+                                    .foregroundColor(.white.opacity(0.6))
+                                    .textCase(.lowercase)
+                                    .id(localizationManager.currentLanguage)
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 8)
+                            }
+                            .padding(.trailing, 34)
+                            .padding(.top, 10)
+                        }
+                        Spacer()
+                    }
+                }
+            },
+            alignment: .topTrailing
+        )
     }
 }
 
@@ -208,19 +201,19 @@ struct IntroPageView: View {
                     // Title - Direct localized strings based on page index
                     if pageIndex == 0 {
                         Text(LocalizedString.metalDetectorGoldFinder.localized)
-                            .font(.custom("Zodiak", size: 38))
+                            .font(.custom("Zodiak", size: 32))
                             .foregroundColor(.white)
                             .multilineTextAlignment(.center)
                             .id("title_\(localizationManager.currentLanguage)_\(pageIndex)")
                     } else if pageIndex == 1 {
                         Text(LocalizedString.goldMetalSensitivityGauge.localized)
-                            .font(.custom("Zodiak", size: 38))
+                            .font(.custom("Zodiak", size: 32))
                             .foregroundColor(.white)
                             .multilineTextAlignment(.center)
                             .id("title_\(localizationManager.currentLanguage)_\(pageIndex)")
                     } else {
                         Text(LocalizedString.theSmartWayToFindNorth.localized)
-                            .font(.custom("Zodiak", size: 38))
+                            .font(.custom("Zodiak", size: 32))
                             .foregroundColor(.white)
                             .multilineTextAlignment(.center)
                             .id("title_\(localizationManager.currentLanguage)_\(pageIndex)")

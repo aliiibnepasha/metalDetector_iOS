@@ -51,6 +51,17 @@ struct NativeAdView: UIViewRepresentable {
         }
         
         func loadAd() {
+            // Don't load ads if user is premium
+            let iapManager = IAPManager.shared
+            if iapManager.isPremium {
+                print("✅ NativeAdView: User is premium, skipping ad load")
+                DispatchQueue.main.async {
+                    self.isLoading = false
+                    self.isLoadingInProgress = false
+                }
+                return
+            }
+            
             // Prevent multiple simultaneous loads
             guard !isLoadingInProgress else {
                 print("⚠️ NativeAdView: Ad load already in progress, skipping")

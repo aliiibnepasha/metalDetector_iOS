@@ -13,6 +13,7 @@ struct SplashScreenView: View {
     @State private var isAdLoading: Bool = true
     @ObservedObject private var localizationManager = LocalizationManager.shared
     @ObservedObject private var adManager = AdManager.shared
+    @StateObject private var iapManager = IAPManager.shared
     var onComplete: () -> Void
     
     var body: some View {
@@ -75,20 +76,22 @@ struct SplashScreenView: View {
                 
                 Spacer()
                 
-                // Banner Ad at bottom with shimmer effect while loading
-                ZStack {
-                    // Shimmer effect while ad is loading
-                    if isAdLoading {
-                        AdShimmerView()
+                // Banner Ad at bottom with shimmer effect while loading - Only show if not premium
+                if !iapManager.isPremium {
+                    ZStack {
+                        // Shimmer effect while ad is loading
+                        if isAdLoading {
+                            AdShimmerView()
+                                .frame(height: 50)
+                                .padding(.bottom, 20)
+                        }
+                        
+                        // Actual banner ad
+                        BannerAdView(adUnitID: AdConfig.bannerSplash, isLoading: $isAdLoading)
                             .frame(height: 50)
                             .padding(.bottom, 20)
+                            .opacity(isAdLoading ? 0 : 1)
                     }
-                    
-                    // Actual banner ad
-                    BannerAdView(adUnitID: AdConfig.bannerSplash, isLoading: $isAdLoading)
-                        .frame(height: 50)
-                        .padding(.bottom, 20)
-                        .opacity(isAdLoading ? 0 : 1)
                 }
             }
         }

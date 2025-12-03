@@ -18,13 +18,47 @@ class AdManager: NSObject, ObservableObject {
     
     private var splashInterstitialWrapper: InterstitialAdWrapper?
     private var generalInterstitialWrapper: InterstitialAdWrapper?
+    private var iapManager = IAPManager.shared
+    
+    // Track which views have already shown an ad in this session
+    private var viewsThatShowedAd: Set<String> = []
     
     override init() {
         super.init()
     }
     
+    // MARK: - Check if User is Premium
+    private var isPremium: Bool {
+        return iapManager.isPremium
+    }
+    
+    // MARK: - Track Ad Display
+    func shouldShowAdForView(_ viewIdentifier: String) -> Bool {
+        // Don't show ad if already shown for this view, or if user is premium
+        if isPremium || viewsThatShowedAd.contains(viewIdentifier) {
+            return false
+        }
+        return true
+    }
+    
+    // Mark that ad was shown for a view
+    func markAdShownForView(_ viewIdentifier: String) {
+        viewsThatShowedAd.insert(viewIdentifier)
+    }
+    
+    // Reset tracking (useful if needed)
+    func resetAdTracking() {
+        viewsThatShowedAd.removeAll()
+    }
+    
     // MARK: - Load Splash Interstitial Ad
     func loadSplashInterstitial() {
+        // Don't load ads if user is premium
+        guard !isPremium else {
+            print("✅ AdManager: User is premium, skipping splash interstitial")
+            return
+        }
+        
         guard splashInterstitialWrapper == nil || !isInterstitialReady else {
             print("✅ AdManager: Splash interstitial already loaded")
             return
@@ -46,6 +80,13 @@ class AdManager: NSObject, ObservableObject {
     
     // MARK: - Show Splash Interstitial Ad
     func showSplashInterstitial(completion: @escaping () -> Void) {
+        // Don't show ads if user is premium
+        guard !isPremium else {
+            print("✅ AdManager: User is premium, skipping splash interstitial")
+            completion()
+            return
+        }
+        
         guard let adWrapper = splashInterstitialWrapper, isInterstitialReady else {
             print("⚠️ AdManager: Splash interstitial not ready, skipping ad")
             completion()
@@ -81,6 +122,12 @@ class AdManager: NSObject, ObservableObject {
     
     // MARK: - Load General Interstitial Ad (for detector taps)
     func loadGeneralInterstitial() {
+        // Don't load ads if user is premium
+        guard !isPremium else {
+            print("✅ AdManager: User is premium, skipping general interstitial")
+            return
+        }
+        
         guard generalInterstitialWrapper == nil || !isInterstitialReady else {
             print("✅ AdManager: General interstitial already loaded")
             return
@@ -101,7 +148,21 @@ class AdManager: NSObject, ObservableObject {
     }
     
     // MARK: - Show General Interstitial Ad
-    func showGeneralInterstitial(completion: @escaping () -> Void) {
+    func showGeneralInterstitial(forView viewIdentifier: String? = nil, completion: @escaping () -> Void) {
+        // Don't show ads if user is premium
+        guard !isPremium else {
+            print("✅ AdManager: User is premium, skipping general interstitial")
+            completion()
+            return
+        }
+        
+        // Check if ad should be shown for this view
+        if let viewId = viewIdentifier, !shouldShowAdForView(viewId) {
+            print("✅ AdManager: Ad already shown for \(viewId), skipping")
+            completion()
+            return
+        }
+        
         guard let adWrapper = generalInterstitialWrapper, isInterstitialReady else {
             print("⚠️ AdManager: General interstitial not ready, skipping ad")
             completion()
@@ -112,6 +173,11 @@ class AdManager: NSObject, ObservableObject {
             print("❌ AdManager: Could not get root view controller")
             completion()
             return
+        }
+        
+        // Mark ad as shown BEFORE displaying (to prevent showing again on back navigation)
+        if let viewId = viewIdentifier {
+            markAdShownForView(viewId)
         }
         
         // Set completion handler

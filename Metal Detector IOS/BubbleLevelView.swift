@@ -14,6 +14,7 @@ struct BubbleLevelView: View {
     @StateObject private var localizationManager = LocalizationManager.shared
     @StateObject private var motionManager = MotionManager()
     @StateObject private var adManager = AdManager.shared
+    @StateObject private var iapManager = IAPManager.shared
     @State private var isBottomAdLoading = true
     
     var body: some View {
@@ -136,6 +137,7 @@ struct BubbleLevelView: View {
                                 .animation(.spring(response: 0.3, dampingFraction: 0.7, blendDuration: 0.2), value: motionManager.bubbleCircularOffsetX + motionManager.bubbleCircularOffsetY)
                         }
                         .padding(.leading, 16)
+                        .padding(.top, 40)
                         
                         Spacer()
                     }
@@ -184,29 +186,32 @@ struct BubbleLevelView: View {
                     InfoCard(value: String(format: "%.0f°Z", motionManager.angleZ))
                 }
                 .padding(.horizontal, 16)
-                .padding(.bottom, 24)
+                .padding(.bottom, 120)
+                .padding(.top, -40)
             }
             
-            // Bottom Native Ad (Fixed at bottom, doesn't scroll)
-            VStack {
-                Spacer()
-                
-                ZStack {
-                    // Shimmer effect while ad is loading
-                    if isBottomAdLoading {
-                        AdShimmerView()
+            // Bottom Native Ad (Fixed at bottom, doesn't scroll) - Only show if not premium
+            if !iapManager.isPremium {
+                VStack {
+                    Spacer()
+                    
+                    ZStack {
+                        // Shimmer effect while ad is loading
+                        if isBottomAdLoading {
+                            AdShimmerView()
+                                .frame(height: 100)
+                                .padding(.horizontal, 16)
+                        }
+                        
+                        // Actual native ad
+                        NativeAdView(adUnitID: AdConfig.nativeModelView, isLoading: $isBottomAdLoading)
                             .frame(height: 100)
                             .padding(.horizontal, 16)
+                            .opacity(isBottomAdLoading ? 0 : 1)
                     }
-                    
-                    // Actual native ad
-                    NativeAdView(adUnitID: AdConfig.nativeModelView, isLoading: $isBottomAdLoading)
-                        .frame(height: 100)
-                        .padding(.horizontal, 16)
-                        .opacity(isBottomAdLoading ? 0 : 1)
+                    .padding(.bottom, 8)
+                    .background(Color.black) // Ensure background matches
                 }
-                .padding(.bottom, 8)
-                .background(Color.black) // Ensure background matches
             }
         }
         .onAppear {
@@ -215,11 +220,11 @@ struct BubbleLevelView: View {
             // Pre-load interstitial ad for future use
             adManager.loadGeneralInterstitial()
             
-            // Show ad when bubble level view appears
+            // Show ad when bubble level view appears (only first time, not on back navigation)
             // Small delay to ensure view is fully loaded
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 if adManager.isInterstitialReady {
-                    adManager.showGeneralInterstitial {
+                    adManager.showGeneralInterstitial(forView: "BubbleLevelView") {
                         // Ad closed, continue with bubble level view
                         print("✅ BubbleLevelView: Ad dismissed, bubble level view ready")
                     }

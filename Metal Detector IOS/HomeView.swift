@@ -13,6 +13,7 @@ struct HomeView: View {
     var onProTap: (() -> Void)? = nil
     @StateObject private var localizationManager = LocalizationManager.shared
     @StateObject private var adManager = AdManager.shared
+    @StateObject private var iapManager = IAPManager.shared
     @State private var isTopAdLoading = true
     @State private var isBottomAdLoading = true
     
@@ -73,24 +74,26 @@ struct HomeView: View {
                 }
                 .padding(.top, 28)
                 
-                // Top Native Ad (Fixed at top, doesn't scroll)
-                ZStack {
-                    // Shimmer effect while ad is loading
-                    if isTopAdLoading {
-                        AdShimmerView()
+                // Top Native Ad (Fixed at top, doesn't scroll) - Only show if not premium
+                if !iapManager.isPremium {
+                    ZStack {
+                        // Shimmer effect while ad is loading
+                        if isTopAdLoading {
+                            AdShimmerView()
+                                .frame(height: 80)
+                                .padding(.horizontal, 16)
+                        }
+                        
+                        // Actual native ad
+                        NativeAdView(adUnitID: AdConfig.nativeHome, isLoading: $isTopAdLoading)
                             .frame(height: 80)
                             .padding(.horizontal, 16)
+                            .opacity(isTopAdLoading ? 0 : 1)
                     }
-                    
-                    // Actual native ad
-                    NativeAdView(adUnitID: AdConfig.nativeHome, isLoading: $isTopAdLoading)
-                        .frame(height: 80)
-                        .padding(.horizontal, 16)
-                        .opacity(isTopAdLoading ? 0 : 1)
+                    .padding(.top, 16)
+                    .padding(.bottom, 12)
+                    .background(Color.black) // Ensure background matches
                 }
-                .padding(.top, 16)
-                .padding(.bottom, 12)
-                .background(Color.black) // Ensure background matches
                 
                 // Main Content - Scrollable Feature Cards
                 ScrollView {
@@ -154,23 +157,25 @@ struct HomeView: View {
                         .padding(.bottom, 24) // Extra padding for bottom ad space
                 }
                 
-                // Bottom Banner Ad (Fixed at bottom, doesn't scroll)
-                ZStack {
-                    // Shimmer effect while ad is loading
-                    if isBottomAdLoading {
-                        AdShimmerView()
+                // Bottom Banner Ad (Fixed at bottom, doesn't scroll) - Only show if not premium
+                if !iapManager.isPremium {
+                    ZStack {
+                        // Shimmer effect while ad is loading
+                        if isBottomAdLoading {
+                            AdShimmerView()
+                                .frame(height: 50)
+                                .padding(.horizontal, 16)
+                        }
+                        
+                        // Actual banner ad
+                        BannerAdView(adUnitID: AdConfig.bannerHome, isLoading: $isBottomAdLoading)
                             .frame(height: 50)
                             .padding(.horizontal, 16)
+                            .opacity(isBottomAdLoading ? 0 : 1)
                     }
-                    
-                    // Actual banner ad
-                    BannerAdView(adUnitID: AdConfig.bannerHome, isLoading: $isBottomAdLoading)
-                        .frame(height: 50)
-                        .padding(.horizontal, 16)
-                        .opacity(isBottomAdLoading ? 0 : 1)
+                    .padding(.bottom, 8)
+                    .background(Color.black) // Ensure background matches
                 }
-                .padding(.bottom, 8)
-                .background(Color.black) // Ensure background matches
             }
         }
         .onAppear {

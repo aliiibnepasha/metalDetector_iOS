@@ -32,10 +32,9 @@ struct SettingsView: View {
             Color(red: 0.07, green: 0.07, blue: 0.07) // #111112
                 .ignoresSafeArea()
             
-            ScrollView {
-                VStack(spacing: 0) {
-                    // Header
-                    HStack(spacing: 6) {
+            VStack(spacing: 0) {
+                // Header
+                HStack(spacing: 6) {
                         // Back Button
                         Button(action: {
                             onBackTap()
@@ -53,7 +52,8 @@ struct SettingsView: View {
                         
                         Spacer()
                     }
-                    .padding(.horizontal, 24)
+                    .padding(.leading, 8)
+                    .padding(.trailing, 24)
                     .padding(.top, 30)
                     .padding(.bottom, 24)
                     
@@ -70,7 +70,7 @@ struct SettingsView: View {
                                     .foregroundColor(.white)
                                 
                                 Text(LocalizedString.detectHiddenTreasuresFaster.localized)
-                                    .font(.system(size: 14, weight: .medium))
+                                    .font(.system(size: 13, weight: .medium))
                                     .foregroundColor(.white.opacity(0.7))
                                     .lineLimit(3)
                                 
@@ -197,7 +197,8 @@ struct SettingsView: View {
                         .padding(.vertical, 24)
                     }
                     .padding(.horizontal, 24)
-                }
+                
+                Spacer() // Push content to top
             }
         }
         .sheet(isPresented: $showPrivacyPolicy) {

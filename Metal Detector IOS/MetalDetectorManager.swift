@@ -161,9 +161,14 @@ class MetalDetectorManager: ObservableObject {
                 }
             } else {
                 // ✅ FIX 1: Baseline auto-adjust (slow exponential smoothing)
-                // This prevents stuck detection by allowing baseline to drift slowly
-                let alpha = 0.02 // Very slow smoothing factor
-                self.baseMagneticField = (alpha * totalField) + ((1 - alpha) * self.baseMagneticField)
+                // BUT: Only adjust baseline when metal is NOT detected
+                // When metal is detected, keep baseline fixed to maintain continuous detection
+                if !self.isMetalDetected {
+                    // Only adjust baseline when no metal is detected (prevents baseline drift during detection)
+                    let alpha = 0.015 // Very slow smoothing factor (even slower)
+                    self.baseMagneticField = (alpha * totalField) + ((1 - alpha) * self.baseMagneticField)
+                }
+                // When metal is detected, baseline stays fixed so detection remains continuous
             }
             
             // Update published property (triggers UI updates)
@@ -263,15 +268,20 @@ class MetalDetectorManager: ObservableObject {
             triggerLevel = 35.0 // Higher trigger level for metal/stud detection
         }
         
-        // Only trigger if significant change detected AND detection level is meaningful
-        if difference > adjustedThreshold && detectionLevel > triggerLevel {
+        // Trigger detection if significant change detected AND detection level is meaningful
+        // OR if already detected and difference is still above minimum threshold (maintain continuous detection)
+        let minimumDetectionThreshold = adjustedThreshold * 0.5 // 50% of threshold to maintain detection
+        let shouldDetect = (difference > adjustedThreshold && detectionLevel > triggerLevel) || 
+                          (self.isMetalDetected && difference > minimumDetectionThreshold && detectionLevel > 10)
+        
+        if shouldDetect {
             DispatchQueue.main.async {
                 self.isMetalDetected = true
             }
             
             let now = Date()
             
-            // Play sound if enabled and cooldown passed
+            // Play sound if enabled and cooldown passed (only play new sound, not continuously)
             if soundEnabled && now.timeIntervalSince(lastSoundTime) > soundCooldown {
                 playDetectionSound()
                 lastSoundTime = now
@@ -283,10 +293,12 @@ class MetalDetectorManager: ObservableObject {
                 lastVibrationTime = now
             }
         } else {
-            // ✅ FIX 2: Detection reset ko easy banao
-            // Reset detection when difference is below 60% of threshold (smooth reset)
-            let resetThreshold = adjustedThreshold * 0.6
-            if difference < resetThreshold {
+            // ✅ FIX 2: Detection reset - only when difference is significantly low
+            // Reset detection when difference is below 40% of threshold (strict reset)
+            // This ensures detection continues as long as metal is near
+            let resetThreshold = adjustedThreshold * 0.4 // Strict reset threshold
+            if difference < resetThreshold && self.detectionLevel < 10 {
+                // Only reset if both difference AND detection level are very low
                 DispatchQueue.main.async {
                     self.isMetalDetected = false
                     

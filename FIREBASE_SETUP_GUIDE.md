@@ -77,3 +77,4 @@ if firebaseManager.isAuthenticated {
 - Perfect for analytics and user tracking without login
 
 
+

@@ -13,6 +13,8 @@ struct BubbleLevelView: View {
     var onBackTap: () -> Void
     @StateObject private var localizationManager = LocalizationManager.shared
     @StateObject private var motionManager = MotionManager()
+    @StateObject private var adManager = AdManager.shared
+    @State private var isBottomAdLoading = true
     
     var body: some View {
         ZStack {
@@ -182,11 +184,47 @@ struct BubbleLevelView: View {
                     InfoCard(value: String(format: "%.0f°Z", motionManager.angleZ))
                 }
                 .padding(.horizontal, 16)
-                .padding(.bottom, 50)
+                .padding(.bottom, 24)
+            }
+            
+            // Bottom Native Ad (Fixed at bottom, doesn't scroll)
+            VStack {
+                Spacer()
+                
+                ZStack {
+                    // Shimmer effect while ad is loading
+                    if isBottomAdLoading {
+                        AdShimmerView()
+                            .frame(height: 100)
+                            .padding(.horizontal, 16)
+                    }
+                    
+                    // Actual native ad
+                    NativeAdView(adUnitID: AdConfig.nativeModelView, isLoading: $isBottomAdLoading)
+                        .frame(height: 100)
+                        .padding(.horizontal, 16)
+                        .opacity(isBottomAdLoading ? 0 : 1)
+                }
+                .padding(.bottom, 8)
+                .background(Color.black) // Ensure background matches
             }
         }
         .onAppear {
             motionManager.startMotionUpdates()
+            
+            // Pre-load interstitial ad for future use
+            adManager.loadGeneralInterstitial()
+            
+            // Show ad when bubble level view appears
+            // Small delay to ensure view is fully loaded
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                if adManager.isInterstitialReady {
+                    adManager.showGeneralInterstitial {
+                        // Ad closed, continue with bubble level view
+                        print("✅ BubbleLevelView: Ad dismissed, bubble level view ready")
+                    }
+                }
+            }
         }
         .onDisappear {
             motionManager.stopMotionUpdates()
@@ -241,8 +279,23 @@ class MotionManager: ObservableObject {
                     // Smooth interpolation for more natural movement (ease-in-out effect)
                     let targetHorizontalOffset = CGFloat(clampedRoll / 30.0) * self.maxHorizontalOffset
                     let targetVerticalOffset = CGFloat(clampedPitch / 30.0) * self.maxVerticalOffset
-                    let targetCircularX = CGFloat(clampedRoll / 30.0) * self.maxCircularOffset
-                    let targetCircularY = CGFloat(clampedPitch / 30.0) * self.maxCircularOffset
+                    
+                    // Calculate target circular offsets
+                    var targetCircularX = CGFloat(clampedRoll / 30.0) * self.maxCircularOffset
+                    var targetCircularY = CGFloat(clampedPitch / 30.0) * self.maxCircularOffset
+                    
+                    // Constrain circular bubble to stay within circle boundaries
+                    // Circle radius: 259/2 = 129.5, Bubble radius: 32/2 = 16
+                    // Maximum distance from center: 129.5 - 16 = 113.5
+                    let maxCircularDistance: CGFloat = 113.5
+                    let distanceFromCenter = sqrt(targetCircularX * targetCircularX + targetCircularY * targetCircularY)
+                    
+                    if distanceFromCenter > maxCircularDistance {
+                        // Normalize to keep bubble within circle
+                        let scale = maxCircularDistance / distanceFromCenter
+                        targetCircularX *= scale
+                        targetCircularY *= scale
+                    }
                     
                     // Apply smooth interpolation (0.15 = smoothness factor, higher = smoother but slower response)
                     let smoothingFactor: CGFloat = 0.25

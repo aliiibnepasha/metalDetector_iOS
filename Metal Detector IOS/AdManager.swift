@@ -17,6 +17,7 @@ class AdManager: NSObject, ObservableObject {
     @Published var isLoadingInterstitial = false
     
     private var splashInterstitialWrapper: InterstitialAdWrapper?
+    private var generalInterstitialWrapper: InterstitialAdWrapper?
     
     override init() {
         super.init()
@@ -71,6 +72,66 @@ class AdManager: NSObject, ObservableObject {
                 print("❌ AdManager: Failed to show interstitial: \(error?.localizedDescription ?? "Unknown error")")
                 self?.isInterstitialReady = false
                 self?.splashInterstitialWrapper = nil
+                completion()
+            }
+        }
+        
+        adWrapper.show(from: rootViewController)
+    }
+    
+    // MARK: - Load General Interstitial Ad (for detector taps)
+    func loadGeneralInterstitial() {
+        guard generalInterstitialWrapper == nil || !isInterstitialReady else {
+            print("✅ AdManager: General interstitial already loaded")
+            return
+        }
+        
+        isLoadingInterstitial = true
+        isInterstitialReady = false
+        
+        generalInterstitialWrapper = InterstitialAdWrapper(adUnitID: AdConfig.interstitial) { [weak self] loaded in
+            DispatchQueue.main.async {
+                self?.isInterstitialReady = loaded
+                self?.isLoadingInterstitial = false
+                print(loaded ? "✅ AdManager: General interstitial loaded successfully" : "❌ AdManager: General interstitial failed to load")
+            }
+        }
+        
+        generalInterstitialWrapper?.load()
+    }
+    
+    // MARK: - Show General Interstitial Ad
+    func showGeneralInterstitial(completion: @escaping () -> Void) {
+        guard let adWrapper = generalInterstitialWrapper, isInterstitialReady else {
+            print("⚠️ AdManager: General interstitial not ready, skipping ad")
+            completion()
+            return
+        }
+        
+        guard let rootViewController = getRootViewController() else {
+            print("❌ AdManager: Could not get root view controller")
+            completion()
+            return
+        }
+        
+        // Set completion handler
+        adWrapper.onAdClosed = { [weak self] in
+            DispatchQueue.main.async {
+                self?.isInterstitialReady = false
+                self?.generalInterstitialWrapper = nil
+                // Reload next ad for future use
+                self?.loadGeneralInterstitial()
+                completion()
+            }
+        }
+        
+        adWrapper.onAdFailedToShow = { [weak self] error in
+            DispatchQueue.main.async {
+                print("❌ AdManager: Failed to show interstitial: \(error?.localizedDescription ?? "Unknown error")")
+                self?.isInterstitialReady = false
+                self?.generalInterstitialWrapper = nil
+                // Reload next ad for future use
+                self?.loadGeneralInterstitial()
                 completion()
             }
         }

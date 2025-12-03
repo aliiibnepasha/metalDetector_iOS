@@ -153,16 +153,26 @@ struct RootView: View {
                             onBackTap: {
                                 // Don't allow back from language screen on first launch
                                 if hasSelectedLanguage {
+                                    // User already selected language before (came from Settings)
+                                    // Simply go back to previous screen (Settings)
                                     navigationPath.removeLast()
                                 }
+                                // If first time (hasSelectedLanguage == false), don't allow back
                             },
                             onDone: {
-                                hasSelectedLanguage = true
-                                // After language selection, navigate to intro screens
-                                // Clear navigation path to show intro screens as default view
-                                var newPath = NavigationPath()
-                                navigationPath = newPath
-                                // Intro screens will be shown as default view
+                                if hasSelectedLanguage {
+                                    // User already selected language (came from Settings)
+                                    // Simply go back to Settings
+                                    navigationPath.removeLast()
+                                } else {
+                                    // First time language selection
+                                    hasSelectedLanguage = true
+                                    // After language selection, navigate to intro screens
+                                    // Clear navigation path to show intro screens as default view
+                                    var newPath = NavigationPath()
+                                    navigationPath = newPath
+                                    // Intro screens will be shown as default view
+                                }
                             }
                         )
                         .navigationBarBackButtonHidden(true)

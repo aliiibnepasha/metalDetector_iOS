@@ -13,6 +13,8 @@ struct CompassDetectorView: View {
     var onBackTap: () -> Void
     @StateObject private var locationManager = LocationManager()
     @StateObject private var localizationManager = LocalizationManager.shared
+    @StateObject private var adManager = AdManager.shared
+    @State private var isBottomAdLoading = true
     
     var body: some View {
         ZStack {
@@ -94,11 +96,12 @@ struct CompassDetectorView: View {
                         .frame(width: 314, height: 368)
                     
                     // Compass Needle - Rotates based on heading with smooth animation
+                    // Added offset to align needle's starting position with North
                     Image("Compass Needle")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 364, height: 230)
-                        .rotationEffect(.degrees(-locationManager.smoothHeading))
+                        .rotationEffect(.degrees(-locationManager.smoothHeading - 20.0)) // Offset: -20 degrees to align needle with N
                         .animation(.spring(response: 0.4, dampingFraction: 0.8, blendDuration: 0.3), value: locationManager.smoothHeading)
                 }
                 .padding(.top, 32)
@@ -117,12 +120,48 @@ struct CompassDetectorView: View {
                     InfoCard(value: String(format: "%.0f°M", locationManager.heading))
                 }
                 .padding(.horizontal, 16)
-                .padding(.bottom, 50)
+                .padding(.bottom, 120) // Increased padding to account for ad height (100px) + spacing
+            }
+            
+            // Bottom Native Ad (Fixed at bottom, doesn't scroll)
+            VStack {
+                Spacer()
+                
+                ZStack {
+                    // Shimmer effect while ad is loading
+                    if isBottomAdLoading {
+                        AdShimmerView()
+                            .frame(height: 100)
+                            .padding(.horizontal, 16)
+                    }
+                    
+                    // Actual native ad
+                    NativeAdView(adUnitID: AdConfig.nativeModelView, isLoading: $isBottomAdLoading)
+                        .frame(height: 100)
+                        .padding(.horizontal, 16)
+                        .opacity(isBottomAdLoading ? 0 : 1)
+                }
+                .padding(.bottom, 8)
+                .background(Color.black) // Ensure background matches
             }
         }
         .onAppear {
             locationManager.requestLocationPermission()
             locationManager.startHeadingUpdates()
+            
+            // Pre-load interstitial ad for future use
+            adManager.loadGeneralInterstitial()
+            
+            // Show ad when compass detector view appears
+            // Small delay to ensure view is fully loaded
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                if adManager.isInterstitialReady {
+                    adManager.showGeneralInterstitial {
+                        // Ad closed, continue with compass detector view
+                        print("✅ CompassDetectorView: Ad dismissed, compass detector view ready")
+                    }
+                }
+            }
         }
         .onDisappear {
             locationManager.stopHeadingUpdates()
@@ -187,23 +226,37 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
             self.heading = newHeadingValue
             
             // Calculate bearings to cardinal directions
-            // East is 90 degrees from North
-            // North is 0/360 degrees
+            // When heading = 0 (pointing North), all values should align correctly
             let currentHeading = newHeadingValue
             
-            // East bearing: 90° - current heading (normalized to 0-360)
-            self.eastBearing = (90.0 - currentHeading + 360).truncatingRemainder(dividingBy: 360)
-            // If > 180, show as negative (shorter direction)
-            if self.eastBearing > 180 {
-                self.eastBearing = self.eastBearing - 360
+            // North bearing: When red needle points to N, value should be 0
+            // Needle image has initial offset of 20 degrees, so we adjust the calculation
+            // Additional adjustments to ensure N shows 0 when needle points to N
+            // If heading is 0 (North), northBearing should show 0 when needle points to N
+            // Adjusted heading accounts for needle's initial offset
+            let adjustedHeading = currentHeading + 20.0 - 15.0 + 0.0  // Total offset: +5 degrees
+            let normalizedHeading = adjustedHeading >= 0 ? adjustedHeading : adjustedHeading + 360.0
+            
+            if normalizedHeading <= 180 {
+                self.northBearing = normalizedHeading
+            } else if normalizedHeading <= 360 {
+                self.northBearing = normalizedHeading - 360
+            } else {
+                self.northBearing = normalizedHeading - 360
             }
             
-            // North bearing: 0° - current heading (normalized to 0-360)
-            // This is essentially the heading itself, but shown as deviation from North
-            self.northBearing = (0.0 - currentHeading + 360).truncatingRemainder(dividingBy: 360)
-            // If > 180, show as negative (shorter direction)
-            if self.northBearing > 180 {
-                self.northBearing = self.northBearing - 360
+            // East bearing: Deviation from East (90 degrees)
+            // If heading is 0 (North), eastBearing = -90 (or 270)
+            // If heading is 90 (East), eastBearing = 0
+            // If heading is 180 (South), eastBearing = 90
+            // If heading is 270 (West), eastBearing = 180 (or -180)
+            let eastDeviation = currentHeading - 90.0
+            if eastDeviation > 180 {
+                self.eastBearing = eastDeviation - 360
+            } else if eastDeviation < -180 {
+                self.eastBearing = eastDeviation + 360
+            } else {
+                self.eastBearing = eastDeviation
             }
             
             // Smooth interpolation with angle wrapping handling

@@ -12,6 +12,9 @@ struct HomeView: View {
     var onDetectorTap: (String) -> Void
     var onProTap: (() -> Void)? = nil
     @StateObject private var localizationManager = LocalizationManager.shared
+    @StateObject private var adManager = AdManager.shared
+    @State private var isTopAdLoading = true
+    @State private var isBottomAdLoading = true
     
     var body: some View {
         ZStack {
@@ -70,68 +73,116 @@ struct HomeView: View {
                 }
                 .padding(.top, 28)
                 
-                // Main Content - Feature Cards
+                // Top Native Ad (Fixed at top, doesn't scroll)
+                ZStack {
+                    // Shimmer effect while ad is loading
+                    if isTopAdLoading {
+                        AdShimmerView()
+                            .frame(height: 80)
+                            .padding(.horizontal, 16)
+                    }
+                    
+                    // Actual native ad
+                    NativeAdView(adUnitID: AdConfig.nativeHome, isLoading: $isTopAdLoading)
+                        .frame(height: 80)
+                        .padding(.horizontal, 16)
+                        .opacity(isTopAdLoading ? 0 : 1)
+                }
+                .padding(.top, 16)
+                .padding(.bottom, 12)
+                .background(Color.black) // Ensure background matches
+                
+                // Main Content - Scrollable Feature Cards
                 ScrollView {
                     VStack(spacing: 12) {
-                        // Gold Detector Card
-                        FeatureCard(
-                            backgroundImageName: "Gold Detector",
-                            title: LocalizedString.goldDetector.localized,
-                            onTap: {
-                                onDetectorTap("Gold Detector")
-                            }
-                        )
-                        
-                        // Metal Detector Card
-                        FeatureCard(
-                            backgroundImageName: "Metal Detector",
-                            title: LocalizedString.metalDetector.localized,
-                            onTap: {
-                                onDetectorTap("Metal Detector")
-                            }
-                        )
-                        
-                        // Stud Finder Card
-                        FeatureCard(
-                            backgroundImageName: "Stud Finder",
-                            title: LocalizedString.studFinder.localized,
-                            onTap: {
-                                onDetectorTap("Stud Finder")
-                            }
-                        )
-                        
-                        // Handled Detector Card
-                        FeatureCard(
-                            backgroundImageName: "Handled Detector",
-                            title: LocalizedString.handledDetector.localized,
-                            onTap: {
-                                onDetectorTap("Handled Detector")
-                            }
-                        )
-                        
-                        // Digital Compass Card
-                        FeatureCard(
-                            backgroundImageName: "Digital Compass",
-                            title: LocalizedString.digitalCompass.localized,
-                            onTap: {
-                                onDetectorTap("Digital Compass")
-                            }
-                        )
-                        
-                        // Bubble Level Card
-                        FeatureCard(
-                            backgroundImageName: "Bubble level",
-                            title: LocalizedString.bubbleLevel.localized,
-                            onTap: {
-                                onDetectorTap("Bubble level")
-                            }
-                        )
-                    }
-                    .padding(.top, 24)
-                    .padding(.horizontal, 16)
+                            // Gold Detector Card
+                            FeatureCard(
+                                backgroundImageName: "Gold Detector",
+                                title: LocalizedString.goldDetector.localized,
+                                onTap: {
+                                    handleDetectorTap("Gold Detector")
+                                }
+                            )
+                            
+                            // Metal Detector Card
+                            FeatureCard(
+                                backgroundImageName: "Metal Detector",
+                                title: LocalizedString.metalDetector.localized,
+                                onTap: {
+                                    handleDetectorTap("Metal Detector")
+                                }
+                            )
+                            
+                            // Stud Finder Card
+                            FeatureCard(
+                                backgroundImageName: "Stud Finder",
+                                title: LocalizedString.studFinder.localized,
+                                onTap: {
+                                    handleDetectorTap("Stud Finder")
+                                }
+                            )
+                            
+                            // Handled Detector Card
+                            FeatureCard(
+                                backgroundImageName: "Handled Detector",
+                                title: LocalizedString.handledDetector.localized,
+                                onTap: {
+                                    handleDetectorTap("Handled Detector")
+                                }
+                            )
+                            
+                            // Digital Compass Card
+                            FeatureCard(
+                                backgroundImageName: "Digital Compass",
+                                title: LocalizedString.digitalCompass.localized,
+                                onTap: {
+                                    handleDetectorTap("Digital Compass")
+                                }
+                            )
+                            
+                            // Bubble Level Card
+                            FeatureCard(
+                                backgroundImageName: "Bubble level",
+                                title: LocalizedString.bubbleLevel.localized,
+                                onTap: {
+                                    handleDetectorTap("Bubble level")
+                                }
+                            )
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.top, 12)
+                        .padding(.bottom, 24) // Extra padding for bottom ad space
                 }
+                
+                // Bottom Banner Ad (Fixed at bottom, doesn't scroll)
+                ZStack {
+                    // Shimmer effect while ad is loading
+                    if isBottomAdLoading {
+                        AdShimmerView()
+                            .frame(height: 50)
+                            .padding(.horizontal, 16)
+                    }
+                    
+                    // Actual banner ad
+                    BannerAdView(adUnitID: AdConfig.bannerHome, isLoading: $isBottomAdLoading)
+                        .frame(height: 50)
+                        .padding(.horizontal, 16)
+                        .opacity(isBottomAdLoading ? 0 : 1)
+                }
+                .padding(.bottom, 8)
+                .background(Color.black) // Ensure background matches
             }
         }
+        .onAppear {
+            // Pre-load interstitial ad when home view appears (for detector screen)
+            adManager.loadGeneralInterstitial()
+        }
+    }
+    
+    // MARK: - Helper Methods
+    private func handleDetectorTap(_ title: String) {
+        // Navigate directly to detector screen (ad will show on detector screen)
+        onDetectorTap(title)
     }
 }
 
@@ -159,7 +210,7 @@ struct FeatureCard: View {
                     
                     // Text Overlay (center positioned, but with proper left padding)
                     Text(title)
-                        .font(.custom("Manrope_Bold", size: 20))
+                        .font(.custom("Manrope_Bold", size: 24))
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
                     

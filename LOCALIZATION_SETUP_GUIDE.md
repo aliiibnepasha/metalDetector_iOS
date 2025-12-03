@@ -128,3 +128,4 @@ let text = LocalizationManager.shared.localizedString("metal_detector")
 - **Testing**: Change device language in Settings → General → Language & Region to test
 
 
+

@@ -11,8 +11,10 @@ struct CalibrationView: View {
     var onBackTap: () -> Void
     @StateObject private var detectorManager = MetalDetectorManager.shared
     @StateObject private var localizationManager = LocalizationManager.shared
+    @StateObject private var adManager = AdManager.shared
     @State private var soundEnabled = true
     @State private var vibrationEnabled = true
+    @State private var isBottomAdLoading = true
     
     var body: some View {
         ZStack {
@@ -135,9 +137,7 @@ struct CalibrationView: View {
                 }
                 .frame(width: 310, height: 310)
                 
-                Spacer()
-                
-                // Detection Status Text
+                // Detection Status Text (moved up closer to calibration meter)
                 VStack(spacing: 12) {
                     Text(detectorManager.getDetectionMessageKey().localized)
                         .font(.custom("Zodiak", size: 24))
@@ -149,15 +149,53 @@ struct CalibrationView: View {
                         .foregroundColor(.white.opacity(0.7))
                         .id(localizationManager.currentLanguage + "_subtitle_" + String(detectorManager.isMetalDetected))
                 }
-                .padding(.top, 16)
+                .padding(.top, 24) // Reduced gap between meter and text
                 
                 Spacer()
-                
+            }
+            
+            // Bottom Native Ad (Fixed at bottom, doesn't scroll)
+            VStack {
                 Spacer()
-                    .frame(height: 40)
+                
+                ZStack {
+                    // Shimmer effect while ad is loading
+                    if isBottomAdLoading {
+                        AdShimmerView()
+                            .frame(height: 100)
+                            .padding(.horizontal, 16)
+                    }
+                    
+                    // Actual native ad
+                    NativeAdView(adUnitID: AdConfig.nativeModelView, isLoading: $isBottomAdLoading)
+                        .frame(height: 100)
+                        .padding(.horizontal, 16)
+                        .opacity(isBottomAdLoading ? 0 : 1)
+                }
+                .padding(.bottom, 8)
+                .background(Color.black) // Ensure background matches
             }
         }
         .onAppear {
+            detectorManager.startDetection()
+            // Sync with detectorManager
+            soundEnabled = detectorManager.soundEnabled
+            vibrationEnabled = detectorManager.vibrationEnabled
+            
+            // Pre-load interstitial ad for future use
+            adManager.loadGeneralInterstitial()
+            
+            // Show ad when calibration view appears
+            // Small delay to ensure view is fully loaded
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                if adManager.isInterstitialReady {
+                    adManager.showGeneralInterstitial {
+                        // Ad closed, continue with calibration view
+                        print("✅ CalibrationView: Ad dismissed, calibration view ready")
+                    }
+                }
+            }
+            
             detectorManager.startDetection()
             // Sync with detectorManager
             soundEnabled = detectorManager.soundEnabled

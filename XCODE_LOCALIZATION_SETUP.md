@@ -134,3 +134,4 @@ After setting up in Xcode:
 3. All views should update automatically using LocalizationManager
 
 
+

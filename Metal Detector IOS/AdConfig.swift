@@ -33,3 +33,4 @@ struct AdConfig {
     static let rewarded = "ca-app-pub-3940256099942544/1712485313" // Test Rewarded ID
 }
 
+

@@ -25,10 +25,12 @@
 		5D8889082EDDF1900057C2CF /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 5D8889072EDDF1900057C2CF /* FirebaseStorage */; };
 		5D88890A2EDDF1900057C2CF /* FirebaseStorageCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = 5D8889092EDDF1900057C2CF /* FirebaseStorageCombine-Community */; };
 		5D8889A92EDF08670057C2CF /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 5D8889A82EDF08670057C2CF /* GoogleMobileAds */; };
+		5D888A322EE029090057C2CF /* AppTrackingTransparency.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D888A312EE029090057C2CF /* AppTrackingTransparency.framework */; };
 		5DE395432ED826D000672CDC /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 5DE395422ED826D000672CDC /* Lottie */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		5D888A312EE029090057C2CF /* AppTrackingTransparency.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppTrackingTransparency.framework; path = System/Library/Frameworks/AppTrackingTransparency.framework; sourceTree = SDKROOT; };
 		5DE395282ED824A300672CDC /* Metal Detector IOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Metal Detector IOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -50,6 +52,7 @@
 				5D8889022EDDF1900057C2CF /* FirebaseInstallations in Frameworks */,
 				5D8888EE2EDDF1900057C2CF /* FirebaseAnalyticsIdentitySupport in Frameworks */,
 				5D8888EA2EDDF1900057C2CF /* FirebaseAnalytics in Frameworks */,
+				5D888A322EE029090057C2CF /* AppTrackingTransparency.framework in Frameworks */,
 				5D8888EC2EDDF1900057C2CF /* FirebaseAnalyticsCore in Frameworks */,
 				5D8888F02EDDF1900057C2CF /* FirebaseAppCheck in Frameworks */,
 				5DE395432ED826D000672CDC /* Lottie in Frameworks */,
@@ -70,10 +73,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5D888A302EE029090057C2CF /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				5D888A312EE029090057C2CF /* AppTrackingTransparency.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		5DE3951F2ED824A300672CDC = {
 			isa = PBXGroup;
 			children = (
 				5DE3952A2ED824A300672CDC /* Metal Detector IOS */,
+				5D888A302EE029090057C2CF /* Frameworks */,
 				5DE395292ED824A300672CDC /* Products */,
 			);
 			sourceTree = "<group>";

@@ -11,11 +11,13 @@ struct GraphView: View {
     var onBackTap: () -> Void
     @StateObject private var detectorManager = MetalDetectorManager.shared
     @StateObject private var localizationManager = LocalizationManager.shared
+    @StateObject private var adManager = AdManager.shared
     @State private var graphData: [Double] = []
     @State private var maxDataPoints = 100 // Keep last 100 readings for smoother graph
     @State private var soundEnabled = true
     @State private var vibrationEnabled = true
     @State private var updateTimer: Timer?
+    @State private var isBottomAdLoading = true
     
     var body: some View {
         ZStack {
@@ -121,9 +123,28 @@ struct GraphView: View {
                 .padding(.top, 36)
                 
                 Spacer()
-                
+            }
+            
+            // Bottom Native Ad (Fixed at bottom, doesn't scroll)
+            VStack {
                 Spacer()
-                    .frame(height: 40)
+                
+                ZStack {
+                    // Shimmer effect while ad is loading
+                    if isBottomAdLoading {
+                        AdShimmerView()
+                            .frame(height: 100)
+                            .padding(.horizontal, 16)
+                    }
+                    
+                    // Actual native ad
+                    NativeAdView(adUnitID: AdConfig.nativeModelView, isLoading: $isBottomAdLoading)
+                        .frame(height: 100)
+                        .padding(.horizontal, 16)
+                        .opacity(isBottomAdLoading ? 0 : 1)
+                }
+                .padding(.bottom, 8)
+                .background(Color.black) // Ensure background matches
             }
         }
         .onAppear {
@@ -133,6 +154,20 @@ struct GraphView: View {
             // Sync with detectorManager
             soundEnabled = detectorManager.soundEnabled
             vibrationEnabled = detectorManager.vibrationEnabled
+            
+            // Pre-load interstitial ad for future use
+            adManager.loadGeneralInterstitial()
+            
+            // Show ad when graph view appears
+            // Small delay to ensure view is fully loaded
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                if adManager.isInterstitialReady {
+                    adManager.showGeneralInterstitial {
+                        // Ad closed, continue with graph view
+                        print("✅ GraphView: Ad dismissed, graph view ready")
+                    }
+                }
+            }
             
             // Start timer to continuously update graph with frequency-based data
             updateTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in

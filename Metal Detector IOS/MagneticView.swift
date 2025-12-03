@@ -11,8 +11,10 @@ struct MagneticView: View {
     var onBackTap: () -> Void
     @StateObject private var detectorManager = MetalDetectorManager.shared
     @StateObject private var localizationManager = LocalizationManager.shared
+    @StateObject private var adManager = AdManager.shared
     @State private var soundEnabled = true
     @State private var vibrationEnabled = true
+    @State private var isBottomAdLoading = true
     
     // Computed properties for capsule fill levels
     private var firstCapsuleFill: Double {
@@ -243,12 +245,49 @@ struct MagneticView: View {
                 .padding(.top, 26)
                 
                 Spacer()
-                
+            }
+            
+            // Bottom Native Ad (Fixed at bottom, doesn't scroll)
+            VStack {
                 Spacer()
-                    .frame(height: 40)
+                
+                ZStack {
+                    // Shimmer effect while ad is loading
+                    if isBottomAdLoading {
+                        AdShimmerView()
+                            .frame(height: 100)
+                            .padding(.horizontal, 16)
+                    }
+                    
+                    // Actual native ad
+                    NativeAdView(adUnitID: AdConfig.nativeModelView, isLoading: $isBottomAdLoading)
+                        .frame(height: 100)
+                        .padding(.horizontal, 16)
+                        .opacity(isBottomAdLoading ? 0 : 1)
+                }
+                .padding(.bottom, 8)
+                .background(Color.black) // Ensure background matches
             }
         }
         .onAppear {
+            // Sync with detectorManager
+            soundEnabled = detectorManager.soundEnabled
+            vibrationEnabled = detectorManager.vibrationEnabled
+            
+            // Pre-load interstitial ad for future use
+            adManager.loadGeneralInterstitial()
+            
+            // Show ad when magnetic view appears
+            // Small delay to ensure view is fully loaded
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                if adManager.isInterstitialReady {
+                    adManager.showGeneralInterstitial {
+                        // Ad closed, continue with magnetic view
+                        print("✅ MagneticView: Ad dismissed, magnetic view ready")
+                    }
+                }
+            }
+            
             // Sync with detectorManager
             soundEnabled = detectorManager.soundEnabled
             vibrationEnabled = detectorManager.vibrationEnabled

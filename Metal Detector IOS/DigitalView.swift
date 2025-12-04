@@ -148,7 +148,7 @@ struct DigitalView: View {
                         
                         // Value text (percentage based on detection level 0% to 100%)
                         Text("\(Int(detectorManager.detectionLevel))%")
-                            .font(.system(size: 36, weight: .bold, design: .serif))
+                            .font(.system(size: 28, weight: .bold, design: .serif))
                             .foregroundColor(.white)
                             .animation(.easeOut(duration: 0.2), value: detectorManager.detectionLevel)
                     }

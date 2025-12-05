@@ -31,6 +31,17 @@ struct RootView: View {
     @ObservedObject private var adManager = AdManager.shared
     @AppStorage("hasSelectedLanguage") private var hasSelectedLanguage = false
     @AppStorage("hasSeenIntro") private var hasSeenIntro = false
+
+    @Environment(\.dismiss) private var dismiss
+
+    // Safely pop one element from the navigation path if possible
+    private func popOrStay() {
+        if !navigationPath.isEmpty {
+            navigationPath.removeLast()
+        } else {
+            // Already at root; nothing to pop
+        }
+    }
     
     var body: some View {
         ZStack {
@@ -85,7 +96,7 @@ struct RootView: View {
                         if title == "Handled Detector" {
                             HandledDetectorView(
                                 onBackTap: {
-                                    navigationPath.removeLast()
+                                    popOrStay()
                                 }
                             )
                             .navigationBarBackButtonHidden(true)
@@ -93,7 +104,7 @@ struct RootView: View {
                         } else if title == "Digital Compass" {
                             CompassDetectorView(
                                 onBackTap: {
-                                    navigationPath.removeLast()
+                                    popOrStay()
                                 }
                             )
                             .navigationBarBackButtonHidden(true)
@@ -101,7 +112,7 @@ struct RootView: View {
                         } else if title == "Bubble level" {
                             BubbleLevelView(
                                 onBackTap: {
-                                    navigationPath.removeLast()
+                                    popOrStay()
                                 }
                             )
                             .navigationBarBackButtonHidden(true)
@@ -110,7 +121,7 @@ struct RootView: View {
                             DetectorView(
                                 detectorTitle: title,
                                 onBackTap: {
-                                    navigationPath.removeLast()
+                                    popOrStay()
                                 },
                                 onMeterViewTap: {
                                     navigationPath.append(IntroRoute.meterView)
@@ -137,7 +148,7 @@ struct RootView: View {
                     case .settings:
                         SettingsView(
                             onBackTap: {
-                                navigationPath.removeLast()
+                                popOrStay()
                             },
                             onGetPremiumTap: {
                                 navigationPath.append(IntroRoute.paywall)
@@ -155,7 +166,7 @@ struct RootView: View {
                                 if hasSelectedLanguage {
                                     // User already selected language before (came from Settings)
                                     // Simply go back to previous screen (Settings)
-                                    navigationPath.removeLast()
+                                    popOrStay()
                                 }
                                 // If first time (hasSelectedLanguage == false), don't allow back
                             },
@@ -182,7 +193,7 @@ struct RootView: View {
                     case .meterView:
                         MeterView(
                             onBackTap: {
-                                navigationPath.removeLast()
+                                popOrStay()
                             }
                         )
                         .navigationBarBackButtonHidden(true)
@@ -190,7 +201,7 @@ struct RootView: View {
                     case .graphView:
                         GraphView(
                             onBackTap: {
-                                navigationPath.removeLast()
+                                popOrStay()
                             }
                         )
                         .navigationBarBackButtonHidden(true)
@@ -198,7 +209,7 @@ struct RootView: View {
                     case .digitalView:
                         DigitalView(
                             onBackTap: {
-                                navigationPath.removeLast()
+                                popOrStay()
                             }
                         )
                         .navigationBarBackButtonHidden(true)
@@ -206,7 +217,7 @@ struct RootView: View {
                     case .sensorView:
                         SensorView(
                             onBackTap: {
-                                navigationPath.removeLast()
+                                popOrStay()
                             }
                         )
                         .navigationBarBackButtonHidden(true)
@@ -214,7 +225,7 @@ struct RootView: View {
                     case .calibrationView:
                         CalibrationView(
                             onBackTap: {
-                                navigationPath.removeLast()
+                                popOrStay()
                             }
                         )
                         .navigationBarBackButtonHidden(true)
@@ -222,7 +233,7 @@ struct RootView: View {
                     case .magneticView:
                         MagneticView(
                             onBackTap: {
-                                navigationPath.removeLast()
+                                popOrStay()
                             }
                         )
                         .navigationBarBackButtonHidden(true)
@@ -230,14 +241,14 @@ struct RootView: View {
                     case .paywall:
                         PaywallView(
                             onClose: {
-                                navigationPath.removeLast()
+                                popOrStay()
                             },
                             onGoPremium: {
                                 // Handle go premium action (e.g., purchase flow)
-                                navigationPath.removeLast()
+                                popOrStay()
                             },
                             onContinueFree: {
-                                navigationPath.removeLast()
+                                popOrStay()
                             }
                         )
                         .navigationBarBackButtonHidden(true)

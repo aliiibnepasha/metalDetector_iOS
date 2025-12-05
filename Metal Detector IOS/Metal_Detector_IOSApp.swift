@@ -7,6 +7,7 @@
 
 import SwiftUI
 import FirebaseCore
+import FirebaseAnalytics
 import GoogleMobileAds
 import AppTrackingTransparency
 
@@ -20,7 +21,7 @@ struct Metal_Detector_IOSApp: App {
         if FirebaseApp.app() == nil {
             FirebaseApp.configure()
         }
-        
+        Analytics.setAnalyticsCollectionEnabled(true)
         // Initialize Google Mobile Ads SDK
         // SDK auto-initializes from Info.plist GADApplicationIdentifier
         // But we can explicitly start it for better control

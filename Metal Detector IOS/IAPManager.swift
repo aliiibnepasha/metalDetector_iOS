@@ -18,7 +18,7 @@ class IAPManager: ObservableObject {
     @Published var errorMessage: String?
     
     // Product ID
-    private let monthlyProductID = "com.theswiftvision.metaldetectorios.monthly"
+    private let monthlyProductID = "com.theswiftvision.metaldetector.monthly"
     
     private var updateListenerTask: Task<Void, Error>?
     

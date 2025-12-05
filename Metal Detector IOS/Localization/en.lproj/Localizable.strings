@@ -22,6 +22,7 @@
 "privacy_policy" = "Privacy policy";
 "terms_of_use" = "Terms of use";
 "default" = "Default";
+"restore" = "Restore";
 
 // MARK: - Language Screen
 "select_your_language" = "Select your Language";
@@ -68,6 +69,10 @@
 "ultra_accurate_detection" = "Ultra-Accurate Detection";
 "gold_precious_metal_scanner" = "Gold & Precious Metal Scanner";
 "24_7_help_support" = "24/7 help & support";
+"restore_purchases" = "Restore Purchases";
+"restoring" = "Restoring...";
+"purchases_restored" = "Purchases restored successfully";
+"no_purchases_found" = "No previous purchases found";
 
 // MARK: - Intro Screens
 "next" = "Next";

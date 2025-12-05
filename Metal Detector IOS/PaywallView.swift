@@ -17,8 +17,11 @@ struct PaywallView: View {
     @State private var rotationAngle: Double = 0
     @State private var animationTimer: Timer?
     @State private var isPurchasing = false
+    @State private var isRestoring = false
     @State private var showError = false
     @State private var errorMessage = ""
+    @State private var showRestoreAlert = false
+    @State private var restoreMessage = ""
     
     var body: some View {
         ZStack {
@@ -226,6 +229,28 @@ struct PaywallView: View {
                             .foregroundColor(.white)
                             .id(localizationManager.currentLanguage)
                     }
+                    
+                    // Restore Purchases Button
+                    Button(action: {
+                        handleRestore()
+                    }) {
+                        HStack(spacing: 8) {
+                            if isRestoring {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle(tint: .white.opacity(0.6)))
+                                    .scaleEffect(0.8)
+                            } else {
+                                Image(systemName: "arrow.clockwise")
+                                    .font(.system(size: 14, weight: .medium))
+                            }
+                            
+                            Text(isRestoring ? LocalizedString.restoring.localized : LocalizedString.restorePurchases.localized)
+                                .font(.system(size: 14, weight: .medium))
+                                .id(localizationManager.currentLanguage + (isRestoring ? "_restoring" : "_restore"))
+                        }
+                        .foregroundColor(.white.opacity(0.6))
+                    }
+                    .disabled(isRestoring)
                 }
                 .padding(.horizontal, 16)
                 .padding(.bottom, 40)
@@ -251,6 +276,11 @@ struct PaywallView: View {
             Button("OK", role: .cancel) { }
         } message: {
             Text(errorMessage)
+        }
+        .alert("Restore Purchases", isPresented: $showRestoreAlert) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(restoreMessage)
         }
     }
     
@@ -297,6 +327,40 @@ struct PaywallView: View {
                     errorMessage = error.localizedDescription
                     showError = true
                 }
+            }
+        }
+    }
+    
+    // MARK: - Handle Restore
+    private func handleRestore() {
+        guard !isRestoring else { return }
+        
+        isRestoring = true
+        
+        Task {
+            let wasPremium = iapManager.isPremium
+            await iapManager.restorePurchases()
+            
+            await MainActor.run {
+                isRestoring = false
+                
+                // Check if there was an error
+                if let errorMsg = iapManager.errorMessage {
+                    restoreMessage = errorMsg
+                    iapManager.errorMessage = nil // Clear error after showing
+                } else if iapManager.isPremium {
+                    if wasPremium {
+                        restoreMessage = LocalizedString.purchasesRestored.localized
+                    } else {
+                        restoreMessage = LocalizedString.purchasesRestored.localized
+                        // If user successfully restored and wasn't premium before, trigger premium callback
+                        onGoPremium()
+                    }
+                } else {
+                    restoreMessage = LocalizedString.noPurchasesFound.localized
+                }
+                
+                showRestoreAlert = true
             }
         }
     }

@@ -131,3 +131,4 @@ let text = LocalizationManager.shared.localizedString("metal_detector")
 
 
 
+

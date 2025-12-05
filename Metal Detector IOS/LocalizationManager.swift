@@ -160,6 +160,7 @@ struct LocalizedString {
     static let privacyPolicy = "privacy_policy"
     static let termsOfUse = "terms_of_use"
     static let defaultLabel = "default"
+    static let restore = "restore"
     
     // Language Screen
     static let selectYourLanguage = "select_your_language"
@@ -208,6 +209,10 @@ struct LocalizedString {
     static let goldPreciousMetalScanner = "gold_precious_metal_scanner"
     static let helpSupport24_7 = "24_7_help_support"
     static let detectHiddenTreasuresFaster = "detect_hidden_treasures_faster"
+    static let restorePurchases = "restore_purchases"
+    static let restoring = "restoring"
+    static let purchasesRestored = "purchases_restored"
+    static let noPurchasesFound = "no_purchases_found"
     
     // Intro
     static let next = "next"

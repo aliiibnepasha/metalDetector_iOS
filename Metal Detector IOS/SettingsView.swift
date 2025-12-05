@@ -15,6 +15,10 @@ struct SettingsView: View {
     @State private var showShareSheet = false
     @State private var showRatingPopup = false
     @StateObject private var localizationManager = LocalizationManager.shared
+    @StateObject private var iapManager = IAPManager.shared
+    @State private var isRestoring = false
+    @State private var showRestoreAlert = false
+    @State private var restoreMessage = ""
     var onBackTap: () -> Void
     var onGetPremiumTap: (() -> Void)? = nil
     var onLanguageTap: (() -> Void)? = nil
@@ -129,7 +133,7 @@ struct SettingsView: View {
                     ZStack {
                         RoundedRectangle(cornerRadius: 20)
                             .fill(Color(red: 0.17, green: 0.17, blue: 0.17)) // #2b2b2b
-                            .frame(height: 264)
+                            .frame(height: 320)
                         
                         VStack(spacing: 0) {
                             // Language
@@ -193,6 +197,21 @@ struct SettingsView: View {
                                     showTermsOfUse = true
                                 }
                             )
+                            
+                            Divider()
+                                .background(Color.white.opacity(0.1))
+                                .padding(.horizontal, 20)
+                            
+                            // Restore Purchases
+                            SettingsRow(
+                                iconName: "arrow.clockwise",
+                                title: LocalizedString.restore.localized,
+                                isSystemIcon: true,
+                                isLoading: isRestoring,
+                                onTap: {
+                                    handleRestore()
+                                }
+                            )
                         }
                         .padding(.vertical, 24)
                     }
@@ -232,6 +251,43 @@ struct SettingsView: View {
                     removal: .scale(scale: 0.0).combined(with: .opacity)
                 ))
                 .animation(.spring(response: 0.4, dampingFraction: 0.7), value: showRatingPopup)
+            }
+        }
+        .alert("Restore Purchases", isPresented: $showRestoreAlert) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(restoreMessage)
+        }
+    }
+    
+    // MARK: - Handle Restore
+    private func handleRestore() {
+        guard !isRestoring else { return }
+        
+        isRestoring = true
+        
+        Task {
+            let wasPremium = iapManager.isPremium
+            await iapManager.restorePurchases()
+            
+            await MainActor.run {
+                isRestoring = false
+                
+                // Check if there was an error
+                if let errorMsg = iapManager.errorMessage {
+                    restoreMessage = errorMsg
+                    iapManager.errorMessage = nil // Clear error after showing
+                } else if iapManager.isPremium {
+                    if wasPremium {
+                        restoreMessage = LocalizedString.purchasesRestored.localized
+                    } else {
+                        restoreMessage = LocalizedString.purchasesRestored.localized
+                    }
+                } else {
+                    restoreMessage = LocalizedString.noPurchasesFound.localized
+                }
+                
+                showRestoreAlert = true
             }
         }
     }
@@ -444,6 +500,8 @@ struct SettingsRow: View {
     let iconName: String
     let title: String
     var rightText: String? = nil
+    var isSystemIcon: Bool = false
+    var isLoading: Bool = false
     var onTap: (() -> Void)? = nil
     
     var body: some View {
@@ -451,10 +509,17 @@ struct SettingsRow: View {
             onTap?()
         }) {
             HStack {
-                Image(iconName)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 24, height: 24)
+                if isSystemIcon {
+                    Image(systemName: iconName)
+                        .font(.system(size: 20, weight: .medium))
+                        .foregroundColor(.white)
+                        .frame(width: 24, height: 24)
+                } else {
+                    Image(iconName)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 24, height: 24)
+                }
                 
                 Text(title)
                     .font(.system(size: 14, weight: .medium))
@@ -462,7 +527,11 @@ struct SettingsRow: View {
                 
                 Spacer()
                 
-                if let rightText = rightText {
+                if isLoading {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                        .scaleEffect(0.8)
+                } else if let rightText = rightText {
                     Text(rightText)
                         .font(.system(size: 14, weight: .medium))
                         .foregroundColor(.white.opacity(0.5))
@@ -472,6 +541,7 @@ struct SettingsRow: View {
             .padding(.vertical, 12)
         }
         .buttonStyle(PlainButtonStyle())
+        .disabled(isLoading)
     }
 }
 

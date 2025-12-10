@@ -28,6 +28,11 @@ struct MeterView: View {
                 HStack(spacing: 6) {
                     // Back Button
                     Button(action: {
+                        // Log backpress event
+                        let detectorPrefix = getDetectorPrefix()
+                        if !detectorPrefix.isEmpty {
+                            FirebaseManager.logEvent("\(detectorPrefix)_meter_view_ui_backpress")
+                        }
                         onBackTap()
                     }) {
                         Image(systemName: "chevron.left")
@@ -47,6 +52,12 @@ struct MeterView: View {
                     Button(action: {
                         soundEnabled.toggle()
                         detectorManager.setSoundEnabled(soundEnabled)
+                        // Log sound event
+                        let detectorPrefix = getDetectorPrefix()
+                        if !detectorPrefix.isEmpty {
+                            let eventName = soundEnabled ? "\(detectorPrefix)_meter_view_sound" : "\(detectorPrefix)_meter_view_silent"
+                            FirebaseManager.logEvent(eventName)
+                        }
                     }) {
                         ZStack {
                             // Conditional background: Yellow asset when ON, Gray when OFF
@@ -74,6 +85,12 @@ struct MeterView: View {
                     Button(action: {
                         vibrationEnabled.toggle()
                         detectorManager.setVibrationEnabled(vibrationEnabled)
+                        // Log vibrate event
+                        let detectorPrefix = getDetectorPrefix()
+                        if !detectorPrefix.isEmpty {
+                            let eventName = vibrationEnabled ? "\(detectorPrefix)_meter_view_vibrate_on" : "\(detectorPrefix)_meter_view_vibrate_off"
+                            FirebaseManager.logEvent(eventName)
+                        }
                     }) {
                         ZStack {
                             // Conditional background: Yellow asset when ON, Gray when OFF
@@ -212,6 +229,8 @@ struct MeterView: View {
             }
         }
         .onAppear {
+            // Set current view for event logging
+            detectorManager.setCurrentView("meter_view")
             // Start detection when view appears
             detectorManager.startDetection()
             // Sync with detectorManager
@@ -233,8 +252,27 @@ struct MeterView: View {
             }
         }
         .onDisappear {
+            // Log phone backpress event (system back gesture)
+            let detectorPrefix = getDetectorPrefix()
+            if !detectorPrefix.isEmpty {
+                FirebaseManager.logEvent("\(detectorPrefix)_meter_view_phone_backpress")
+            }
             // Stop detection when leaving view
             detectorManager.stopDetection()
+        }
+    }
+    
+    // MARK: - Helper Methods
+    private func getDetectorPrefix() -> String {
+        switch detectorManager.currentDetectorTitle.lowercased() {
+        case "gold detector":
+            return "gold"
+        case "metal detector":
+            return "metal"
+        case "stud finder":
+            return "stud"
+        default:
+            return ""
         }
     }
 }

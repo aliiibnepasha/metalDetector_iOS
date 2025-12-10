@@ -28,6 +28,8 @@ struct BubbleLevelView: View {
                 HStack {
                     // Back Button
                     Button(action: {
+                        // Log backpress event
+                        FirebaseManager.logEvent("bubble_level_ui_backpress")
                         onBackTap()
                     }) {
                         Image(systemName: "chevron.left")
@@ -215,6 +217,7 @@ struct BubbleLevelView: View {
             }
         }
         .onAppear {
+            // Log bubble level opened event (already logged in RootView)
             motionManager.startMotionUpdates()
             
             // Pre-load interstitial ad for future use

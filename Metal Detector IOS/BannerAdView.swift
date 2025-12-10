@@ -43,6 +43,11 @@ struct BannerAdView: UIViewRepresentable {
             isLoading = true
         }
         
+        // Log ad requested event
+        if adUnitID == AdConfig.bannerSplash {
+            FirebaseManager.logAdEvent("splash", placement: "splash", adType: "banner", status: "requested")
+        }
+        
         // Load ad
         let request = Request()
         bannerView.load(request)
@@ -72,12 +77,20 @@ struct BannerAdView: UIViewRepresentable {
         func bannerViewDidReceiveAd(_ bannerView: BannerView) {
             DispatchQueue.main.async {
                 self.isLoading = false
+                // Log ad loaded event
+                if bannerView.adUnitID == AdConfig.bannerSplash {
+                    FirebaseManager.logAdEvent("splash", placement: "splash", adType: "banner", status: "loaded")
+                }
             }
         }
         
         func bannerView(_ bannerView: BannerView, didFailToReceiveAdWithError error: Error) {
             DispatchQueue.main.async {
                 self.isLoading = false
+                // Log ad failed event
+                if bannerView.adUnitID == AdConfig.bannerSplash {
+                    FirebaseManager.logAdEvent("splash", placement: "splash", adType: "banner", status: "failed")
+                }
             }
         }
     }

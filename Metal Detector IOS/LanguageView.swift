@@ -69,6 +69,9 @@ struct LanguageView: View {
                     
                     // Done Button
                     Button(action: {
+                        // Log language done event
+                        FirebaseManager.logEvent("language_done", parameters: ["selected_language": selectedLanguage])
+                        
                         // Call onDone if provided, otherwise just go back
                         if let onDone = onDone {
                             onDone()
@@ -98,6 +101,9 @@ struct LanguageView: View {
                                 // Change app language
                                 let languageCode = localizationManager.languageCode(for: language.name)
                                 localizationManager.setLanguage(languageCode)
+                                
+                                // Log language selection event
+                                FirebaseManager.logEvent("language_language_select", parameters: ["language": language.name])
                             }
                         }
                     }
@@ -108,6 +114,14 @@ struct LanguageView: View {
                 Spacer()
             }
             .frame(maxWidth: .infinity)
+        }
+        .onAppear {
+            // Log language screen opened event
+            FirebaseManager.logEvent("language_opened")
+        }
+        .onChange(of: selectedLanguage) { oldValue, newValue in
+            // Log when done button is tapped (language_done)
+            // This will be called when user taps done button after selecting language
         }
     }
 }

@@ -23,12 +23,12 @@ struct Intro3View: View {
                 Image("415845897_8f37c68b-d006-49d8-9c53-8e9483be02fe 1")
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 412, height: 700)
+                    .frame(width: 250, height: 690)
                 
                 Spacer()
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            .padding(.top, -30)
+            .padding(.top, 20)
             
             // Gradient Overlay at bottom
             VStack {

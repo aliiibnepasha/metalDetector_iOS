@@ -28,6 +28,8 @@ struct CompassDetectorView: View {
                 HStack {
                     // Back Button
                     Button(action: {
+                        // Log backpress event
+                        FirebaseManager.logEvent("digital_compass_ui_backpress")
                         onBackTap()
                     }) {
                         Image(systemName: "chevron.left")
@@ -149,6 +151,7 @@ struct CompassDetectorView: View {
             }
         }
         .onAppear {
+            // Log compass opened event (already logged in RootView, but can add here too if needed)
             locationManager.requestLocationPermission()
             locationManager.startHeadingUpdates()
             

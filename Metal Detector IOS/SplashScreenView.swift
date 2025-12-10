@@ -96,6 +96,24 @@ struct SplashScreenView: View {
             }
         }
         .onAppear {
+            // Log splash screen opened event
+            FirebaseManager.logEvent("splash_screen_opened")
+            
+            // Track splash user count (first, second, third, other)
+            let splashCount = UserDefaults.standard.integer(forKey: "splash_open_count")
+            let newCount = splashCount + 1
+            UserDefaults.standard.set(newCount, forKey: "splash_open_count")
+            
+            if newCount == 1 {
+                FirebaseManager.logEvent("splash_first_user")
+            } else if newCount == 2 {
+                FirebaseManager.logEvent("splash_second_user")
+            } else if newCount == 3 {
+                FirebaseManager.logEvent("splash_third_user")
+            } else {
+                FirebaseManager.logEvent("splash_other_user")
+            }
+            
             // Start loading interstitial ad in background
             adManager.loadSplashInterstitial()
             // Start loading animation

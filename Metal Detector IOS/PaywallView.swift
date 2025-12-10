@@ -14,8 +14,6 @@ struct PaywallView: View {
     var onClose: () -> Void
     var onGoPremium: () -> Void
     var onContinueFree: () -> Void
-    @State private var rotationAngle: Double = 0
-    @State private var animationTimer: Timer?
     @State private var isPurchasing = false
     @State private var isRestoring = false
     @State private var showError = false
@@ -25,123 +23,71 @@ struct PaywallView: View {
     
     var body: some View {
         ZStack {
-            // Background
-            Color(red: 18/255, green: 18/255, blue: 18/255)
+            // Background - Black
+            Color.black
                 .ignoresSafeArea()
             
             VStack(spacing: 0) {
-                // Top Section with Close Button
-                HStack {
-                    Spacer()
-                    
-                    // Close Button
-                    Button(action: {
-                        onClose()
-                    }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 32))
-                            .foregroundColor(.white)
-                    }
-                    .padding(.trailing, 15)
-                    .padding(.top, 20)
-                }
-                
-                Spacer()
-                    .frame(height: 4)
-                
-                // Title Section with Surrounding Icons
+                // Background Image - Half Screen Only
                 ZStack {
-                    // Title Text
-                    VStack(spacing: 0) {
-                        Text(LocalizedString.metalDetector.localized)
-                            .font(.custom("Zodiak", size: 25))
-                            .foregroundColor(.white)
-                            .tracking(-1.5)
-                            .id(localizationManager.currentLanguage)
+                    Image("paywall_bg")
+                        .resizable()
+                        .scaledToFill()
+                        .frame(height: UIScreen.main.bounds.height * 0.5)
+                        .clipped()
+                        .overlay(
+                            // Black gradient from top and bottom (darker at edges for perfect blend)
+                            ZStack {
+                                // Top gradient (darker for perfect blend with black background)
+                                LinearGradient(
+                                    gradient: Gradient(stops: [
+                                        .init(color: Color.black.opacity(0.9), location: 0.0),
+                                        .init(color: Color.black.opacity(0.7), location: 0.15),
+                                        .init(color: Color.black.opacity(0.4), location: 0.3),
+                                        .init(color: Color.black.opacity(0.0), location: 0.5)
+                                    ]),
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                )
+                                
+                                // Bottom gradient (darker for perfect blend with background)
+                                LinearGradient(
+                                    gradient: Gradient(stops: [
+                                        .init(color: Color.black.opacity(0.0), location: 0.5),
+                                        .init(color: Color.black.opacity(0.3), location: 0.7),
+                                        .init(color: Color.black.opacity(0.7), location: 0.85),
+                                        .init(color: Color.black.opacity(0.95), location: 1.0)
+                                    ]),
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                )
+                            }
+                        )
+                    
+                    // Close Button - Overlay on image (moved down)
+                    VStack {
+                        Spacer()
+                            .frame(height: 50) // Add space from top
                         
-                        // Premium Badge
-                        Text(LocalizedString.premium.localized)
-                            .font(.system(size: 14, weight: .regular))
-                            .foregroundColor(.white)
-                            .id(localizationManager.currentLanguage)
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 10)
-                            .background(Color(red: 32/255, green: 32/255, blue: 32/255))
-                            .clipShape(RoundedRectangle(cornerRadius: 30))
-                            .padding(.top, 12)
+                        HStack {
+                            Spacer()
+                            
+                            Button(action: {
+                                onClose()
+                            }) {
+                                Image(systemName: "xmark.circle.fill")
+                                    .font(.system(size: 32))
+                                    .foregroundColor(.white)
+                            }
+                            .padding(.trailing, 19)
+                        }
+                        
+                        Spacer()
                     }
-                    .offset(y: 20)
-                    
-                    // Icon 1 - Top Left (Metal Links) - Rotating around center
-                    RotatingIcon(
-                        iconName: "Paywall Icon 1",
-                        radius: 140,
-                        angle: 150,
-                        baseRotation: $rotationAngle,
-                        borderColor: Color(red: 167/255, green: 167/255, blue: 167/255).opacity(0.1),
-                        borderWidth: 0.748
-                    )
-                    
-                    // Icon 2 - Top Center (Gold Coin) - Rotating around center
-                    RotatingIcon(
-                        iconName: "Paywall Icon 2",
-                        radius: 140,
-                        angle: 90,
-                        baseRotation: $rotationAngle,
-                        borderColor: Color(red: 255/255, green: 224/255, blue: 102/255).opacity(0.1),
-                        borderWidth: 0.847
-                    )
-                    
-                    // Icon 3 - Top Right (Screw/Bolt) - Rotating around center
-                    RotatingIcon(
-                        iconName: "Paywall Icon 3",
-                        radius: 140,
-                        angle: 30,
-                        baseRotation: $rotationAngle,
-                        borderColor: Color(red: 167/255, green: 167/255, blue: 167/255).opacity(0.1),
-                        borderWidth: 1
-                    )
-                    
-                    // Icon 4 - Mid Left (Metal Detector Wand) - Rotating around center
-                    RotatingIcon(
-                        iconName: "Paywall Icon 4",
-                        radius: 140,
-                        angle: 210,
-                        baseRotation: $rotationAngle,
-                        borderColor: Color(red: 167/255, green: 167/255, blue: 167/255).opacity(0.1),
-                        borderWidth: 0.802
-                    )
-                    
-                    // Icon 5 - Mid Right (Compass) - Rotating around center
-                    RotatingIcon(
-                        iconName: "Paywall Icon 5",
-                        radius: 140,
-                        angle: 330,
-                        baseRotation: $rotationAngle,
-                        borderColor: Color(red: 167/255, green: 167/255, blue: 167/255).opacity(0.1),
-                        borderWidth: 0.802
-                    )
-                    
-                    // Icon 6 - Bottom Center (Spirit Level) - Rotating around center
-                    RotatingIcon(
-                        iconName: "Paywall Icon 6",
-                        radius: 140,
-                        angle: 270,
-                        baseRotation: $rotationAngle,
-                        borderColor: Color(red: 255/255, green: 224/255, blue: 102/255).opacity(0.1),
-                        borderWidth: 1
-                    )
                 }
-                .frame(height: 300)
-                .onDisappear {
-                    // Clean up timer when view disappears
-                    animationTimer?.invalidate()
-                }
-                .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("LanguageChanged"))) { _ in
-                    // Force view refresh when language changes
-                }
+                .frame(height: UIScreen.main.bounds.height * 0.5)
                 
-                // What's Included Section
+                // What's Included Section - positioned lower in darker area
                 VStack(alignment: .leading, spacing: 24) {
                     // Section Title
                     HStack {
@@ -173,7 +119,7 @@ struct PaywallView: View {
                     }
                     .padding(.horizontal, 16)
                 }
-                .padding(.top, 26)
+                .padding(.top, 40)
                 
                 Spacer()
                 
@@ -222,6 +168,8 @@ struct PaywallView: View {
                     
                     // Continue for free
                     Button(action: {
+                        // Log continue for free event
+                        FirebaseManager.logEvent("paywall_continue_free")
                         onContinueFree()
                     }) {
                         Text(LocalizedString.orContinueForFree.localized)
@@ -257,8 +205,8 @@ struct PaywallView: View {
             }
         }
         .onAppear {
-            // Start loading animation
-            startRotationAnimation()
+            // Log paywall opened event
+            FirebaseManager.logEvent("paywall_opened")
             
             // Check subscription status
             Task {
@@ -284,24 +232,6 @@ struct PaywallView: View {
         }
     }
     
-    private func startRotationAnimation() {
-        // Reset to 0 first
-        rotationAngle = 0
-        
-        // Stop any existing timer
-        animationTimer?.invalidate()
-        
-        // Use a timer to continuously update rotation angle (60 FPS)
-        animationTimer = Timer.scheduledTimer(withTimeInterval: 1.0/60.0, repeats: true) { _ in
-            DispatchQueue.main.async {
-                self.rotationAngle += 0.2 // 360 degrees / (30 seconds * 60 FPS) ≈ 0.2 per frame
-                if self.rotationAngle >= 360 {
-                    self.rotationAngle = 0 // Reset to keep it continuous
-                }
-            }
-        }
-    }
-    
     // MARK: - Handle Purchase
     private func handlePurchase() {
         guard let product = iapManager.monthlyProduct else {
@@ -309,6 +239,9 @@ struct PaywallView: View {
             showError = true
             return
         }
+        
+        // Log purchase initiated event
+        FirebaseManager.logEvent("paywall_purchase_initiated", parameters: ["product_id": product.id, "price": product.displayPrice])
         
         isPurchasing = true
         
@@ -318,12 +251,19 @@ struct PaywallView: View {
                 await MainActor.run {
                     isPurchasing = false
                     if success {
+                        // Log purchase success event
+                        FirebaseManager.logEvent("paywall_purchase_success", parameters: ["product_id": product.id, "price": product.displayPrice])
                         onGoPremium()
+                    } else {
+                        // Log purchase cancelled event
+                        FirebaseManager.logEvent("paywall_purchase_cancelled")
                     }
                 }
             } catch {
                 await MainActor.run {
                     isPurchasing = false
+                    // Log purchase failed event
+                    FirebaseManager.logEvent("paywall_purchase_failed", parameters: ["error": error.localizedDescription])
                     errorMessage = error.localizedDescription
                     showError = true
                 }
@@ -334,6 +274,9 @@ struct PaywallView: View {
     // MARK: - Handle Restore
     private func handleRestore() {
         guard !isRestoring else { return }
+        
+        // Log restore initiated event
+        FirebaseManager.logEvent("paywall_restore_initiated")
         
         isRestoring = true
         
@@ -349,6 +292,8 @@ struct PaywallView: View {
                     restoreMessage = errorMsg
                     iapManager.errorMessage = nil // Clear error after showing
                 } else if iapManager.isPremium {
+                    // Log restore success event
+                    FirebaseManager.logEvent("paywall_restore_success")
                     if wasPremium {
                         restoreMessage = LocalizedString.purchasesRestored.localized
                     } else {
@@ -357,6 +302,8 @@ struct PaywallView: View {
                         onGoPremium()
                     }
                 } else {
+                    // Log restore no purchases found event
+                    FirebaseManager.logEvent("paywall_restore_no_purchases")
                     restoreMessage = LocalizedString.noPurchasesFound.localized
                 }
                 
@@ -383,41 +330,6 @@ struct FeatureRow: View {
                 .foregroundColor(.white)
                 .id(localizationManager.currentLanguage + "_" + localizedKey)
         }
-    }
-}
-
-struct RotatingIcon: View {
-    let iconName: String
-    let radius: CGFloat
-    let angle: Double // Starting angle in degrees (0 = right, 90 = top, etc.)
-    @Binding var baseRotation: Double // Current rotation angle (must be Binding)
-    let borderColor: Color
-    let borderWidth: CGFloat
-    
-    // Calculate position based on angle and radius
-    private var xOffset: CGFloat {
-        let totalAngle = angle + baseRotation
-        let angleInRadians = totalAngle * .pi / 180
-        return radius * cos(angleInRadians)
-    }
-    
-    private var yOffset: CGFloat {
-        let totalAngle = angle + baseRotation
-        let angleInRadians = totalAngle * .pi / 180
-        // Negate Y because in SwiftUI, Y increases downward
-        return -radius * sin(angleInRadians)
-    }
-    
-    var body: some View {
-        Image(iconName)
-            .resizable()
-            .scaledToFit()
-            .frame(width: 76, height: 76)
-            .overlay(
-                Circle()
-                    .stroke(borderColor, lineWidth: borderWidth)
-            )
-            .offset(x: xOffset, y: yOffset)
     }
 }
 

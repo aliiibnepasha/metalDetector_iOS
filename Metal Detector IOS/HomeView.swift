@@ -179,6 +179,8 @@ struct HomeView: View {
             }
         }
         .onAppear {
+            // Log home screen opened event
+            FirebaseManager.logEvent("home_screen_opened")
             // Pre-load interstitial ad when home view appears (for detector screen)
             adManager.loadGeneralInterstitial()
         }

@@ -168,6 +168,12 @@ struct DetectorView: View {
             }
         }
         .onAppear {
+            // Log detector opened event (for main detector views)
+            let eventName = getDetectorEventName(for: detectorTitle)
+            if !eventName.isEmpty {
+                FirebaseManager.logEvent(eventName)
+            }
+            
             // Set detection mode based on detector title
             detectorManager.setMode(for: detectorTitle)
             // Pre-load interstitial ad for future use
@@ -191,6 +197,19 @@ struct DetectorView: View {
     private func handleViewTap(_ completion: @escaping () -> Void) {
         // Navigate directly to view (ad will show on the target view)
         completion()
+    }
+    
+    private func getDetectorEventName(for title: String) -> String {
+        switch title.lowercased() {
+        case "gold detector":
+            return "gold_detector_opened"
+        case "metal detector":
+            return "metal_detector_opened"
+        case "stud finder":
+            return "stud_finder_opened"
+        default:
+            return ""
+        }
     }
 }
 

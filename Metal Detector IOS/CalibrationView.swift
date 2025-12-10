@@ -28,6 +28,11 @@ struct CalibrationView: View {
                 HStack(spacing: 6) {
                     // Back Button
                     Button(action: {
+                        // Log backpress event
+                        let detectorPrefix = getDetectorPrefix()
+                        if !detectorPrefix.isEmpty {
+                            FirebaseManager.logEvent("\(detectorPrefix)_callibration_view_ui_backpress")
+                        }
                         onBackTap()
                     }) {
                         Image(systemName: "chevron.left")
@@ -47,6 +52,12 @@ struct CalibrationView: View {
                     Button(action: {
                         soundEnabled.toggle()
                         detectorManager.setSoundEnabled(soundEnabled)
+                        // Log sound event
+                        let detectorPrefix = getDetectorPrefix()
+                        if !detectorPrefix.isEmpty {
+                            let eventName = soundEnabled ? "\(detectorPrefix)_callibration_view_sound" : "\(detectorPrefix)_callibration_view_silent"
+                            FirebaseManager.logEvent(eventName)
+                        }
                     }) {
                         ZStack {
                             // Conditional background: Yellow asset when ON, Gray when OFF
@@ -74,6 +85,12 @@ struct CalibrationView: View {
                     Button(action: {
                         vibrationEnabled.toggle()
                         detectorManager.setVibrationEnabled(vibrationEnabled)
+                        // Log vibrate event
+                        let detectorPrefix = getDetectorPrefix()
+                        if !detectorPrefix.isEmpty {
+                            let eventName = vibrationEnabled ? "\(detectorPrefix)_callibration_view_vibrate_on" : "\(detectorPrefix)_callibration_view_vibrate_off"
+                            FirebaseManager.logEvent(eventName)
+                        }
                     }) {
                         ZStack {
                             // Conditional background: Yellow asset when ON, Gray when OFF
@@ -180,6 +197,8 @@ struct CalibrationView: View {
             }
         }
         .onAppear {
+            // Set current view for event logging
+            detectorManager.setCurrentView("callibration_view")
             detectorManager.startDetection()
             // Sync with detectorManager
             soundEnabled = detectorManager.soundEnabled
@@ -205,7 +224,26 @@ struct CalibrationView: View {
             vibrationEnabled = detectorManager.vibrationEnabled
         }
         .onDisappear {
+            // Log phone backpress event (system back gesture)
+            let detectorPrefix = getDetectorPrefix()
+            if !detectorPrefix.isEmpty {
+                FirebaseManager.logEvent("\(detectorPrefix)_callibration_view_phone_backpress")
+            }
             detectorManager.stopDetection()
+        }
+    }
+    
+    // MARK: - Helper Methods
+    private func getDetectorPrefix() -> String {
+        switch detectorManager.currentDetectorTitle.lowercased() {
+        case "gold detector":
+            return "gold"
+        case "metal detector":
+            return "metal"
+        case "stud finder":
+            return "stud"
+        default:
+            return ""
         }
     }
 }

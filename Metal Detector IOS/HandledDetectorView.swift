@@ -29,6 +29,8 @@ struct HandledDetectorView: View {
                 HStack {
                     // Back Button
                     Button(action: {
+                        // Log backpress event
+                        FirebaseManager.logEvent("handle_detector_ui_backpress")
                         onBackTap()
                     }) {
                         Image(systemName: "chevron.left")
@@ -50,6 +52,9 @@ struct HandledDetectorView: View {
                     Button(action: {
                         soundEnabled.toggle()
                         detectorManager.setSoundEnabled(soundEnabled)
+                        // Log sound event
+                        let eventName = soundEnabled ? "handle_detector_sound" : "handle_detector_silent"
+                        FirebaseManager.logEvent(eventName)
                     }) {
                         ZStack {
                             // Conditional background: Yellow asset when ON, Gray when OFF
@@ -77,6 +82,9 @@ struct HandledDetectorView: View {
                     Button(action: {
                         vibrationEnabled.toggle()
                         detectorManager.setVibrationEnabled(vibrationEnabled)
+                        // Log vibrate event
+                        let eventName = vibrationEnabled ? "handle_detector_vibrate_on" : "handle_detector_vibrate_off"
+                        FirebaseManager.logEvent(eventName)
                     }) {
                         ZStack {
                             // Conditional background: Yellow asset when ON, Gray when OFF
@@ -169,8 +177,16 @@ struct HandledDetectorView: View {
             }
         }
         .onAppear {
+            // Set current view for event logging
+            detectorManager.setCurrentView("handle_detector")
+            detectorManager.setMode(for: "Handled Detector")
+            detectorManager.startDetection()
             // Pre-load interstitial ad for future use
             adManager.loadGeneralInterstitial()
+            
+            // Sync with detectorManager
+            soundEnabled = detectorManager.soundEnabled
+            vibrationEnabled = detectorManager.vibrationEnabled
             
             // Show ad when handled detector view appears (only first time, not on back navigation)
             // Small delay to ensure view is fully loaded
@@ -182,17 +198,10 @@ struct HandledDetectorView: View {
                     }
                 }
             }
-            
-            // Sync with detectorManager
-            soundEnabled = detectorManager.soundEnabled
-            vibrationEnabled = detectorManager.vibrationEnabled
-            // Set mode for Handled Detector
-            detectorManager.setMode(for: "Handled Detector")
-            // Start detection
-            detectorManager.startDetection()
         }
         .onDisappear {
-            // Stop detection when view disappears
+            // Log phone backpress event (system back gesture)
+            FirebaseManager.logEvent("handle_detector_phone_backpress")
             detectorManager.stopDetection()
             shakeOffset = 0
         }

@@ -70,10 +70,19 @@ struct IntroOnboardingView: View {
                     // Action Button (stays in same place, text changes)
                     Button(action: {
                         if currentPage < introPages.count - 1 {
+                            // Log next events based on current page
+                            if currentPage == 0 {
+                                FirebaseManager.logEvent("onboarding_first_next")
+                            } else if currentPage == 1 {
+                                FirebaseManager.logEvent("onboarding_second_next")
+                            }
+                            
                             withAnimation(.smooth(duration: 0.4)) {
                                 currentPage += 1
                             }
                         } else {
+                            // Log onboarding to home transition
+                            FirebaseManager.logEvent("oboarding_to_home")
                             onGetStarted()
                         }
                     }) {
@@ -107,6 +116,14 @@ struct IntroOnboardingView: View {
                         HStack {
                             Spacer()
                             Button(action: {
+                                // Log skip events based on current page
+                                if currentPage == 0 {
+                                    FirebaseManager.logEvent("onboarding_first_skip")
+                                } else if currentPage == 1 {
+                                    FirebaseManager.logEvent("onboarding_second_skip")
+                                }
+                                // Log onboarding to home transition
+                                FirebaseManager.logEvent("oboarding_to_home")
                                 onGetStarted()
                             }) {
                                 Text(LocalizedString.skip.localized)
@@ -126,6 +143,17 @@ struct IntroOnboardingView: View {
             },
             alignment: .topTrailing
         )
+        .onAppear {
+            // Log onboarding opened event
+            FirebaseManager.logEvent("onboarding_opend")
+        }
+        .onChange(of: currentPage) { oldValue, newValue in
+            // Log third page next event when moving from page 2 to 3
+            if oldValue == 2 && newValue == 3 {
+                // This won't happen as there are only 3 pages (0, 1, 2)
+                // But we can log when user is on third page and clicks next
+            }
+        }
     }
 }
 
@@ -166,17 +194,31 @@ struct IntroPageView: View {
     
     var body: some View {
         ZStack {
-            // Phone Image (positioned at top)
+            // Phone Image (positioned at top) - Reduced size with bottom gradient
             VStack(alignment: .center) {
-                Image(pageData.imageName)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 412, height: 700)
+                ZStack(alignment: .bottom) {
+                    Image(pageData.imageName)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 280, height: 480)
+                    
+                    // Black gradient overlay at bottom of image
+                    LinearGradient(
+                        gradient: Gradient(stops: [
+                            .init(color: Color.black.opacity(0), location: 0.5),
+                            .init(color: Color.black.opacity(0.7), location: 0.8),
+                            .init(color: Color.black.opacity(1.0), location: 1.0)
+                        ]),
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                    .frame(height: 480)
+                }
                 
                 Spacer()
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            .padding(.top, -30)
+            .padding(.top, 20)
             
             // Gradient Overlay at bottom
             VStack {
@@ -243,7 +285,7 @@ struct IntroPageView: View {
                             .id("description_\(localizationManager.currentLanguage)_\(pageIndex)")
                     }
                 }
-                .padding(.bottom, 120)
+                .padding(.bottom, 150) // add extra spacing between text block and pagination dots
                 .padding(.horizontal, 36)
             }
         }

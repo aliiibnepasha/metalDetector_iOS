@@ -34,6 +34,13 @@ struct Metal_Detector_IOSApp: App {
         
         // Start anonymous authentication
         FirebaseManager.shared.checkAndSignInAnonymously()
+        
+        // Log first_open event (only once per app install)
+        let hasLoggedFirstOpen = UserDefaults.standard.bool(forKey: "has_logged_first_open")
+        if !hasLoggedFirstOpen {
+            FirebaseManager.logEvent("first_open")
+            UserDefaults.standard.set(true, forKey: "has_logged_first_open")
+        }
     }
     
     var body: some Scene {

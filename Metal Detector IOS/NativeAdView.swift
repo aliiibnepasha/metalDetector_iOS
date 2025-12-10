@@ -94,6 +94,12 @@ struct NativeAdView: UIViewRepresentable {
                 
                 print("📱 NativeAdView: Loading ad with ID: \(self.adUnitID)")
                 
+                // Log ad requested event (check if it's a splash native ad by checking if it's one of the native ad IDs)
+                // Since there's no nativeSplash in AdConfig, we'll check if it matches any native ad ID
+                if self.adUnitID == AdConfig.nativeAd || self.adUnitID == AdConfig.nativeOnboarding {
+                    FirebaseManager.logAdEvent("splash", placement: "splash", adType: "native", status: "requested")
+                }
+                
                 let loader = AdLoader(adUnitID: self.adUnitID, rootViewController: rootViewController, adTypes: [.native], options: [])
                 loader.delegate = self
                 self.adLoader = loader
@@ -112,10 +118,20 @@ struct NativeAdView: UIViewRepresentable {
             self.nativeAd = nativeAd
             nativeAd.delegate = self
             
+            // Log ad loaded event
+            if self.adUnitID == AdConfig.nativeAd || self.adUnitID == AdConfig.nativeOnboarding {
+                FirebaseManager.logAdEvent("splash", placement: "splash", adType: "native", status: "loaded")
+            }
+            
             DispatchQueue.main.async {
                 self.setupNativeAdView(nativeAd: nativeAd)
                 self.isLoading = false
                 print("✅ NativeAdView: Loaded and displayed successfully")
+                
+                // Log ad shown event
+                if self.adUnitID == AdConfig.nativeAd || self.adUnitID == AdConfig.nativeOnboarding {
+                    FirebaseManager.logEvent("splash_screen_native_ad_show")
+                }
             }
         }
         
@@ -125,6 +141,11 @@ struct NativeAdView: UIViewRepresentable {
             print("❌ NativeAdView: Failed to load ad")
             print("   Error: \(errorDescription)")
             print("   Ad Unit ID: \(self.adUnitID)")
+            
+            // Log ad failed event
+            if self.adUnitID == AdConfig.nativeAd || self.adUnitID == AdConfig.nativeOnboarding {
+                FirebaseManager.logAdEvent("splash", placement: "splash", adType: "native", status: "failed")
+            }
             
             // Extract error details
             let nsError = error as NSError

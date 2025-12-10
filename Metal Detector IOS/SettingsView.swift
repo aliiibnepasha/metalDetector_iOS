@@ -35,6 +35,10 @@ struct SettingsView: View {
             // Background
             Color(red: 0.07, green: 0.07, blue: 0.07) // #111112
                 .ignoresSafeArea()
+                .onAppear {
+                    // Log settings opened event
+                    FirebaseManager.logEvent("settings_opened")
+                }
             
             VStack(spacing: 0) {
                 // Header
@@ -80,6 +84,7 @@ struct SettingsView: View {
                                 
                                 // Get Premium Button
                                 Button(action: {
+                                    FirebaseManager.logEvent("settings_get_premium_tapped")
                                     onGetPremiumTap?()
                                 }) {
                                     ZStack {
@@ -142,6 +147,7 @@ struct SettingsView: View {
                                 title: LocalizedString.language.localized,
                                 rightText: LocalizedString.defaultLabel.localized,
                                 onTap: {
+                                    FirebaseManager.logEvent("settings_language_tapped")
                                     onLanguageTap?()
                                 }
                             )
@@ -155,6 +161,7 @@ struct SettingsView: View {
                                 iconName: "Share Icon",
                                 title: LocalizedString.share.localized,
                                 onTap: {
+                                    FirebaseManager.logEvent("settings_share_tapped")
                                     showShareSheet = true
                                 }
                             )
@@ -168,6 +175,7 @@ struct SettingsView: View {
                                 iconName: "Rate Icon",
                                 title: LocalizedString.rate.localized,
                                 onTap: {
+                                    FirebaseManager.logEvent("settings_rate_tapped")
                                     showRatingPopup = true
                                 }
                             )
@@ -181,6 +189,7 @@ struct SettingsView: View {
                                 iconName: "Privacy Icon",
                                 title: LocalizedString.privacyPolicy.localized,
                                 onTap: {
+                                    FirebaseManager.logEvent("settings_privacy_policy_tapped")
                                     showPrivacyPolicy = true
                                 }
                             )
@@ -194,6 +203,7 @@ struct SettingsView: View {
                                 iconName: "Terms Icon",
                                 title: LocalizedString.termsOfUse.localized,
                                 onTap: {
+                                    FirebaseManager.logEvent("settings_terms_of_use_tapped")
                                     showTermsOfUse = true
                                 }
                             )

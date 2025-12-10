@@ -276,7 +276,11 @@ class MetalDetectorManager: ObservableObject {
         
         if shouldDetect {
             DispatchQueue.main.async {
-                self.isMetalDetected = true
+                if !self.isMetalDetected {
+                    // Metal just detected - log detection event
+                    self.isMetalDetected = true
+                    self.logDetectionEvent(isDetected: true)
+                }
             }
             
             let now = Date()
@@ -300,6 +304,10 @@ class MetalDetectorManager: ObservableObject {
             if difference < resetThreshold && self.detectionLevel < 10 {
                 // Only reset if both difference AND detection level are very low
                 DispatchQueue.main.async {
+                    if self.isMetalDetected {
+                        // Metal no longer detected - log no detection event
+                        self.logDetectionEvent(isDetected: false)
+                    }
                     self.isMetalDetected = false
                     
                     // ✅ FIX 4: Sound ko stop karo jab metal door ho
@@ -469,4 +477,62 @@ class MetalDetectorManager: ObservableObject {
             return LocalizedString.pleaseCheckThoroughly
         }
     }
+    
+    // MARK: - Log Detection Events
+    private func logDetectionEvent(isDetected: Bool) {
+        // Special handling for handle detector (no view suffix)
+        if currentDetectorTitle.lowercased() == "handled detector" {
+            let eventName = isDetected ? "handle_detector_detection" : "handle_detector_no_detection"
+            FirebaseManager.logEvent(eventName)
+            return
+        }
+        
+        // Get current view name based on detector title and view type
+        // This will be set by individual views
+        let viewPrefix = getViewEventPrefix()
+        if !viewPrefix.isEmpty {
+            let eventName = isDetected ? "\(viewPrefix)_detection" : "\(viewPrefix)_no_detection"
+            FirebaseManager.logEvent(eventName)
+        }
+    }
+    
+    // Track current view for event logging
+    private var currentViewName: String = ""
+    
+    func setCurrentView(_ viewName: String) {
+        currentViewName = viewName
+    }
+    
+    private func getViewEventPrefix() -> String {
+        // Combine detector title and view name
+        let detectorPrefix = getDetectorPrefix()
+        if !detectorPrefix.isEmpty && !currentViewName.isEmpty {
+            return "\(detectorPrefix)_\(currentViewName)"
+        }
+        return ""
+    }
+    
+    private func getDetectorPrefix() -> String {
+        switch currentDetectorTitle.lowercased() {
+        case "gold detector":
+            return "gold"
+        case "metal detector":
+            return "metal"
+        case "stud finder":
+            return "stud"
+        case "handled detector":
+            return "handle"
+        default:
+            return ""
+        }
+    }
+    
+    // Helper to get view event prefix for handle detector
+    private func getHandleDetectorViewPrefix() -> String {
+        if currentDetectorTitle.lowercased() == "handled detector" {
+            return "handle_detector"
+        }
+        return ""
+    }
+    
 }

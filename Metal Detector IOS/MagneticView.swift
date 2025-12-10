@@ -54,6 +54,11 @@ struct MagneticView: View {
                 HStack(spacing: 6) {
                     // Back Button
                     Button(action: {
+                        // Log backpress event
+                        let detectorPrefix = getDetectorPrefix()
+                        if !detectorPrefix.isEmpty {
+                            FirebaseManager.logEvent("\(detectorPrefix)_magnetic_view_ui_backpress")
+                        }
                         onBackTap()
                     }) {
                         Image(systemName: "chevron.left")
@@ -73,6 +78,12 @@ struct MagneticView: View {
                     Button(action: {
                         soundEnabled.toggle()
                         detectorManager.setSoundEnabled(soundEnabled)
+                        // Log sound event
+                        let detectorPrefix = getDetectorPrefix()
+                        if !detectorPrefix.isEmpty {
+                            let eventName = soundEnabled ? "\(detectorPrefix)_magnetic_view_sound" : "\(detectorPrefix)_magnetic_view_silent"
+                            FirebaseManager.logEvent(eventName)
+                        }
                     }) {
                         ZStack {
                             // Conditional background: Yellow asset when ON, Gray when OFF
@@ -100,6 +111,12 @@ struct MagneticView: View {
                     Button(action: {
                         vibrationEnabled.toggle()
                         detectorManager.setVibrationEnabled(vibrationEnabled)
+                        // Log vibrate event
+                        let detectorPrefix = getDetectorPrefix()
+                        if !detectorPrefix.isEmpty {
+                            let eventName = vibrationEnabled ? "\(detectorPrefix)_magnetic_view_vibrate_on" : "\(detectorPrefix)_magnetic_view_vibrate_off"
+                            FirebaseManager.logEvent(eventName)
+                        }
                     }) {
                         ZStack {
                             // Conditional background: Yellow asset when ON, Gray when OFF
@@ -273,6 +290,8 @@ struct MagneticView: View {
             }
         }
         .onAppear {
+            // Set current view for event logging
+            detectorManager.setCurrentView("magnetic_view")
             // Sync with detectorManager
             soundEnabled = detectorManager.soundEnabled
             vibrationEnabled = detectorManager.vibrationEnabled
@@ -301,6 +320,27 @@ struct MagneticView: View {
         }
         // Note: MagneticView has its own Start/Stop buttons, so no auto-start here
         // Detection starts/stops manually via buttons
+        .onDisappear {
+            // Log phone backpress event (system back gesture)
+            let detectorPrefix = getDetectorPrefix()
+            if !detectorPrefix.isEmpty {
+                FirebaseManager.logEvent("\(detectorPrefix)_magnetic_view_phone_backpress")
+            }
+        }
+    }
+    
+    // MARK: - Helper Methods
+    private func getDetectorPrefix() -> String {
+        switch detectorManager.currentDetectorTitle.lowercased() {
+        case "gold detector":
+            return "gold"
+        case "metal detector":
+            return "metal"
+        case "stud finder":
+            return "stud"
+        default:
+            return ""
+        }
     }
 }
 

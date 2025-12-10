@@ -23,7 +23,7 @@ struct Intro2View: View {
                 Image("Phone_Air (1) 1")
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 412, height: 700)
+                    .frame(width: 250, height: 690)
                 
                 Spacer()
             }

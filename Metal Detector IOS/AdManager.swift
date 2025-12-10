@@ -67,11 +67,20 @@ class AdManager: NSObject, ObservableObject {
         isLoadingInterstitial = true
         isInterstitialReady = false
         
+        // Log ad requested event
+        FirebaseManager.logAdEvent("splash", placement: "splash", adType: "fullscreen", status: "requested")
+        
         splashInterstitialWrapper = InterstitialAdWrapper(adUnitID: AdConfig.interstitialSplash) { [weak self] loaded in
             DispatchQueue.main.async {
                 self?.isInterstitialReady = loaded
                 self?.isLoadingInterstitial = false
-                print(loaded ? "✅ AdManager: Splash interstitial loaded successfully" : "❌ AdManager: Splash interstitial failed to load")
+                if loaded {
+                    print("✅ AdManager: Splash interstitial loaded successfully")
+                    FirebaseManager.logAdEvent("splash", placement: "splash", adType: "fullscreen", status: "loaded")
+                } else {
+                    print("❌ AdManager: Splash interstitial failed to load")
+                    FirebaseManager.logAdEvent("splash", placement: "splash", adType: "fullscreen", status: "failed")
+                }
             }
         }
         

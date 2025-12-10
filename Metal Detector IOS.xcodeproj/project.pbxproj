@@ -26,6 +26,7 @@
 		5D88890A2EDDF1900057C2CF /* FirebaseStorageCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = 5D8889092EDDF1900057C2CF /* FirebaseStorageCombine-Community */; };
 		5D8889A92EDF08670057C2CF /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 5D8889A82EDF08670057C2CF /* GoogleMobileAds */; };
 		5D888A322EE029090057C2CF /* AppTrackingTransparency.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D888A312EE029090057C2CF /* AppTrackingTransparency.framework */; };
+		5DBDEF452EE9A9D600B7F9D8 /* AdjustSdk in Frameworks */ = {isa = PBXBuildFile; productRef = 5DBDEF442EE9A9D600B7F9D8 /* AdjustSdk */; };
 		5DE395432ED826D000672CDC /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 5DE395422ED826D000672CDC /* Lottie */; };
 /* End PBXBuildFile section */
 
@@ -47,6 +48,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5DBDEF452EE9A9D600B7F9D8 /* AdjustSdk in Frameworks */,
 				5D8889002EDDF1900057C2CF /* FirebaseFirestoreCombine-Community in Frameworks */,
 				5D8889A92EDF08670057C2CF /* GoogleMobileAds in Frameworks */,
 				5D8889022EDDF1900057C2CF /* FirebaseInstallations in Frameworks */,
@@ -137,6 +139,7 @@
 				5D8889072EDDF1900057C2CF /* FirebaseStorage */,
 				5D8889092EDDF1900057C2CF /* FirebaseStorageCombine-Community */,
 				5D8889A82EDF08670057C2CF /* GoogleMobileAds */,
+				5DBDEF442EE9A9D600B7F9D8 /* AdjustSdk */,
 			);
 			productName = "Metal Detector IOS";
 			productReference = 5DE395282ED824A300672CDC /* Metal Detector IOS.app */;
@@ -189,6 +192,7 @@
 				5DE395412ED826D000672CDC /* XCRemoteSwiftPackageReference "lottie-spm" */,
 				5D8888E82EDDF1900057C2CF /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				5D8889A72EDF08670057C2CF /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
+				5DBDEF432EE9A9D600B7F9D8 /* XCRemoteSwiftPackageReference "ios_sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 5DE395292ED824A300672CDC /* Products */;
@@ -348,7 +352,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = V5QZS9L352;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -384,7 +388,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = V5QZS9L352;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -452,6 +456,14 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 12.14.0;
+			};
+		};
+		5DBDEF432EE9A9D600B7F9D8 /* XCRemoteSwiftPackageReference "ios_sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/adjust/ios_sdk.git";
+			requirement = {
+				branch = master;
+				kind = branch;
 			};
 		};
 		5DE395412ED826D000672CDC /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
@@ -554,6 +566,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 5D8889A72EDF08670057C2CF /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */;
 			productName = GoogleMobileAds;
+		};
+		5DBDEF442EE9A9D600B7F9D8 /* AdjustSdk */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5DBDEF432EE9A9D600B7F9D8 /* XCRemoteSwiftPackageReference "ios_sdk" */;
+			productName = AdjustSdk;
 		};
 		5DE395422ED826D000672CDC /* Lottie */ = {
 			isa = XCSwiftPackageProductDependency;

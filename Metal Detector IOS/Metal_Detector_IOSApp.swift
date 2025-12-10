@@ -10,6 +10,9 @@ import FirebaseCore
 import FirebaseAnalytics
 import GoogleMobileAds
 import AppTrackingTransparency
+#if canImport(Adjust)
+import Adjust
+#endif
 
 @main
 struct Metal_Detector_IOSApp: App {
@@ -34,6 +37,9 @@ struct Metal_Detector_IOSApp: App {
         
         // Start anonymous authentication
         FirebaseManager.shared.checkAndSignInAnonymously()
+
+        // Initialize Adjust (safe even if SDK is not yet added; guarded by canImport)
+        AdjustManager.shared.start()
         
         // Log first_open event (only once per app install)
         let hasLoggedFirstOpen = UserDefaults.standard.bool(forKey: "has_logged_first_open")

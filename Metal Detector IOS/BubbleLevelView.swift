@@ -223,16 +223,6 @@ struct BubbleLevelView: View {
             // Pre-load interstitial ad for future use
             adManager.loadGeneralInterstitial()
             
-            // Show ad when bubble level view appears (only first time, not on back navigation)
-            // Small delay to ensure view is fully loaded
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                if adManager.isInterstitialReady {
-                    adManager.showGeneralInterstitial(forView: "BubbleLevelView") {
-                        // Ad closed, continue with bubble level view
-                        print("✅ BubbleLevelView: Ad dismissed, bubble level view ready")
-                    }
-                }
-            }
         }
         .onDisappear {
             motionManager.stopMotionUpdates()

@@ -158,16 +158,6 @@ struct CompassDetectorView: View {
             // Pre-load interstitial ad for future use
             adManager.loadGeneralInterstitial()
             
-            // Show ad when compass detector view appears (only first time, not on back navigation)
-            // Small delay to ensure view is fully loaded
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                if adManager.isInterstitialReady {
-                    adManager.showGeneralInterstitial(forView: "CompassDetectorView") {
-                        // Ad closed, continue with compass detector view
-                        print("✅ CompassDetectorView: Ad dismissed, compass detector view ready")
-                    }
-                }
-            }
         }
         .onDisappear {
             locationManager.stopHeadingUpdates()

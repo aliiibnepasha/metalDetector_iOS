@@ -357,6 +357,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Metal-Detector-IOS-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "";
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_NSUserTrackingUsageDescription = "We use tracking to show you personalized ads and improve your app experience. Your data helps us provide better content.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -393,6 +394,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Metal-Detector-IOS-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "";
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_NSUserTrackingUsageDescription = "We use tracking to show you personalized ads and improve your app experience. Your data helps us provide better content.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

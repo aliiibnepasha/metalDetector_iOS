@@ -179,24 +179,15 @@ struct DetectorView: View {
             // Pre-load interstitial ad for future use
             adManager.loadGeneralInterstitial()
             
-            // Show ad when detector screen appears (only first time, not on back navigation)
-            // Small delay to ensure view is fully loaded
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                if adManager.isInterstitialReady {
-                    adManager.showGeneralInterstitial(forView: "DetectorView_\(detectorTitle)") {
-                        // Ad closed, continue with detector screen
-                        print("✅ DetectorView: Ad dismissed, detector screen ready")
-                    }
-                }
-            }
         }
         // Don't auto-start detection here - let individual views handle it
     }
     
     // MARK: - Helper Methods
     private func handleViewTap(_ completion: @escaping () -> Void) {
-        // Navigate directly to view (ad will show on the target view)
-        completion()
+        AdManager.shared.handleClickTriggeredInterstitial(context: "detector_grid") {
+            completion()
+        }
     }
     
     private func getDetectorEventName(for title: String) -> String {

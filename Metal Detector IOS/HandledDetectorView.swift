@@ -188,16 +188,6 @@ struct HandledDetectorView: View {
             soundEnabled = detectorManager.soundEnabled
             vibrationEnabled = detectorManager.vibrationEnabled
             
-            // Show ad when handled detector view appears (only first time, not on back navigation)
-            // Small delay to ensure view is fully loaded
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                if adManager.isInterstitialReady {
-                    adManager.showGeneralInterstitial(forView: "HandledDetectorView") {
-                        // Ad closed, continue with handled detector view
-                        print("✅ HandledDetectorView: Ad dismissed, handled detector view ready")
-                    }
-                }
-            }
         }
         .onDisappear {
             // Log phone backpress event (system back gesture)

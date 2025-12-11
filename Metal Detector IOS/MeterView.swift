@@ -239,17 +239,6 @@ struct MeterView: View {
             
             // Pre-load interstitial ad for future use
             adManager.loadGeneralInterstitial()
-            
-            // Show ad when meter view appears (only first time, not on back navigation)
-            // Small delay to ensure view is fully loaded
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                if adManager.isInterstitialReady {
-                    adManager.showGeneralInterstitial(forView: "MeterView") {
-                        // Ad closed, continue with meter view
-                        print("✅ MeterView: Ad dismissed, meter view ready")
-                    }
-                }
-            }
         }
         .onDisappear {
             // Log phone backpress event (system back gesture)

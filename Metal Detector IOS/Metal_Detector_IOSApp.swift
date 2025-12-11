@@ -39,6 +39,11 @@ struct Metal_Detector_IOSApp: App {
         // Start anonymous authentication
         FirebaseManager.shared.checkAndSignInAnonymously()
 
+        // Enable AdMob test devices (simulator by default; add device IDs as needed)
+        #if DEBUG
+        MobileAds.shared.requestConfiguration.testDeviceIdentifiers = [ "SIMULATOR" ]
+        #endif
+
         // Initialize Adjust (safe even if SDK is not yet added; guarded by canImport)
         AdjustManager.shared.start()
         

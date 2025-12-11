@@ -180,17 +180,6 @@ struct GraphView: View {
             // Pre-load interstitial ad for future use
             adManager.loadGeneralInterstitial()
             
-            // Show ad when graph view appears (only first time, not on back navigation)
-            // Small delay to ensure view is fully loaded
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                if adManager.isInterstitialReady {
-                    adManager.showGeneralInterstitial(forView: "GraphView") {
-                        // Ad closed, continue with graph view
-                        print("✅ GraphView: Ad dismissed, graph view ready")
-                    }
-                }
-            }
-            
             // Start timer to continuously update graph with frequency-based data
             updateTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
                 let currentLevel = detectorManager.detectionLevel

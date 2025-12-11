@@ -93,6 +93,10 @@ struct HomeView: View {
                     .padding(.top, 16)
                     .padding(.bottom, 12)
                     .background(Color.black) // Ensure background matches
+                    .onAppear {
+                        // Trigger early loading when home appears
+                        isTopAdLoading = true
+                    }
                 }
                 
                 // Main Content - Scrollable Feature Cards
@@ -191,8 +195,10 @@ struct HomeView: View {
     
     // MARK: - Helper Methods
     private func handleDetectorTap(_ title: String) {
-        // Navigate directly to detector screen (ad will show on detector screen)
-        onDetectorTap(title)
+        adManager.handleClickTriggeredInterstitial(context: "home_\(title)") {
+            // Navigate directly to detector screen
+            onDetectorTap(title)
+        }
     }
 }
 

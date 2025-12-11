@@ -12,20 +12,80 @@ struct AdConfig {
     static let adAppId = "ca-app-pub-9844943887550892~6872640469"
     
     // Banner Ad IDs
-    static let bannerSplash = "ca-app-pub-9844943887550892/5632437338"
-    static let bannerHome = "ca-app-pub-9844943887550892/3871072600"
-    static let bannerOnboarding = "ca-app-pub-9844943887550892/1244909266"
+    static var bannerSplash: String {
+        #if DEBUG
+        return "ca-app-pub-3940256099942544/2934735716" // Test banner
+        #else
+        return "ca-app-pub-9844943887550892/5632437338"
+        #endif
+    }
+    static var bannerHome: String {
+        #if DEBUG
+        return "ca-app-pub-3940256099942544/2934735716" // Test banner
+        #else
+        return "ca-app-pub-9844943887550892/3871072600"
+        #endif
+    }
+    static var bannerOnboarding: String {
+        #if DEBUG
+        return "ca-app-pub-3940256099942544/2934735716" // Test banner
+        #else
+        return "ca-app-pub-9844943887550892/1244909266"
+        #endif
+    }
     
     // Interstitial Ad IDs
-    static let interstitialSplash = "ca-app-pub-9844943887550892/4319355669"
-    static let interstitial = "ca-app-pub-9844943887550892/5559558792"
+    static var interstitialSplash: String {
+        #if DEBUG
+        return "ca-app-pub-3940256099942544/1033173712" // Test interstitial
+        #else
+        return "ca-app-pub-9844943887550892/4319355669"
+        #endif
+    }
+    static var interstitial: String {
+        #if DEBUG
+        return "ca-app-pub-3940256099942544/4411468910" // Test interstitial
+        #else
+        return "ca-app-pub-9844943887550892/5559558792"
+        #endif
+    }
     
     // Native Ad IDs
-    static let nativeAd = "ca-app-pub-9844943887550892/4992582581"
-    static let nativeOnboarding = "ca-app-pub-9844943887550892/4992582581"
-    static let nativeLanguage = "ca-app-pub-9844943887550892/3679500913"
-    static let nativeHome = "ca-app-pub-9844943887550892/7618745928"
-    static let nativeModelView = "ca-app-pub-9844943887550892/4992582581"
+    static var nativeAd: String {
+        #if DEBUG
+        return "ca-app-pub-3940256099942544/3986624511" // Test native
+        #else
+        return "ca-app-pub-9844943887550892/4992582581"
+        #endif
+    }
+    static var nativeOnboarding: String {
+        #if DEBUG
+        return "ca-app-pub-3940256099942544/3986624511" // Test native
+        #else
+        return "ca-app-pub-9844943887550892/4992582581"
+        #endif
+    }
+    static var nativeLanguage: String {
+        #if DEBUG
+        return "ca-app-pub-3940256099942544/3986624511" // Test native
+        #else
+        return "ca-app-pub-9844943887550892/3679500913"
+        #endif
+    }
+    static var nativeHome: String {
+        #if DEBUG
+        return "ca-app-pub-3940256099942544/3986624511" // Test native
+        #else
+        return "ca-app-pub-9844943887550892/7618745928"
+        #endif
+    }
+    static var nativeModelView: String {
+        #if DEBUG
+        return "ca-app-pub-3940256099942544/3986624511" // Test native
+        #else
+        return "ca-app-pub-9844943887550892/4992582581"
+        #endif
+    }
     
     // App Open Ad ID
     static let appOpen = "ca-app-pub-9844943887550892/5412945488"

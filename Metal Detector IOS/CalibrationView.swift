@@ -207,17 +207,6 @@ struct CalibrationView: View {
             // Pre-load interstitial ad for future use
             adManager.loadGeneralInterstitial()
             
-            // Show ad when calibration view appears (only first time, not on back navigation)
-            // Small delay to ensure view is fully loaded
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                if adManager.isInterstitialReady {
-                    adManager.showGeneralInterstitial(forView: "CalibrationView") {
-                        // Ad closed, continue with calibration view
-                        print("✅ CalibrationView: Ad dismissed, calibration view ready")
-                    }
-                }
-            }
-            
             detectorManager.startDetection()
             // Sync with detectorManager
             soundEnabled = detectorManager.soundEnabled

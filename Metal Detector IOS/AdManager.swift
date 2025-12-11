@@ -17,10 +17,13 @@ class AdManager: NSObject, ObservableObject {
     @Published var isLoadingInterstitial = false
     @Published var isHomeBannerReady = false
     @Published var isHomeBannerLoading = false
+    @Published var isSplashBannerReady = false
+    @Published var isSplashBannerLoading = false
     
     private var splashInterstitialWrapper: InterstitialAdWrapper?
     private var generalInterstitialWrapper: InterstitialAdWrapper?
     var homeBannerView: BannerView?
+    var splashBannerView: BannerView?
     private var iapManager = IAPManager.shared
     
     // Backoff / cooldown for general interstitials to protect match rate
@@ -44,10 +47,28 @@ class AdManager: NSObject, ObservableObject {
     private let homeBannerMaxCooldown: TimeInterval = 60
     private var scheduledHomeBannerRetry: DispatchWorkItem?
 
+    // Backoff for splash banner
+    private var splashBannerRetryCount = 0
+    private var splashBannerNextAllowedLoad: Date = .distantPast
+    private let splashBannerBaseCooldown: TimeInterval = 5
+    private let splashBannerMaxCooldown: TimeInterval = 60
+    private var scheduledSplashBannerRetry: DispatchWorkItem?
+
     // Foreground interstitial gating
     private var hasSeenFirstForeground = false
     private var lastForegroundShow: Date = .distantPast
     private let foregroundMinInterval: TimeInterval = 120 // seconds between foreground shows
+
+    // Click-based interstitial cadence (skip 2, show on 3rd)
+    private var interstitialClickCount: Int = 0
+    private var pendingCadenceShow: Bool = false
+    private var pendingCadenceCapping: Bool = false
+    // Reset click cadence (e.g., when returning to home)
+    func resetInterstitialCadence() {
+        interstitialClickCount = 0
+        pendingCadenceShow = false
+        pendingCadenceCapping = false
+    }
     
     // Track which views have already shown an ad in this session
     private var viewsThatShowedAd: Set<String> = []
@@ -70,12 +91,7 @@ class AdManager: NSObject, ObservableObject {
         return true
     }
     
-    // Mark that ad was shown for a view
-    func markAdShownForView(_ viewIdentifier: String) {
-        viewsThatShowedAd.insert(viewIdentifier)
-    }
-    
-    // Reset tracking (useful if needed)
+    // Reset tracking (retained for future use; currently we allow repeat shows per view)
     func resetAdTracking() {
         viewsThatShowedAd.removeAll()
     }
@@ -180,6 +196,54 @@ class AdManager: NSObject, ObservableObject {
         banner.load(request)
         
         self.homeBannerView = banner
+    }
+
+    // MARK: - Preload Splash Banner (single cached banner)
+    func preloadSplashBanner() {
+        // Don't load ads if user is premium
+        guard !isPremium else {
+            print("✅ AdManager: User is premium, skipping splash banner")
+            return
+        }
+        
+        // If already loaded, skip
+        if isSplashBannerReady {
+            print("✅ AdManager: Splash banner already loaded")
+            return
+        }
+        
+        // If currently loading, skip
+        if isSplashBannerLoading {
+            print("ℹ️ AdManager: Splash banner load already in progress")
+            return
+        }
+        
+        // Respect cooldown/backoff
+        let now = Date()
+        if now < splashBannerNextAllowedLoad {
+            let wait = splashBannerNextAllowedLoad.timeIntervalSince(now)
+            print("⏳ AdManager: In cooldown (\(Int(wait))s) before requesting splash banner")
+            return
+        }
+        
+        isSplashBannerLoading = true
+        isSplashBannerReady = false
+        
+        let banner = BannerView(adSize: AdSizeBanner)
+        banner.adUnitID = AdConfig.bannerSplash
+        banner.delegate = self
+        
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let rootViewController = windowScene.windows.first?.rootViewController {
+            banner.rootViewController = rootViewController
+        }
+        
+        FirebaseManager.logAdEvent("splash", placement: "splash", adType: "banner", status: "requested")
+        
+        let request = Request()
+        banner.load(request)
+        
+        self.splashBannerView = banner
     }
     
     // MARK: - Show Splash Interstitial Ad
@@ -288,35 +352,28 @@ class AdManager: NSObject, ObservableObject {
             return
         }
         
-        // Check if ad should be shown for this view
-        if let viewId = viewIdentifier, !shouldShowAdForView(viewId) {
-            print("✅ AdManager: Ad already shown for \(viewId), skipping")
-            completion()
-            return
-        }
-        
         guard let adWrapper = generalInterstitialWrapper, isInterstitialReady else {
             print("⚠️ AdManager: General interstitial not ready, skipping ad")
             completion()
             return
         }
-        
+
         guard let rootViewController = getRootViewController() else {
             print("❌ AdManager: Could not get root view controller")
             completion()
             return
         }
         
-        // Mark ad as shown BEFORE displaying (to prevent showing again on back navigation)
-        if let viewId = viewIdentifier {
-            markAdShownForView(viewId)
-        }
-        
         // Set completion handler
         adWrapper.onAdClosed = { [weak self] in
             DispatchQueue.main.async {
+                if let self = self, self.pendingCadenceShow, self.pendingCadenceCapping {
+                    self.interstitialClickCount = 0 // restart cadence after a successful show
+                }
                 self?.isInterstitialReady = false
                 self?.generalInterstitialWrapper = nil
+                self?.pendingCadenceShow = false
+                self?.pendingCadenceCapping = false
                 // Reload next ad for future use
                 self?.loadGeneralInterstitial()
                 completion()
@@ -326,6 +383,11 @@ class AdManager: NSObject, ObservableObject {
         adWrapper.onAdFailedToShow = { [weak self] error in
             DispatchQueue.main.async {
                 print("❌ AdManager: Failed to show interstitial: \(error?.localizedDescription ?? "Unknown error")")
+                if let self = self, self.pendingCadenceShow, self.pendingCadenceCapping {
+                    self.interstitialClickCount = max(0, self.interstitialClickCount - 1)
+                }
+                self?.pendingCadenceShow = false
+                self?.pendingCadenceCapping = false
                 self?.isInterstitialReady = false
                 self?.generalInterstitialWrapper = nil
                 // Reload next ad for future use
@@ -397,6 +459,17 @@ extension AdManager: BannerViewDelegate {
                 print("✅ AdManager: Home banner loaded")
             }
         }
+        
+        if bannerView == splashBannerView {
+            DispatchQueue.main.async {
+                self.isSplashBannerReady = true
+                self.isSplashBannerLoading = false
+                self.splashBannerRetryCount = 0
+                self.splashBannerNextAllowedLoad = Date()
+                FirebaseManager.logAdEvent("splash", placement: "splash", adType: "banner", status: "loaded")
+                print("✅ AdManager: Splash banner loaded")
+            }
+        }
     }
     
     func bannerView(_ bannerView: BannerView, didFailToReceiveAdWithError error: Error) {
@@ -407,6 +480,16 @@ extension AdManager: BannerViewDelegate {
                 FirebaseManager.logAdEvent("home", placement: "home", adType: "banner", status: "failed")
                 self.scheduleHomeBannerRetry()
                 print("❌ AdManager: Home banner failed: \(error.localizedDescription)")
+            }
+        }
+        
+        if bannerView == splashBannerView {
+            DispatchQueue.main.async {
+                self.isSplashBannerReady = false
+                self.isSplashBannerLoading = false
+                FirebaseManager.logAdEvent("splash", placement: "splash", adType: "banner", status: "failed")
+                self.scheduleSplashBannerRetry()
+                print("❌ AdManager: Splash banner failed: \(error.localizedDescription)")
             }
         }
     }
@@ -423,6 +506,20 @@ extension AdManager: BannerViewDelegate {
         scheduledHomeBannerRetry = work
         DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: work)
         print("🔁 AdManager: Scheduled home banner retry in \(Int(delay))s (retry \(homeBannerRetryCount))")
+    }
+
+    private func scheduleSplashBannerRetry() {
+        splashBannerRetryCount += 1
+        let delay = min(splashBannerMaxCooldown, splashBannerBaseCooldown * pow(2.0, Double(splashBannerRetryCount - 1)))
+        splashBannerNextAllowedLoad = Date().addingTimeInterval(delay)
+
+        scheduledSplashBannerRetry?.cancel()
+        let work = DispatchWorkItem { [weak self] in
+            self?.preloadSplashBanner()
+        }
+        scheduledSplashBannerRetry = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: work)
+        print("🔁 AdManager: Scheduled splash banner retry in \(Int(delay))s (retry \(splashBannerRetryCount))")
     }
 
     // MARK: - Foreground interstitial (on resume)
@@ -448,6 +545,45 @@ extension AdManager: BannerViewDelegate {
         } else {
             loadGeneralInterstitial()
         }
+    }
+
+    // MARK: - Click-based interstitial cadence (mirror Android: show on 1,4,7...; splash can bypass)
+    func handleClickTriggeredInterstitial(context: String? = nil,
+                                          isCapping: Bool = true,
+                                          completion: @escaping () -> Void) {
+        guard !isPremium else {
+            completion()
+            return
+        }
+
+        if isCapping {
+            interstitialClickCount += 1
+        }
+
+        // Skip 2 clicks, show on the 3rd (pattern: 3,6,9...) after app enters flow
+        let shouldShow = isCapping ? (interstitialClickCount > 0 && interstitialClickCount % 3 == 0) : true
+
+        // If it's a show turn and ad is ready, show now
+        if shouldShow, isInterstitialReady, generalInterstitialWrapper != nil {
+            pendingCadenceShow = true
+            pendingCadenceCapping = isCapping
+            showGeneralInterstitial(forView: context, completion: completion)
+            return
+        }
+
+        // If it's a show turn but not ready, roll back the count and trigger a load so the next click still tries to show
+        if shouldShow {
+            if isCapping { interstitialClickCount -= 1 }
+            loadGeneralInterstitial()
+            completion()
+            return
+        }
+
+        // Not a show turn: ensure a load is in-flight for future shows
+        if !isInterstitialReady && !isLoadingInterstitial {
+            loadGeneralInterstitial()
+        }
+        completion()
     }
 }
 

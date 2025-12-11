@@ -299,17 +299,6 @@ struct MagneticView: View {
             // Pre-load interstitial ad for future use
             adManager.loadGeneralInterstitial()
             
-            // Show ad when magnetic view appears (only first time, not on back navigation)
-            // Small delay to ensure view is fully loaded
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                if adManager.isInterstitialReady {
-                    adManager.showGeneralInterstitial(forView: "MagneticView") {
-                        // Ad closed, continue with magnetic view
-                        print("✅ MagneticView: Ad dismissed, magnetic view ready")
-                    }
-                }
-            }
-            
             // Sync with detectorManager
             soundEnabled = detectorManager.soundEnabled
             vibrationEnabled = detectorManager.vibrationEnabled

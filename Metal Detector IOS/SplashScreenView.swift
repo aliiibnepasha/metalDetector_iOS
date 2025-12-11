@@ -79,18 +79,15 @@ struct SplashScreenView: View {
                 // Banner Ad at bottom with shimmer effect while loading - Only show if not premium
                 if !iapManager.isPremium {
                     ZStack {
-                        // Shimmer effect while ad is loading
-                        if isAdLoading {
+                        if adManager.isSplashBannerReady {
+                            SplashBannerContainer()
+                                .frame(height: 50)
+                                .padding(.bottom, 20)
+                        } else {
                             AdShimmerView()
                                 .frame(height: 50)
                                 .padding(.bottom, 20)
                         }
-                        
-                        // Actual banner ad
-                        BannerAdView(adUnitID: AdConfig.bannerSplash, isLoading: $isAdLoading)
-                            .frame(height: 50)
-                            .padding(.bottom, 20)
-                            .opacity(isAdLoading ? 0 : 1)
                     }
                 }
             }
@@ -116,6 +113,8 @@ struct SplashScreenView: View {
             
             // Start loading interstitial ad in background
             adManager.loadSplashInterstitial()
+            // Preload splash banner
+            adManager.preloadSplashBanner()
             // Start loading animation
             startLoading()
         }

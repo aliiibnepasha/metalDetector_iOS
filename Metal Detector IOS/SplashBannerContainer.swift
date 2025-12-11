@@ -1,14 +1,14 @@
 //
-//  HomeBannerContainer.swift
+//  SplashBannerContainer.swift
 //  Metal Detector IOS
 //
-//  Shows cached/preloaded home banner from AdManager.
+//  Shows cached/preloaded splash banner from AdManager.
 //
 
 import SwiftUI
 import GoogleMobileAds
 
-struct HomeBannerContainer: UIViewRepresentable {
+struct SplashBannerContainer: UIViewRepresentable {
     @ObservedObject private var adManager = AdManager.shared
     
     func makeUIView(context: Context) -> UIView {
@@ -18,10 +18,9 @@ struct HomeBannerContainer: UIViewRepresentable {
     }
     
     func updateUIView(_ uiView: UIView, context: Context) {
-        // Remove old subviews
         uiView.subviews.forEach { $0.removeFromSuperview() }
         
-        if adManager.isHomeBannerReady, let banner = adManager.homeBannerView {
+        if adManager.isSplashBannerReady, let banner = adManager.splashBannerView {
             banner.translatesAutoresizingMaskIntoConstraints = false
             uiView.addSubview(banner)
             NSLayoutConstraint.activate([
@@ -34,5 +33,4 @@ struct HomeBannerContainer: UIViewRepresentable {
         }
     }
 }
-
 

@@ -26,7 +26,19 @@ struct NativeAdView: UIViewRepresentable {
     }
     
     func updateUIView(_ uiView: UIView, context: Context) {
-        // Update if needed
+        // If a native ad was already loaded, ensure its view is attached
+        if let ad = context.coordinator.nativeAd {
+            context.coordinator.setupNativeAdView(nativeAd: ad)
+            DispatchQueue.main.async {
+                context.coordinator.isLoading = false
+            }
+            return
+        }
+        
+        // If no ad and not currently loading, trigger a load (e.g., when view re-appears)
+        if !context.coordinator.isLoadingInProgress {
+            context.coordinator.loadAd()
+        }
     }
     
     class Coordinator: NSObject, AdLoaderDelegate, NativeAdLoaderDelegate, NativeAdDelegate {
@@ -42,7 +54,11 @@ struct NativeAdView: UIViewRepresentable {
                 }
             }
         }
-        private var isLoadingInProgress = false
+        fileprivate var isLoadingInProgress = false
+        private var retryCount = 0
+        private var scheduledRetry: DispatchWorkItem?
+        private let baseRetryDelay: TimeInterval = 5
+        private let maxRetryDelay: TimeInterval = 60
         
         init(isLoading: Binding<Bool>, adUnitID: String) {
             _isLoading = isLoading
@@ -158,18 +174,27 @@ struct NativeAdView: UIViewRepresentable {
             isLoadingInProgress = false
             DispatchQueue.main.async {
                 self.isLoading = false
-                // Retry after 3 seconds if failed (but only once to avoid infinite loop)
-                if self.adLoader != nil && self.nativeAd == nil { // Only retry if loader still exists and no ad loaded
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) { [weak self] in
-                        guard let self = self, self.adLoader != nil, self.nativeAd == nil else { return }
-                        print("🔄 NativeAdView: Retrying ad load...")
-                        self.loadAd()
-                    }
-                }
             }
+            scheduleRetry()
+        }
+
+        private func scheduleRetry() {
+            // Exponential backoff retry until success, capped to avoid spamming
+            guard nativeAd == nil else { return }
+            retryCount += 1
+            let delay = min(maxRetryDelay, baseRetryDelay * pow(2.0, Double(max(retryCount - 1, 0))))
+            
+            scheduledRetry?.cancel()
+            let work = DispatchWorkItem { [weak self] in
+                guard let self = self else { return }
+                self.loadAd()
+            }
+            scheduledRetry = work
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: work)
+            print("🔄 NativeAdView: Scheduled retry in \(Int(delay))s (retry \(retryCount))")
         }
         
-        private func setupNativeAdView(nativeAd: NativeAd) {
+        fileprivate func setupNativeAdView(nativeAd: NativeAd) {
             guard let container = containerView else {
                 print("⚠️ NativeAdView: Container view is nil, cannot setup ad")
                 return

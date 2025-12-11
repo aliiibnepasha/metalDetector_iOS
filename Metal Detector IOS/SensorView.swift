@@ -175,17 +175,6 @@ struct SensorView: View {
             
             // Pre-load interstitial ad for future use
             adManager.loadGeneralInterstitial()
-            
-            // Show ad when sensor view appears (only first time, not on back navigation)
-            // Small delay to ensure view is fully loaded
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                if adManager.isInterstitialReady {
-                    adManager.showGeneralInterstitial(forView: "SensorView") {
-                        // Ad closed, continue with sensor view
-                        print("✅ SensorView: Ad dismissed, sensor view ready")
-                    }
-                }
-            }
         }
         .onDisappear {
             // Log phone backpress event (system back gesture)

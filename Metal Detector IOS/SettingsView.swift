@@ -525,10 +525,10 @@ struct SettingsRow: View {
                         .foregroundColor(.white)
                         .frame(width: 24, height: 24)
                 } else {
-                    Image(iconName)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 24, height: 24)
+                Image(iconName)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 24, height: 24)
                 }
                 
                 Text(title)

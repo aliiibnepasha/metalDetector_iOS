@@ -80,7 +80,7 @@ struct PaywallView: View {
                                     .foregroundColor(.white)
                             }
                             .padding(.trailing, 19)
-                            .padding(.top,30)
+                            .padding(.top,40)
                         }
                         
                         Spacer()
@@ -126,7 +126,7 @@ struct PaywallView: View {
                 Spacer()
                 
                 // Go Premium Button Section
-                VStack(spacing: 12) {
+                VStack(spacing: 1) {
                     // Go Premium Button (background from assets) with real price
                     Button(action: {
                         handlePurchase()
@@ -179,8 +179,8 @@ struct PaywallView: View {
                             .foregroundColor(.white)
                             .id(localizationManager.currentLanguage)
                     }
-                    .padding(.top,20)
-                    .padding(.bottom,20)
+                    .padding(.top,10)
+                    .padding(.bottom,10)
                     
                     // Restore Purchases Button
                     Button(action: {

@@ -47,6 +47,9 @@ struct Metal_Detector_IOSApp: App {
             FirebaseManager.logEvent("first_open")
             UserDefaults.standard.set(true, forKey: "has_logged_first_open")
         }
+
+        // Preload home banner early to reduce first paint latency
+        AdManager.shared.preloadHomeBanner()
     }
     
     var body: some Scene {

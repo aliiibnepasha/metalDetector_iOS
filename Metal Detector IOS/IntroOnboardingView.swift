@@ -197,9 +197,9 @@ struct IntroPageView: View {
             // Phone Image (positioned at top) - Reduced size with bottom gradient
             VStack(alignment: .center) {
                 ZStack(alignment: .bottom) {
-                    Image(pageData.imageName)
-                        .resizable()
-                        .scaledToFit()
+                Image(pageData.imageName)
+                    .resizable()
+                    .scaledToFit()
                         .frame(width: 280, height: 480)
                     
                     // Black gradient overlay at bottom of image

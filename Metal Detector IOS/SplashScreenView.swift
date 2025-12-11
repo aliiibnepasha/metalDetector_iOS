@@ -125,14 +125,14 @@ struct SplashScreenView: View {
         // Reset progress to 0%
         progress = 0.0
         
-        // Smooth animation from 0% to 100% - increased duration for ad loading
+        // Smooth animation from 0% to 100% - slightly longer to allow banner to load
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            withAnimation(.linear(duration: 4.5)) { // Increased from 3.0 to 4.5 seconds
+            withAnimation(.linear(duration: 5.5)) { // was 4.5s, slightly extended
                 progress = 1.0
             }
             
             // Navigate to intro1 after loading completes - give more time for ads to load
-            DispatchQueue.main.asyncAfter(deadline: .now() + 4.6) { // Increased from 3.1 to 4.6 seconds
+            DispatchQueue.main.asyncAfter(deadline: .now() + 5.7) { // was 4.6s
                 onComplete()
             }
         }

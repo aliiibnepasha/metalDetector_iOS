@@ -160,21 +160,22 @@ struct HomeView: View {
                 // Bottom Banner Ad (Fixed at bottom, doesn't scroll) - Only show if not premium
                 if !iapManager.isPremium {
                     ZStack {
-                        // Shimmer effect while ad is loading
-                        if isBottomAdLoading {
+                        if adManager.isHomeBannerReady {
+                            HomeBannerContainer()
+                                .frame(height: 50)
+                                .padding(.horizontal, 16)
+                        } else {
                             AdShimmerView()
                                 .frame(height: 50)
                                 .padding(.horizontal, 16)
                         }
-                        
-                        // Actual banner ad
-                        BannerAdView(adUnitID: AdConfig.bannerHome, isLoading: $isBottomAdLoading)
-                            .frame(height: 50)
-                            .padding(.horizontal, 16)
-                            .opacity(isBottomAdLoading ? 0 : 1)
                     }
                     .padding(.bottom, 8)
                     .background(Color.black) // Ensure background matches
+                    .onAppear {
+                        // Trigger preload if not already loaded
+                        adManager.preloadHomeBanner()
+                    }
                 }
             }
         }
@@ -183,6 +184,8 @@ struct HomeView: View {
             FirebaseManager.logEvent("home_screen_opened")
             // Pre-load interstitial ad when home view appears (for detector screen)
             adManager.loadGeneralInterstitial()
+            // Ensure home banner preload
+            adManager.preloadHomeBanner()
         }
     }
     

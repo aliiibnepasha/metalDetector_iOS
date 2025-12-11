@@ -12,9 +12,10 @@ import UIKit
 struct BannerAdView: UIViewRepresentable {
     let adUnitID: String
     @Binding var isLoading: Bool
+    private let retryDelay: TimeInterval = 5.0
     
     func makeCoordinator() -> Coordinator {
-        Coordinator(isLoading: $isLoading)
+        Coordinator(isLoading: $isLoading, retryDelay: retryDelay, adUnitID: adUnitID)
     }
     
     func makeUIView(context: Context) -> BannerView {
@@ -69,9 +70,14 @@ struct BannerAdView: UIViewRepresentable {
     
     class Coordinator: NSObject, BannerViewDelegate {
         @Binding var isLoading: Bool
+        private let retryDelay: TimeInterval
+        private let adUnitID: String
+        private var didRetry = false
         
-        init(isLoading: Binding<Bool>) {
+        init(isLoading: Binding<Bool>, retryDelay: TimeInterval, adUnitID: String) {
             _isLoading = isLoading
+            self.retryDelay = retryDelay
+            self.adUnitID = adUnitID
         }
         
         func bannerViewDidReceiveAd(_ bannerView: BannerView) {
@@ -90,6 +96,19 @@ struct BannerAdView: UIViewRepresentable {
                 // Log ad failed event
                 if bannerView.adUnitID == AdConfig.bannerSplash {
                     FirebaseManager.logAdEvent("splash", placement: "splash", adType: "banner", status: "failed")
+                }
+            }
+            
+            // Lightweight single retry after a short delay to improve show rate without spamming requests
+            if !didRetry {
+                didRetry = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + retryDelay) { [weak self, weak bannerView] in
+                    guard let self = self, let bannerView = bannerView else { return }
+                    DispatchQueue.main.async {
+                        self.isLoading = true
+                    }
+                    let request = Request()
+                    bannerView.load(request)
                 }
             }
         }

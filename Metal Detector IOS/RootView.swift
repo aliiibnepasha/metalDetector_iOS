@@ -94,66 +94,66 @@ struct RootView: View {
                         .navigationBarHidden(true)
                     case .detector(let title):
                         Group {
-                            if title == "Handled Detector" {
-                                HandledDetectorView(
-                                    onBackTap: {
-                                        popOrStay()
-                                    }
-                                )
-                                .navigationBarBackButtonHidden(true)
-                                .navigationBarHidden(true)
+                        if title == "Handled Detector" {
+                            HandledDetectorView(
+                                onBackTap: {
+                                    popOrStay()
+                                }
+                            )
+                            .navigationBarBackButtonHidden(true)
+                            .navigationBarHidden(true)
                                 .onAppear {
                                     FirebaseManager.logEvent("handled_detector_opened")
                                 }
-                            } else if title == "Digital Compass" {
-                                CompassDetectorView(
-                                    onBackTap: {
-                                        popOrStay()
-                                    }
-                                )
-                                .navigationBarBackButtonHidden(true)
-                                .navigationBarHidden(true)
+                        } else if title == "Digital Compass" {
+                            CompassDetectorView(
+                                onBackTap: {
+                                    popOrStay()
+                                }
+                            )
+                            .navigationBarBackButtonHidden(true)
+                            .navigationBarHidden(true)
                                 .onAppear {
                                     FirebaseManager.logEvent("digital_compass_opened")
                                 }
-                            } else if title == "Bubble level" {
-                                BubbleLevelView(
-                                    onBackTap: {
-                                        popOrStay()
-                                    }
-                                )
-                                .navigationBarBackButtonHidden(true)
-                                .navigationBarHidden(true)
+                        } else if title == "Bubble level" {
+                            BubbleLevelView(
+                                onBackTap: {
+                                    popOrStay()
+                                }
+                            )
+                            .navigationBarBackButtonHidden(true)
+                            .navigationBarHidden(true)
                                 .onAppear {
                                     FirebaseManager.logEvent("bubble_level_opened")
                                 }
-                            } else {
-                                DetectorView(
-                                    detectorTitle: title,
-                                    onBackTap: {
-                                        popOrStay()
-                                    },
-                                    onMeterViewTap: {
-                                        navigationPath.append(IntroRoute.meterView)
-                                    },
-                                    onGraphViewTap: {
-                                        navigationPath.append(IntroRoute.graphView)
-                                    },
-                                    onDigitalViewTap: {
-                                        navigationPath.append(IntroRoute.digitalView)
-                                    },
-                                    onSensorViewTap: {
-                                        navigationPath.append(IntroRoute.sensorView)
-                                    },
-                                    onCalibrationViewTap: {
-                                        navigationPath.append(IntroRoute.calibrationView)
-                                    },
-                                    onMagneticViewTap: {
-                                        navigationPath.append(IntroRoute.magneticView)
-                                    }
-                                )
-                                .navigationBarBackButtonHidden(true)
-                                .navigationBarHidden(true)
+                        } else {
+                            DetectorView(
+                                detectorTitle: title,
+                                onBackTap: {
+                                    popOrStay()
+                                },
+                                onMeterViewTap: {
+                                    navigationPath.append(IntroRoute.meterView)
+                                },
+                                onGraphViewTap: {
+                                    navigationPath.append(IntroRoute.graphView)
+                                },
+                                onDigitalViewTap: {
+                                    navigationPath.append(IntroRoute.digitalView)
+                                },
+                                onSensorViewTap: {
+                                    navigationPath.append(IntroRoute.sensorView)
+                                },
+                                onCalibrationViewTap: {
+                                    navigationPath.append(IntroRoute.calibrationView)
+                                },
+                                onMagneticViewTap: {
+                                    navigationPath.append(IntroRoute.magneticView)
+                                }
+                            )
+                            .navigationBarBackButtonHidden(true)
+                            .navigationBarHidden(true)
                                 .onAppear {
                                     // Log detector opened events based on title
                                     if title == "Gold Detector" {

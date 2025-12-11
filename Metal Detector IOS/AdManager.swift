@@ -15,10 +15,34 @@ class AdManager: NSObject, ObservableObject {
     
     @Published var isInterstitialReady = false
     @Published var isLoadingInterstitial = false
+    @Published var isHomeBannerReady = false
+    @Published var isHomeBannerLoading = false
     
     private var splashInterstitialWrapper: InterstitialAdWrapper?
     private var generalInterstitialWrapper: InterstitialAdWrapper?
+    var homeBannerView: BannerView?
     private var iapManager = IAPManager.shared
+    
+    // Backoff / cooldown for general interstitials to protect match rate
+    private var generalRetryCount = 0
+    private var generalNextAllowedLoad: Date = .distantPast
+    private let generalBaseCooldown: TimeInterval = 5       // seconds
+    private let generalMaxCooldown: TimeInterval = 60       // seconds
+    private var scheduledGeneralRetry: DispatchWorkItem?
+
+    // Backoff / cooldown for splash interstitials
+    private var splashRetryCount = 0
+    private var splashNextAllowedLoad: Date = .distantPast
+    private let splashBaseCooldown: TimeInterval = 5
+    private let splashMaxCooldown: TimeInterval = 60
+    private var scheduledSplashRetry: DispatchWorkItem?
+    
+    // Backoff for home banner
+    private var homeBannerRetryCount = 0
+    private var homeBannerNextAllowedLoad: Date = .distantPast
+    private let homeBannerBaseCooldown: TimeInterval = 5
+    private let homeBannerMaxCooldown: TimeInterval = 60
+    private var scheduledHomeBannerRetry: DispatchWorkItem?
     
     // Track which views have already shown an ad in this session
     private var viewsThatShowedAd: Set<String> = []
@@ -59,8 +83,23 @@ class AdManager: NSObject, ObservableObject {
             return
         }
         
-        guard splashInterstitialWrapper == nil || !isInterstitialReady else {
+        // If already loaded, skip
+        if splashInterstitialWrapper != nil, isInterstitialReady {
             print("✅ AdManager: Splash interstitial already loaded")
+            return
+        }
+
+        // If currently loading, skip
+        if isLoadingInterstitial {
+            print("ℹ️ AdManager: Splash interstitial load already in progress")
+            return
+        }
+
+        // Respect cooldown/backoff to protect match rate
+        let now = Date()
+        if now < splashNextAllowedLoad {
+            let wait = splashNextAllowedLoad.timeIntervalSince(now)
+            print("⏳ AdManager: In cooldown (\(Int(wait))s) before requesting splash interstitial")
             return
         }
         
@@ -77,14 +116,65 @@ class AdManager: NSObject, ObservableObject {
                 if loaded {
                     print("✅ AdManager: Splash interstitial loaded successfully")
                     FirebaseManager.logAdEvent("splash", placement: "splash", adType: "fullscreen", status: "loaded")
+                    self?.splashRetryCount = 0
+                    self?.splashNextAllowedLoad = Date()
                 } else {
                     print("❌ AdManager: Splash interstitial failed to load")
                     FirebaseManager.logAdEvent("splash", placement: "splash", adType: "fullscreen", status: "failed")
+                    self?.scheduleSplashRetry()
                 }
             }
         }
         
         splashInterstitialWrapper?.load()
+    }
+    
+    // MARK: - Preload Home Banner (single cached banner)
+    func preloadHomeBanner() {
+        // Don't load ads if user is premium
+        guard !isPremium else {
+            print("✅ AdManager: User is premium, skipping home banner")
+            return
+        }
+        
+        // If already loaded, skip
+        if isHomeBannerReady {
+            print("✅ AdManager: Home banner already loaded")
+            return
+        }
+        
+        // If currently loading, skip
+        if isHomeBannerLoading {
+            print("ℹ️ AdManager: Home banner load already in progress")
+            return
+        }
+        
+        // Respect cooldown/backoff
+        let now = Date()
+        if now < homeBannerNextAllowedLoad {
+            let wait = homeBannerNextAllowedLoad.timeIntervalSince(now)
+            print("⏳ AdManager: In cooldown (\(Int(wait))s) before requesting home banner")
+            return
+        }
+        
+        isHomeBannerLoading = true
+        isHomeBannerReady = false
+        
+        let banner = BannerView(adSize: AdSizeBanner)
+        banner.adUnitID = AdConfig.bannerHome
+        banner.delegate = self
+        
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let rootViewController = windowScene.windows.first?.rootViewController {
+            banner.rootViewController = rootViewController
+        }
+        
+        FirebaseManager.logAdEvent("home", placement: "home", adType: "banner", status: "requested")
+        
+        let request = Request()
+        banner.load(request)
+        
+        self.homeBannerView = banner
     }
     
     // MARK: - Show Splash Interstitial Ad
@@ -137,19 +227,47 @@ class AdManager: NSObject, ObservableObject {
             return
         }
         
-        guard generalInterstitialWrapper == nil || !isInterstitialReady else {
+        // If ad is already loaded, skip
+        if generalInterstitialWrapper != nil, isInterstitialReady {
             print("✅ AdManager: General interstitial already loaded")
+            return
+        }
+        
+        // If currently loading, skip
+        if isLoadingInterstitial {
+            print("ℹ️ AdManager: General interstitial load already in progress")
+            return
+        }
+        
+        // Respect cooldown/backoff to protect match rate
+        let now = Date()
+        if now < generalNextAllowedLoad {
+            let wait = generalNextAllowedLoad.timeIntervalSince(now)
+            print("⏳ AdManager: In cooldown (\(Int(wait))s) before requesting general interstitial")
             return
         }
         
         isLoadingInterstitial = true
         isInterstitialReady = false
         
+        // Log ad requested event
+        FirebaseManager.logAdEvent("general", placement: "general", adType: "fullscreen", status: "requested")
+        
         generalInterstitialWrapper = InterstitialAdWrapper(adUnitID: AdConfig.interstitial) { [weak self] loaded in
             DispatchQueue.main.async {
                 self?.isInterstitialReady = loaded
                 self?.isLoadingInterstitial = false
-                print(loaded ? "✅ AdManager: General interstitial loaded successfully" : "❌ AdManager: General interstitial failed to load")
+                
+                if loaded {
+                    print("✅ AdManager: General interstitial loaded successfully")
+                    FirebaseManager.logAdEvent("general", placement: "general", adType: "fullscreen", status: "loaded")
+                    self?.generalRetryCount = 0
+                    self?.generalNextAllowedLoad = Date() // immediately eligible to show
+                } else {
+                    print("❌ AdManager: General interstitial failed to load")
+                    FirebaseManager.logAdEvent("general", placement: "general", adType: "fullscreen", status: "failed")
+                    self?.scheduleGeneralRetry()
+                }
             }
         }
         
@@ -229,6 +347,77 @@ class AdManager: NSObject, ObservableObject {
         }
         
         return topController
+    }
+    
+    // MARK: - Backoff helpers
+    private func scheduleGeneralRetry() {
+        generalRetryCount += 1
+        let delay = min(generalMaxCooldown, generalBaseCooldown * pow(2.0, Double(generalRetryCount - 1)))
+        generalNextAllowedLoad = Date().addingTimeInterval(delay)
+        
+        scheduledGeneralRetry?.cancel()
+        let work = DispatchWorkItem { [weak self] in
+            self?.loadGeneralInterstitial()
+        }
+        scheduledGeneralRetry = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: work)
+        print("🔁 AdManager: Scheduled general interstitial retry in \(Int(delay))s (retry \(generalRetryCount))")
+    }
+
+    private func scheduleSplashRetry() {
+        splashRetryCount += 1
+        let delay = min(splashMaxCooldown, splashBaseCooldown * pow(2.0, Double(splashRetryCount - 1)))
+        splashNextAllowedLoad = Date().addingTimeInterval(delay)
+
+        scheduledSplashRetry?.cancel()
+        let work = DispatchWorkItem { [weak self] in
+            self?.loadSplashInterstitial()
+        }
+        scheduledSplashRetry = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: work)
+        print("🔁 AdManager: Scheduled splash interstitial retry in \(Int(delay))s (retry \(splashRetryCount))")
+    }
+}
+
+// MARK: - BannerViewDelegate for home banner caching
+extension AdManager: BannerViewDelegate {
+    func bannerViewDidReceiveAd(_ bannerView: BannerView) {
+        if bannerView == homeBannerView {
+            DispatchQueue.main.async {
+                self.isHomeBannerReady = true
+                self.isHomeBannerLoading = false
+                self.homeBannerRetryCount = 0
+                self.homeBannerNextAllowedLoad = Date()
+                FirebaseManager.logAdEvent("home", placement: "home", adType: "banner", status: "loaded")
+                print("✅ AdManager: Home banner loaded")
+            }
+        }
+    }
+    
+    func bannerView(_ bannerView: BannerView, didFailToReceiveAdWithError error: Error) {
+        if bannerView == homeBannerView {
+            DispatchQueue.main.async {
+                self.isHomeBannerReady = false
+                self.isHomeBannerLoading = false
+                FirebaseManager.logAdEvent("home", placement: "home", adType: "banner", status: "failed")
+                self.scheduleHomeBannerRetry()
+                print("❌ AdManager: Home banner failed: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    private func scheduleHomeBannerRetry() {
+        homeBannerRetryCount += 1
+        let delay = min(homeBannerMaxCooldown, homeBannerBaseCooldown * pow(2.0, Double(homeBannerRetryCount - 1)))
+        homeBannerNextAllowedLoad = Date().addingTimeInterval(delay)
+        
+        scheduledHomeBannerRetry?.cancel()
+        let work = DispatchWorkItem { [weak self] in
+            self?.preloadHomeBanner()
+        }
+        scheduledHomeBannerRetry = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: work)
+        print("🔁 AdManager: Scheduled home banner retry in \(Int(delay))s (retry \(homeBannerRetryCount))")
     }
 }
 

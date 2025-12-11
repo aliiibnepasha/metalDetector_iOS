@@ -278,7 +278,7 @@ class MetalDetectorManager: ObservableObject {
             DispatchQueue.main.async {
                 if !self.isMetalDetected {
                     // Metal just detected - log detection event
-                    self.isMetalDetected = true
+                self.isMetalDetected = true
                     self.logDetectionEvent(isDetected: true)
                 }
             }

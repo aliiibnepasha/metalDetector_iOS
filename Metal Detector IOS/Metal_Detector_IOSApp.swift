@@ -17,6 +17,7 @@ import Adjust
 @main
 struct Metal_Detector_IOSApp: App {
     @StateObject private var firebaseManager = FirebaseManager.shared
+    @Environment(\.scenePhase) private var scenePhase
     
     init() {
         // Firebase will be configured in FirebaseManager
@@ -66,6 +67,11 @@ struct Metal_Detector_IOSApp: App {
                         ATTManager.shared.requestTrackingPermission { status in
                             print("📊 ATT Status: \(status.rawValue)")
                         }
+                    }
+                }
+                .onChange(of: scenePhase) { _, newPhase in
+                    if newPhase == .active {
+                        AdManager.shared.maybeShowForegroundInterstitial()
                     }
                 }
         }

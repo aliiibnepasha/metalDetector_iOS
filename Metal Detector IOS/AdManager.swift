@@ -43,6 +43,11 @@ class AdManager: NSObject, ObservableObject {
     private let homeBannerBaseCooldown: TimeInterval = 5
     private let homeBannerMaxCooldown: TimeInterval = 60
     private var scheduledHomeBannerRetry: DispatchWorkItem?
+
+    // Foreground interstitial gating
+    private var hasSeenFirstForeground = false
+    private var lastForegroundShow: Date = .distantPast
+    private let foregroundMinInterval: TimeInterval = 120 // seconds between foreground shows
     
     // Track which views have already shown an ad in this session
     private var viewsThatShowedAd: Set<String> = []
@@ -418,6 +423,31 @@ extension AdManager: BannerViewDelegate {
         scheduledHomeBannerRetry = work
         DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: work)
         print("🔁 AdManager: Scheduled home banner retry in \(Int(delay))s (retry \(homeBannerRetryCount))")
+    }
+
+    // MARK: - Foreground interstitial (on resume)
+    func maybeShowForegroundInterstitial() {
+        guard !isPremium else { return }
+        
+        // Skip first activation after app launch
+        if !hasSeenFirstForeground {
+            hasSeenFirstForeground = true
+            return
+        }
+        
+        let now = Date()
+        if now.timeIntervalSince(lastForegroundShow) < foregroundMinInterval {
+            print("⏳ AdManager: Foreground interstitial gated by interval")
+            return
+        }
+        
+        // If ready, show; else trigger a load
+        if isInterstitialReady {
+            showGeneralInterstitial(forView: nil) { }
+            lastForegroundShow = now
+        } else {
+            loadGeneralInterstitial()
+        }
     }
 }
 

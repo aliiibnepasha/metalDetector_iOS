@@ -80,6 +80,7 @@ struct PaywallView: View {
                                     .foregroundColor(.white)
                             }
                             .padding(.trailing, 19)
+                            .padding(.top,30)
                         }
                         
                         Spacer()
@@ -120,6 +121,7 @@ struct PaywallView: View {
                     .padding(.horizontal, 16)
                 }
                 .padding(.top, 40)
+                .padding(.bottom, 40)
                 
                 Spacer()
                 
@@ -149,7 +151,7 @@ struct PaywallView: View {
                                     .progressViewStyle(CircularProgressViewStyle(tint: Color(red: 21/255, green: 21/255, blue: 21/255)))
                             } else if let product = iapManager.monthlyProduct {
                                 // Show "Get premium for" + real price from StoreKit
-                                Text("\(LocalizedString.getPremium.localized) for \(product.displayPrice)/\(LocalizedString.month.localized)")
+                                Text("\(LocalizedString.getPremium.localized) for \(product.displayPrice)")
                                     .font(.custom("Manrope_Bold", size: 16))
                                     .foregroundColor(Color(red: 21/255, green: 21/255, blue: 21/255))
                                     .id(localizationManager.currentLanguage + "_premium_price")
@@ -170,13 +172,15 @@ struct PaywallView: View {
                     Button(action: {
                         // Log continue for free event
                         FirebaseManager.logEvent("paywall_continue_free")
-                        onContinueFree()
+                        onClose()
                     }) {
                         Text(LocalizedString.orContinueForFree.localized)
                             .font(.system(size: 14, weight: .medium))
                             .foregroundColor(.white)
                             .id(localizationManager.currentLanguage)
                     }
+                    .padding(.top,20)
+                    .padding(.bottom,20)
                     
                     // Restore Purchases Button
                     Button(action: {
@@ -197,7 +201,9 @@ struct PaywallView: View {
                                 .id(localizationManager.currentLanguage + (isRestoring ? "_restoring" : "_restore"))
                         }
                         .foregroundColor(.white.opacity(0.6))
+                       
                     }
+                    .padding(.bottom,20)
                     .disabled(isRestoring)
                 }
                 .padding(.horizontal, 16)

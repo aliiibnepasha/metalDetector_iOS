@@ -32,7 +32,7 @@
 
 /* Begin PBXFileReference section */
 		5D888A312EE029090057C2CF /* AppTrackingTransparency.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppTrackingTransparency.framework; path = System/Library/Frameworks/AppTrackingTransparency.framework; sourceTree = SDKROOT; };
-		5DE395282ED824A300672CDC /* Metal Detector IOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Metal Detector IOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		5DE395282ED824A300672CDC /* Metal Detector.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Metal Detector.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -95,7 +95,7 @@
 		5DE395292ED824A300672CDC /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				5DE395282ED824A300672CDC /* Metal Detector IOS.app */,
+				5DE395282ED824A300672CDC /* Metal Detector.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -103,9 +103,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		5DE395272ED824A300672CDC /* Metal Detector IOS */ = {
+		5DE395272ED824A300672CDC /* Metal Detector */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 5DE395332ED824A400672CDC /* Build configuration list for PBXNativeTarget "Metal Detector IOS" */;
+			buildConfigurationList = 5DE395332ED824A400672CDC /* Build configuration list for PBXNativeTarget "Metal Detector" */;
 			buildPhases = (
 				5DE395242ED824A300672CDC /* Sources */,
 				5DE395252ED824A300672CDC /* Frameworks */,
@@ -118,7 +118,7 @@
 			fileSystemSynchronizedGroups = (
 				5DE3952A2ED824A300672CDC /* Metal Detector IOS */,
 			);
-			name = "Metal Detector IOS";
+			name = "Metal Detector";
 			packageProductDependencies = (
 				5DE395422ED826D000672CDC /* Lottie */,
 				5D8888E92EDDF1900057C2CF /* FirebaseAnalytics */,
@@ -142,7 +142,7 @@
 				5DBDEF442EE9A9D600B7F9D8 /* AdjustSdk */,
 			);
 			productName = "Metal Detector IOS";
-			productReference = 5DE395282ED824A300672CDC /* Metal Detector IOS.app */;
+			productReference = 5DE395282ED824A300672CDC /* Metal Detector.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -199,7 +199,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				5DE395272ED824A300672CDC /* Metal Detector IOS */,
+				5DE395272ED824A300672CDC /* Metal Detector */,
 			);
 		};
 /* End PBXProject section */
@@ -352,7 +352,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = V5QZS9L352;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -369,7 +369,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.lowbytestudio.MetalDetector;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -388,7 +388,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = V5QZS9L352;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -405,7 +405,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.lowbytestudio.MetalDetector;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -430,7 +430,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		5DE395332ED824A400672CDC /* Build configuration list for PBXNativeTarget "Metal Detector IOS" */ = {
+		5DE395332ED824A400672CDC /* Build configuration list for PBXNativeTarget "Metal Detector" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				5DE395342ED824A400672CDC /* Debug */,

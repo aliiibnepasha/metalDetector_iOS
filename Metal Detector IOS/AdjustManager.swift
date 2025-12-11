@@ -8,10 +8,8 @@
 //
 
 import Foundation
+import AdjustSdk
 
-#if canImport(Adjust)
-import Adjust
-#endif
 
 final class AdjustManager {
     static let shared = AdjustManager()
@@ -20,25 +18,22 @@ final class AdjustManager {
     /// Initialize Adjust. Replace `YOUR_ADJUST_APP_TOKEN` once you have it.
     /// Call this once on app launch.
     func start() {
-        #if canImport(Adjust)
+      
         // TODO: Replace with the real app token when available.
-        let appToken = "YOUR_ADJUST_APP_TOKEN"
+        let appToken = "2era6fmhgo00"
         // Use `.production` when you are ready for release builds.
-        let environment = ADJEnvironmentSandbox
+        let environment = ADJEnvironmentProduction
 
-        guard let config = ADJConfig(appToken: appToken, environment: environment) else {
+        guard let adjustConfig = ADJConfig(appToken: appToken, environment: environment) else {
             print("⚠️ Adjust: Failed to create config")
             return
         }
 
         // Optional: enable logs during integration
-        config.logLevel = ADJLogLevelInfo
-
-        Adjust.appDidLaunch(config)
+        adjustConfig.logLevel = ADJLogLevel.info
+        Adjust.initSdk(adjustConfig)
         print("✅ Adjust: Initialized (env: \(environment))")
-        #else
-        print("ℹ️ Adjust: SDK not added yet. Add via SPM/Pods, then set the app token.")
-        #endif
+
     }
 
     /// Track a generic event by token (token is created in the Adjust dashboard).

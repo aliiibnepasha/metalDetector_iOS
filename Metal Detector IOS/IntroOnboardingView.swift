@@ -10,6 +10,8 @@ import SwiftUI
 struct IntroOnboardingView: View {
     @State private var currentPage = 0
     @ObservedObject private var localizationManager = LocalizationManager.shared
+    @StateObject private var iapManager = IAPManager.shared
+    @State private var isOnboardingAdLoading = true
     var onGetStarted: () -> Void
     
     var introPages: [IntroPage] {
@@ -55,8 +57,10 @@ struct IntroOnboardingView: View {
                 Spacer()
                     .frame(minHeight: 20)
                 
-                VStack(spacing: 24) {
-                    // Pagination Dots
+                VStack(spacing: 18) {
+                    Spacer().frame(height: 8)
+                    
+                    // Pagination Dots (raised)
                     HStack(spacing: 9.76) {
                         ForEach(0..<3) { index in
                             Circle()
@@ -65,12 +69,11 @@ struct IntroOnboardingView: View {
                                 .animation(.smooth(duration: 0.3), value: currentPage)
                         }
                     }
-                    .padding(.top, 48)
+                    .padding(.top, 32)
                     
-                    // Action Button (stays in same place, text changes)
+                    // Action Button (raised)
                     Button(action: {
                         if currentPage < introPages.count - 1 {
-                            // Log next events based on current page
                             if currentPage == 0 {
                                 FirebaseManager.logEvent("onboarding_first_next")
                             } else if currentPage == 1 {
@@ -81,20 +84,17 @@ struct IntroOnboardingView: View {
                                 currentPage += 1
                             }
                         } else {
-                            // Log onboarding to home transition
                             FirebaseManager.logEvent("oboarding_to_home")
                             onGetStarted()
                         }
                     }) {
                         ZStack {
-                            // Button background from assets (same as paywall)
                             Image("Go Premium Button Background")
                                 .resizable()
                                 .scaledToFill()
                                 .frame(width: 275, height: 44)
                                 .clipShape(RoundedRectangle(cornerRadius: 18.76))
                             
-                            // Button text (changes based on page)
                             Text(currentPage < introPages.count - 1 ? LocalizedString.next.localized : LocalizedString.getStarted.localized)
                                 .font(.custom("Manrope_Bold", size: 16))
                                 .foregroundColor(.black)
@@ -103,9 +103,26 @@ struct IntroOnboardingView: View {
                                 .id(localizationManager.currentLanguage)
                         }
                     }
+                    
+                    // Native Ad below button (non-premium only)
+                    if !iapManager.isPremium {
+                        ZStack {
+                            if isOnboardingAdLoading {
+                                AdShimmerView()
+                                    .frame(height: 120)
+                                    .padding(.horizontal, 16)
+                            }
+                            
+                            NativeAdView(adUnitID: AdConfig.nativeOnboarding, isLoading: $isOnboardingAdLoading)
+                                .frame(height: 120)
+                                .padding(.horizontal, 16)
+                                .opacity(isOnboardingAdLoading ? 0 : 1)
+                        }
+                        .padding(.top, 6)
+                    }
                 }
-                .padding(.bottom, 40)
-                .padding(.horizontal, 36)
+                .padding(.bottom, 24)
+                .padding(.horizontal, 24)
             }
         }
         .overlay(
@@ -238,8 +255,7 @@ struct IntroPageView: View {
             // Content Section (bottom) - Title and Description only
             VStack {
                 Spacer()
-                
-                VStack(spacing: 14.76) {
+                VStack(spacing: 8) {
                     // Title - Direct localized strings based on page index
                     if pageIndex == 0 {
                         Text(LocalizedString.metalDetectorGoldFinder.localized)
@@ -285,7 +301,7 @@ struct IntroPageView: View {
                             .id("description_\(localizationManager.currentLanguage)_\(pageIndex)")
                     }
                 }
-                .padding(.bottom, 150) // add extra spacing between text block and pagination dots
+                .padding(.bottom, 260) // raise text block higher
                 .padding(.horizontal, 36)
             }
         }

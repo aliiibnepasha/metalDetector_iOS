@@ -28,9 +28,11 @@ struct BubbleLevelView: View {
                 HStack {
                     // Back Button
                     Button(action: {
-                        // Log backpress event
-                        FirebaseManager.logEvent("bubble_level_ui_backpress")
-                        onBackTap()
+                        adManager.handleClickTriggeredInterstitial(context: "bubble_back") {
+                            // Log backpress event
+                            FirebaseManager.logEvent("bubble_level_ui_backpress")
+                            onBackTap()
+                        }
                     }) {
                         Image(systemName: "chevron.left")
                             .font(.system(size: 20, weight: .semibold))

@@ -28,12 +28,14 @@ struct SensorView: View {
                 HStack(spacing: 6) {
                     // Back Button
                     Button(action: {
-                        // Log backpress event
-                        let detectorPrefix = getDetectorPrefix()
-                        if !detectorPrefix.isEmpty {
-                            FirebaseManager.logEvent("\(detectorPrefix)_sensor_view_ui_backpress")
+                        adManager.handleClickTriggeredInterstitial(context: "sensor_back") {
+                            // Log backpress event
+                            let detectorPrefix = getDetectorPrefix()
+                            if !detectorPrefix.isEmpty {
+                                FirebaseManager.logEvent("\(detectorPrefix)_sensor_view_ui_backpress")
+                            }
+                            onBackTap()
                         }
-                        onBackTap()
                     }) {
                         Image(systemName: "chevron.left")
                             .font(.system(size: 20, weight: .semibold))

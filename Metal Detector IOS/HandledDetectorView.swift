@@ -29,9 +29,11 @@ struct HandledDetectorView: View {
                 HStack {
                     // Back Button
                     Button(action: {
-                        // Log backpress event
-                        FirebaseManager.logEvent("handle_detector_ui_backpress")
-                        onBackTap()
+                        adManager.handleClickTriggeredInterstitial(context: "handled_back") {
+                            // Log backpress event
+                            FirebaseManager.logEvent("handle_detector_ui_backpress")
+                            onBackTap()
+                        }
                     }) {
                         Image(systemName: "chevron.left")
                             .font(.system(size: 20, weight: .semibold))

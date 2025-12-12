@@ -28,9 +28,11 @@ struct CompassDetectorView: View {
                 HStack {
                     // Back Button
                     Button(action: {
-                        // Log backpress event
-                        FirebaseManager.logEvent("digital_compass_ui_backpress")
-                        onBackTap()
+                        adManager.handleClickTriggeredInterstitial(context: "compass_back") {
+                            // Log backpress event
+                            FirebaseManager.logEvent("digital_compass_ui_backpress")
+                            onBackTap()
+                        }
                     }) {
                         Image(systemName: "chevron.left")
                             .font(.system(size: 20, weight: .semibold))
